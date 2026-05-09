@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fire Sprinkler Calculator</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #111827;
+      color: white;
+    }
+
+    header {
+      padding: 60px 20px;
+      text-align: center;
+      background: #dc2626;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .hero-text {
+      font-size: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .container {
+      padding: 40px 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: #1f2937;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      background: #dc2626;
+      color: white;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #b91c1c;
+    }
+
+    .results {
+      margin-top: 30px;
+      line-height: 2;
+      font-size: 18px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Fire Sprinkler Material Calculator</h1>
+  <p class="hero-text">
+    Fast sprinkler estimating and material list generation for contractors.
+  </p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Quick Estimate Calculator</h2>
+
+    <label>Number of Sprinkler Heads</label>
+    <input type="number" id="heads" placeholder="Enter number of heads">
+
+    <label>Feet of 2” Pipe</label>
+    <input type="number" id="pipe" placeholder="Enter feet of pipe">
+
+    <button onclick="calculateMaterials()">Generate Material List</button>
+
+    <div class="results" id="results"></div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Fire Sprinkler Calculator
+</footer>
+
+<script>
+  function calculateMaterials() {
+
+    const heads = parseInt(document.getElementById('heads').value) || 0;
+    const pipe = parseInt(document.getElementById('pipe').value) || 0;
+
+    const couplings = Math.ceil(pipe / 10);
+    const hangers = Math.ceil(pipe / 12);
+    const mechTees = heads;
+
+    document.getElementById('results').innerHTML = `
+      <h3>Estimated Material List</h3>
+
+      <p>Sprinkler Heads: ${heads}</p>
+      <p>2" Pipe: ${pipe} ft</p>
+      <p>2" Couplings: ${couplings}</p>
+      <p>2" Hangers: ${hangers}</p>
+      <p>2"x1/2" Mechanical Tees: ${mechTees}</p>
+    `;
+  }
+</script>
+
+</body>
+</html>
