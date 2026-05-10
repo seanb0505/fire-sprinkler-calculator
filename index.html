@@ -250,12 +250,14 @@
     const mechanicalTees = newHeads;
 
     const oneInchPipeFeet = totalHeads * 3;
-    const oneInchElbows = totalHeads;
-    const oneInchNipples = totalHeads;
+    const oneInch90s = totalHeads * 3;
+    const oneByTwoNipples = totalHeads;
+    const hangers = totalHeads;
+    const rodAssemblies = totalHeads;
     const escutcheons = totalHeads;
 
     const branchPipeFeet = newHeads * 4;
-    const branchCouplings = Math.ceil(branchPipeFeet / 21);
+    const branchCouplings = newHeads > 0 ? Math.ceil(branchPipeFeet / 21) : 0;
 
     const totalLabourHours = totalHeads * hoursPerHead;
     const labourTotal = totalLabourHours * labourRate;
@@ -296,7 +298,7 @@
       <tr>
         <td>1&quot; Threaded Drop Assemblies</td>
         <td>${dropAssemblies}</td>
-        <td>Each assembly includes 1&quot; pipe, elbow, nipple, and head connection</td>
+        <td>Each drop assembly includes threaded pipe, 90s, nipple, hanger, and rod assembly</td>
       </tr>
       <tr>
         <td>1&quot; Threaded Pipe</td>
@@ -304,14 +306,24 @@
         <td>Estimated at 3 ft per pendant drop</td>
       </tr>
       <tr>
-        <td>1&quot; Threaded Elbows</td>
-        <td>${oneInchElbows}</td>
-        <td>One per drop assembly</td>
+        <td>1&quot; Threaded 90s</td>
+        <td>${oneInch90s}</td>
+        <td>Three 90s per drop</td>
       </tr>
       <tr>
-        <td>1&quot; Threaded Nipples</td>
-        <td>${oneInchNipples}</td>
-        <td>One per pendant head</td>
+        <td>1&quot; x 2&quot; Nipples</td>
+        <td>${oneByTwoNipples}</td>
+        <td>One per drop</td>
+      </tr>
+      <tr>
+        <td>Hangers</td>
+        <td>${hangers}</td>
+        <td>One hanger per drop</td>
+      </tr>
+      <tr>
+        <td>Rod Assemblies</td>
+        <td>${rodAssemblies}</td>
+        <td>One rod assembly per drop</td>
       </tr>
       <tr>
         <td>Escutcheons</td>
@@ -331,7 +343,7 @@
       <tr>
         <td>${branchPipeSize}&quot; Grooved Couplings</td>
         <td>${branchCouplings}</td>
-        <td>For branch pipe only. No 1&quot; couplings included.</td>
+        <td>Only included when new branch piping is required. No couplings for drop-only work.</td>
       </tr>
     `;
   }
