@@ -1,247 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sprinkler Takeoff</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fire Sprinkler Estimator</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px;
+      background: #111827;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    header p {
+      color: #cbd5e1;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #38bdf8;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      color: #e5e7eb;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #38bdf8;
+      color: #0f172a;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #334155;
+      text-align: left;
+    }
+
+    th {
+      color: #38bdf8;
+    }
+
+    .summary {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .note {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
   <h1>Fire Sprinkler Estimator</h1>
-  <p>Material & Labour Estimating for Sprinkler Contractors</p>
+  <p>Estimate sprinkler drops, relocates, materials, labour, and pricing.</p>
 </header>
 
-<main class="container">
+<div class="container">
 
-  <section class="card">
-    <h2>Estimate Setup</h2>
+  <div class="grid">
 
-    <label>Job Type</label>
-    <select id="jobType">
-      <option value="new">New Install</option>
-      <option value="relocate">Relocate Existing Heads</option>
-      <option value="service">Service Call</option>
-      <option value="mixed">Mixed Job</option>
-    </select>
+    <div class="card">
+      <h2>Job Information</h2>
 
-    <label>Head Type</label>
-    <select id="headType">
-      <option value="pendent">Pendent</option>
-      <option value="upright">Upright</option>
-      <option value="sidewall">Sidewall</option>
-      <option value="concealed">Concealed</option>
-    </select>
+      <label>Project Name</label>
+      <input type="text" id="projectName" placeholder="Example: Office Renovation" />
 
-    <label>Drop Type</label>
-    <select id="dropType">
-      <option value="hardpipe">Hard Pipe Drop</option>
-      <option value="flex">Flexible Drop</option>
-    </select>
+      <label>Job Type</label>
+      <select id="jobType">
+        <option>Small Contract</option>
+        <option>Large Contract</option>
+        <option>Service Job</option>
+        <option>Tenant Improvement</option>
+      </select>
 
-    <label>Drop Pipe Size</label>
-    <select id="dropPipeSize">
-      <option value='1"'>1"</option>
-      <option value='3/4"'>3/4"</option>
-      <option value='1/2"'>1/2"</option>
-    </select>
+      <label>Location</label>
+      <input type="text" id="location" placeholder="Example: Barrie, ON" />
+    </div>
 
-    <label>Branch Pipe Size</label>
-    <select id="branchPipeSize">
-      <option value='1"'>1"</option>
-      <option value='1-1/4"'>1-1/4"</option>
-      <option value='1-1/2"'>1-1/2"</option>
-      <option value='2"'>2"</option>
-    </select>
+    <div class="card">
+      <h2>Sprinkler Heads</h2>
 
-    <label>Pipe Type</label>
-    <select id="pipeType">
-      <option value="sch10">Schedule 10</option>
-      <option value="sch40">Schedule 40</option>
-    </select>
+      <label>New Pendant Heads</label>
+      <input type="number" id="newHeads" value="0" min="0" />
 
-    <label>New Heads</label>
-    <input type="number" id="newHeads" value="0">
+      <label>Relocated Heads</label>
+      <input type="number" id="relocatedHeads" value="0" min="0" />
 
-    <label>Relocated Heads</label>
-    <input type="number" id="relocateHeads" value="0">
+      <label>New Head Branch Pipe Size</label>
+      <select id="branchPipeSize">
+        <option value="2">2&quot; Pipe</option>
+        <option value="1.5">1-1/2&quot; Pipe</option>
+        <option value="1.25">1-1/4&quot; Pipe</option>
+      </select>
 
-    <label>Branch Pipe Length (ft)</label>
-    <input type="number" id="branchPipeLength" value="0">
+      <p class="note">
+        Pendant drops are estimated with 1&quot; threaded pipe. No 1&quot; couplings are included.
+      </p>
+    </div>
 
-    <label>Mechanical Tees Required?</label>
-    <select id="mechanicalTee">
-      <option value="yes">Yes</option>
-      <option value="no">No</option>
-    </select>
+    <div class="card">
+      <h2>Labour</h2>
 
-    <label>Labour Rate ($/hr)</label>
-    <input type="number" id="labourRate" value="120">
+      <label>Labour Hours Per Head</label>
+      <input type="number" id="hoursPerHead" value="1" step="0.25" min="0" />
 
-    <label>Material Markup (%)</label>
-    <input type="number" id="markup" value="25">
+      <label>Hourly Labour Rate</label>
+      <input type="number" id="labourRate" value="95" min="0" />
 
-    <button onclick="calculateEstimate()">Calculate Estimate</button>
-  </section>
+      <label>Markup %</label>
+      <input type="number" id="markup" value="20" min="0" />
+    </div>
 
-  <section class="card results">
-    <h2>Estimate Results</h2>
+    <div class="card">
+      <h2>Material Pricing</h2>
 
-    <h3>Material List</h3>
-    <p>Sprinkler Heads: <span id="sprinklerHeads">0</span></p>
-    <p>Cover Plates: <span id="coverPlates">0</span></p>
-    <p>Drop Assembly Material: <span id="dropAssemblies">0</span></p>
-    <p>Flexible Drops: <span id="flexDrops">0</span></p>
-    <p>Branch Pipe: <span id="branchPipe">0</span> ft</p>
-    <p>Threaded Fittings: <span id="threadedFittings">0</span></p>
-    <p>Grooved Couplings: <span id="groovedCouplings">0</span></p>
-    <p>Hangers: <span id="hangers">0</span></p>
-    <p>Mechanical Tees: <span id="tees">0</span></p>
+      <label>Sprinkler Head Cost</label>
+      <input type="number" id="headCost" value="18" min="0" />
 
-    <h3>Labour</h3>
-    <p>Total Labour Hours: <span id="hours">0</span></p>
-    <p>Labour Cost: $<span id="labourCost">0.00</span></p>
+      <label>1&quot; Drop Assembly Cost</label>
+      <input type="number" id="dropCost" value="32" min="0" />
 
-    <h3>Pricing</h3>
-    <p>Material Cost: $<span id="materialCost">0.00</span></p>
-    <p>Markup: $<span id="markupCost">0.00</span></p>
-    <h2>Total Estimate: $<span id="totalEstimate">0.00</span></h2>
-  </section>
+      <label>Mechanical Tee Cost</label>
+      <input type="number" id="teeCost" value="28" min="0" />
 
-  <section class="card">
-    <h2>Future AI PDF Takeoff</h2>
-    <p>This section will eventually allow contractors to upload sprinkler drawings and automatically generate material and labour estimates.</p>
-    <input type="file" disabled>
-  </section>
+      <label>Misc. Material Cost</label>
+      <input type="number" id="miscCost" value="0" min="0" />
+    </div>
 
-</main>
+  </div>
+
+  <button onclick="calculateEstimate()">Calculate Estimate</button>
+
+  <div class="card" style="margin-top: 25px;">
+    <h2>Estimate Summary</h2>
+    <div id="estimateSummary" class="summary">
+      Enter job information and click calculate.
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 25px;">
+    <h2>Material List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Quantity</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="materialTable">
+        <tr>
+          <td colspan="3">No estimate calculated yet.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
 
 <script>
-function calculateEstimate() {
-  const jobType = document.getElementById("jobType").value;
-  const headType = document.getElementById("headType").value;
-  const dropType = document.getElementById("dropType").value;
-  const branchPipeSize = document.getElementById("branchPipeSize").value;
-  const pipeType = document.getElementById("pipeType").value;
+  function calculateEstimate() {
+    const projectName = document.getElementById("projectName").value || "Untitled Project";
+    const jobType = document.getElementById("jobType").value;
+    const location = document.getElementById("location").value || "Not entered";
 
-  const newHeads = Number(document.getElementById("newHeads").value) || 0;
-  const relocateHeads = Number(document.getElementById("relocateHeads").value) || 0;
-  const branchPipeLengthInput = Number(document.getElementById("branchPipeLength").value) || 0;
-  const labourRate = Number(document.getElementById("labourRate").value) || 0;
-  const markupPercent = Number(document.getElementById("markup").value) || 0;
-  const mechanicalTee = document.getElementById("mechanicalTee").value;
+    const newHeads = Number(document.getElementById("newHeads").value) || 0;
+    const relocatedHeads = Number(document.getElementById("relocatedHeads").value) || 0;
+    const branchPipeSize = document.getElementById("branchPipeSize").value;
 
-  const totalHeads = newHeads + relocateHeads;
+    const hoursPerHead = Number(document.getElementById("hoursPerHead").value) || 0;
+    const labourRate = Number(document.getElementById("labourRate").value) || 0;
+    const markup = Number(document.getElementById("markup").value) || 0;
 
-  let labourHours = (newHeads * 1) + (relocateHeads * 0.75);
+    const headCost = Number(document.getElementById("headCost").value) || 0;
+    const dropCost = Number(document.getElementById("dropCost").value) || 0;
+    const teeCost = Number(document.getElementById("teeCost").value) || 0;
+    const miscCost = Number(document.getElementById("miscCost").value) || 0;
 
-  if (dropType === "flex") {
-    labourHours = labourHours * 0.85;
+    const totalHeads = newHeads + relocatedHeads;
+
+    const sprinklerHeads = totalHeads;
+    const dropAssemblies = totalHeads;
+    const mechanicalTees = newHeads;
+
+    const oneInchPipeFeet = totalHeads * 3;
+    const oneInchElbows = totalHeads;
+    const oneInchNipples = totalHeads;
+    const escutcheons = totalHeads;
+
+    const branchPipeFeet = newHeads * 4;
+    const branchCouplings = Math.ceil(branchPipeFeet / 21);
+
+    const totalLabourHours = totalHeads * hoursPerHead;
+    const labourTotal = totalLabourHours * labourRate;
+
+    const materialTotal =
+      (sprinklerHeads * headCost) +
+      (dropAssemblies * dropCost) +
+      (mechanicalTees * teeCost) +
+      miscCost;
+
+    const subtotal = labourTotal + materialTotal;
+    const markupAmount = subtotal * (markup / 100);
+    const totalPrice = subtotal + markupAmount;
+
+    document.getElementById("estimateSummary").innerHTML = `
+      <strong>Project:</strong> ${projectName}<br>
+      <strong>Job Type:</strong> ${jobType}<br>
+      <strong>Location:</strong> ${location}<br><br>
+
+      <strong>Total Heads:</strong> ${totalHeads}<br>
+      <strong>New Heads:</strong> ${newHeads}<br>
+      <strong>Relocated Heads:</strong> ${relocatedHeads}<br><br>
+
+      <strong>Labour Hours:</strong> ${totalLabourHours.toFixed(2)} hrs<br>
+      <strong>Labour Cost:</strong> $${labourTotal.toFixed(2)}<br>
+      <strong>Material Cost:</strong> $${materialTotal.toFixed(2)}<br>
+      <strong>Markup:</strong> $${markupAmount.toFixed(2)}<br><br>
+
+      <strong>Estimated Total:</strong> $${totalPrice.toFixed(2)}
+    `;
+
+    document.getElementById("materialTable").innerHTML = `
+      <tr>
+        <td>Sprinkler Heads</td>
+        <td>${sprinklerHeads}</td>
+        <td>Includes new and relocated heads</td>
+      </tr>
+      <tr>
+        <td>1&quot; Threaded Drop Assemblies</td>
+        <td>${dropAssemblies}</td>
+        <td>Each assembly includes 1&quot; pipe, elbow, nipple, and head connection</td>
+      </tr>
+      <tr>
+        <td>1&quot; Threaded Pipe</td>
+        <td>${oneInchPipeFeet} ft</td>
+        <td>Estimated at 3 ft per pendant drop</td>
+      </tr>
+      <tr>
+        <td>1&quot; Threaded Elbows</td>
+        <td>${oneInchElbows}</td>
+        <td>One per drop assembly</td>
+      </tr>
+      <tr>
+        <td>1&quot; Threaded Nipples</td>
+        <td>${oneInchNipples}</td>
+        <td>One per pendant head</td>
+      </tr>
+      <tr>
+        <td>Escutcheons</td>
+        <td>${escutcheons}</td>
+        <td>One per finished pendant head</td>
+      </tr>
+      <tr>
+        <td>${branchPipeSize}&quot; x 1&quot; Mechanical Tees</td>
+        <td>${mechanicalTees}</td>
+        <td>Only for new heads, not relocated heads</td>
+      </tr>
+      <tr>
+        <td>${branchPipeSize}&quot; Branch Pipe</td>
+        <td>${branchPipeFeet} ft</td>
+        <td>Estimated at 4 ft per new head</td>
+      </tr>
+      <tr>
+        <td>${branchPipeSize}&quot; Grooved Couplings</td>
+        <td>${branchCouplings}</td>
+        <td>For branch pipe only. No 1&quot; couplings included.</td>
+      </tr>
+    `;
   }
-
-  if (jobType === "service" && labourHours < 4) {
-    labourHours = 4;
-  }
-
-  const labourCost = labourHours * labourRate;
-
-  const sprinklerHeads = totalHeads;
-  const coverPlates = headType === "concealed" ? totalHeads : 0;
-
-  const branchPipe = branchPipeLengthInput > 0 ? branchPipeLengthInput : totalHeads * 10;
-
-  let elbows = 0;
-  let reducers = 0;
-  let nipples = 0;
-  let threadedFittings = 0;
-  let flexDrops = 0;
-
-  if (dropType === "hardpipe") {
-    elbows = totalHeads * 2;
-    reducers = totalHeads;
-    nipples = totalHeads * 2;
-    threadedFittings = elbows + reducers + nipples;
-  } else {
-    flexDrops = totalHeads;
-  }
-
-  let groovedCouplings = 0;
-
-  if (branchPipeSize !== '1"') {
-    groovedCouplings = Math.ceil(branchPipe / 10);
-  }
-
-  const hangers = Math.ceil(branchPipe / 10);
-  const tees = mechanicalTee === "yes" ? newHeads : 0;
-
-  let pipeCostPerFt = 4;
-
-  if (branchPipeSize === '1"') pipeCostPerFt = 4;
-  if (branchPipeSize === '1-1/4"') pipeCostPerFt = 5;
-  if (branchPipeSize === '1-1/2"') pipeCostPerFt = 6;
-  if (branchPipeSize === '2"') pipeCostPerFt = 8;
-
-  if (pipeType === "sch40") {
-    pipeCostPerFt = pipeCostPerFt * 1.35;
-  }
-
-  let headCostEach = 18;
-
-  if (headType === "sidewall") headCostEach = 28;
-  if (headType === "concealed") headCostEach = 45;
-
-  const headCost = sprinklerHeads * headCostEach;
-  const coverPlateCost = coverPlates * 25;
-  const pipeCost = branchPipe * pipeCostPerFt;
-  const elbowCost = elbows * 5;
-  const reducerCost = reducers * 4;
-  const nippleCost = nipples * 3;
-  const flexDropCost = flexDrops * 65;
-  const groovedCouplingCost = groovedCouplings * 8;
-  const hangerCost = hangers * 6;
-  const teeCost = tees * 22;
-
-  const materialCost =
-    headCost +
-    coverPlateCost +
-    pipeCost +
-    elbowCost +
-    reducerCost +
-    nippleCost +
-    flexDropCost +
-    groovedCouplingCost +
-    hangerCost +
-    teeCost;
-
-  const markupCost = materialCost * (markupPercent / 100);
-  const totalEstimate = materialCost + markupCost + labourCost;
-
-  document.getElementById("sprinklerHeads").innerText = sprinklerHeads;
-  document.getElementById("coverPlates").innerText = coverPlates;
-
-  if (dropType === "hardpipe") {
-    document.getElementById("dropAssemblies").innerText =
-      elbows + " elbows, " + reducers + " reducers, " + nipples + " nipples";
-  } else {
-    document.getElementById("dropAssemblies").innerText =
-      "Flexible drop assemblies selected";
-  }
-
-  document.getElementById("flexDrops").innerText = flexDrops;
-  document.getElementById("branchPipe").innerText = branchPipe;
-  document.getElementById("threadedFittings").innerText = threadedFittings;
-  document.getElementById("groovedCouplings").innerText = groovedCouplings;
-  document.getElementById("hangers").innerText = hangers;
-  document.getElementById("tees").innerText = tees;
-
-  document.getElementById("hours").innerText = labourHours.toFixed(2);
-  document.getElementById("labourCost").innerText = labourCost.toFixed(2);
-  document.getElementById("materialCost").innerText = materialCost.toFixed(2);
-  document.getElementById("markupCost").innerText = markupCost.toFixed(2);
-  document.getElementById("totalEstimate").innerText = totalEstimate.toFixed(2);
-}
 </script>
 
 </body>
