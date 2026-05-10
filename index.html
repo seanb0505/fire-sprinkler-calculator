@@ -35,6 +35,12 @@
       <option value="concealed">Concealed</option>
     </select>
 
+    <label>Drop Type</label>
+    <select id="dropType">
+      <option value="hardpipe">Hard Pipe Drop</option>
+      <option value="flex">Flexible Drop</option>
+    </select>
+
     <label>Drop Pipe Size</label>
     <select id="dropPipeSize">
       <option value='1"'>1"</option>
@@ -50,11 +56,20 @@
       <option value='2"'>2"</option>
     </select>
 
+    <label>Pipe Type</label>
+    <select id="pipeType">
+      <option value="sch10">Schedule 10</option>
+      <option value="sch40">Schedule 40</option>
+    </select>
+
     <label>New Heads</label>
     <input type="number" id="newHeads" value="0">
 
     <label>Relocated Heads</label>
     <input type="number" id="relocateHeads" value="0">
+
+    <label>Branch Pipe Length (ft)</label>
+    <input type="number" id="branchPipeLength" value="0">
 
     <label>Mechanical Tees Required?</label>
     <select id="mechanicalTee">
@@ -76,7 +91,9 @@
 
     <h3>Material List</h3>
     <p>Sprinkler Heads: <span id="sprinklerHeads">0</span></p>
+    <p>Cover Plates: <span id="coverPlates">0</span></p>
     <p>Drop Assembly Material: <span id="dropAssemblies">0</span></p>
+    <p>Flexible Drops: <span id="flexDrops">0</span></p>
     <p>Branch Pipe: <span id="branchPipe">0</span> ft</p>
     <p>Threaded Fittings: <span id="threadedFittings">0</span></p>
     <p>Grooved Couplings: <span id="groovedCouplings">0</span></p>
@@ -103,25 +120,52 @@
 
 <script>
 function calculateEstimate() {
+  const jobType = document.getElementById("jobType").value;
+  const headType = document.getElementById("headType").value;
+  const dropType = document.getElementById("dropType").value;
+  const branchPipeSize = document.getElementById("branchPipeSize").value;
+  const pipeType = document.getElementById("pipeType").value;
+
   const newHeads = Number(document.getElementById("newHeads").value) || 0;
   const relocateHeads = Number(document.getElementById("relocateHeads").value) || 0;
+  const branchPipeLengthInput = Number(document.getElementById("branchPipeLength").value) || 0;
   const labourRate = Number(document.getElementById("labourRate").value) || 0;
   const markupPercent = Number(document.getElementById("markup").value) || 0;
   const mechanicalTee = document.getElementById("mechanicalTee").value;
-  const branchPipeSize = document.getElementById("branchPipeSize").value;
 
   const totalHeads = newHeads + relocateHeads;
 
-  const labourHours = (newHeads * 1) + (relocateHeads * 0.75);
+  let labourHours = (newHeads * 1) + (relocateHeads * 0.75);
+
+  if (dropType === "flex") {
+    labourHours = labourHours * 0.85;
+  }
+
+  if (jobType === "service" && labourHours < 4) {
+    labourHours = 4;
+  }
+
   const labourCost = labourHours * labourRate;
 
   const sprinklerHeads = totalHeads;
-  const branchPipe = totalHeads * 10;
+  const coverPlates = headType === "concealed" ? totalHeads : 0;
 
-  const elbows = totalHeads * 2;
-  const reducers = totalHeads;
-  const nipples = totalHeads * 2;
-  const threadedFittings = elbows + reducers + nipples;
+  const branchPipe = branchPipeLengthInput > 0 ? branchPipeLengthInput : totalHeads * 10;
+
+  let elbows = 0;
+  let reducers = 0;
+  let nipples = 0;
+  let threadedFittings = 0;
+  let flexDrops = 0;
+
+  if (dropType === "hardpipe") {
+    elbows = totalHeads * 2;
+    reducers = totalHeads;
+    nipples = totalHeads * 2;
+    threadedFittings = elbows + reducers + nipples;
+  } else {
+    flexDrops = totalHeads;
+  }
 
   let groovedCouplings = 0;
 
@@ -132,21 +176,41 @@ function calculateEstimate() {
   const hangers = Math.ceil(branchPipe / 10);
   const tees = mechanicalTee === "yes" ? newHeads : 0;
 
-  const headCost = sprinklerHeads * 18;
-  const pipeCost = branchPipe * 4;
+  let pipeCostPerFt = 4;
+
+  if (branchPipeSize === '1"') pipeCostPerFt = 4;
+  if (branchPipeSize === '1-1/4"') pipeCostPerFt = 5;
+  if (branchPipeSize === '1-1/2"') pipeCostPerFt = 6;
+  if (branchPipeSize === '2"') pipeCostPerFt = 8;
+
+  if (pipeType === "sch40") {
+    pipeCostPerFt = pipeCostPerFt * 1.35;
+  }
+
+  let headCostEach = 18;
+
+  if (headType === "sidewall") headCostEach = 28;
+  if (headType === "concealed") headCostEach = 45;
+
+  const headCost = sprinklerHeads * headCostEach;
+  const coverPlateCost = coverPlates * 25;
+  const pipeCost = branchPipe * pipeCostPerFt;
   const elbowCost = elbows * 5;
   const reducerCost = reducers * 4;
   const nippleCost = nipples * 3;
+  const flexDropCost = flexDrops * 65;
   const groovedCouplingCost = groovedCouplings * 8;
   const hangerCost = hangers * 6;
   const teeCost = tees * 22;
 
   const materialCost =
     headCost +
+    coverPlateCost +
     pipeCost +
     elbowCost +
     reducerCost +
     nippleCost +
+    flexDropCost +
     groovedCouplingCost +
     hangerCost +
     teeCost;
@@ -155,10 +219,17 @@ function calculateEstimate() {
   const totalEstimate = materialCost + markupCost + labourCost;
 
   document.getElementById("sprinklerHeads").innerText = sprinklerHeads;
+  document.getElementById("coverPlates").innerText = coverPlates;
 
-  document.getElementById("dropAssemblies").innerText =
-    elbows + " elbows, " + reducers + " reducers, " + nipples + " nipples";
+  if (dropType === "hardpipe") {
+    document.getElementById("dropAssemblies").innerText =
+      elbows + " elbows, " + reducers + " reducers, " + nipples + " nipples";
+  } else {
+    document.getElementById("dropAssemblies").innerText =
+      "Flexible drop assemblies selected";
+  }
 
+  document.getElementById("flexDrops").innerText = flexDrops;
   document.getElementById("branchPipe").innerText = branchPipe;
   document.getElementById("threadedFittings").innerText = threadedFittings;
   document.getElementById("groovedCouplings").innerText = groovedCouplings;
