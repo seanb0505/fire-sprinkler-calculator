@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sprinkler Takeoff</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -29,26 +28,30 @@
     <label>Labour Rate ($/hr)</label>
     <input type="number" id="labourRate" value="120">
 
-    <button onclick="calculateEstimate()">
-      Calculate Estimate
-    </button>
+    <button onclick="calculateEstimate()">Calculate Estimate</button>
   </section>
 
   <section class="card results">
     <h2>Results</h2>
-
-    <p>Total Labour Hours:
-      <span id="hours">0</span>
-    </p>
-
-    <p>Estimated Labour Cost:
-      $<span id="cost">0.00</span>
-    </p>
+    <p>Total Labour Hours: <span id="hours">0</span></p>
+    <p>Estimated Labour Cost: $<span id="cost">0.00</span></p>
   </section>
 
 </main>
 
-<script src="script.js"></script>
+<script>
+function calculateEstimate() {
+  let newHeads = Number(document.getElementById("newHeads").value);
+  let relocateHeads = Number(document.getElementById("relocateHeads").value);
+  let labourRate = Number(document.getElementById("labourRate").value);
+
+  let totalHours = newHeads + relocateHeads;
+  let labourCost = totalHours * labourRate;
+
+  document.getElementById("hours").innerText = totalHours;
+  document.getElementById("cost").innerText = labourCost.toFixed(2);
+}
+</script>
 
 </body>
 </html>
