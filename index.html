@@ -17,7 +17,38 @@
 <main class="container">
 
   <section class="card">
-    <h2>Estimate Calculator</h2>
+    <h2>Estimate Setup</h2>
+
+    <label>Job Type</label>
+    <select id="jobType">
+      <option value="new">New Install</option>
+      <option value="relocate">Relocate Existing Heads</option>
+      <option value="service">Service Call</option>
+      <option value="mixed">Mixed Job</option>
+    </select>
+
+    <label>Head Type</label>
+    <select id="headType">
+      <option value="pendent">Pendent</option>
+      <option value="upright">Upright</option>
+      <option value="sidewall">Sidewall</option>
+      <option value="concealed">Concealed</option>
+    </select>
+
+    <label>Drop Pipe Size</label>
+    <select id="dropPipeSize">
+      <option value='1"'>1"</option>
+      <option value='3/4"'>3/4"</option>
+      <option value='1/2"'>1/2"</option>
+    </select>
+
+    <label>Branch Pipe Size</label>
+    <select id="branchPipeSize">
+      <option value='1"'>1"</option>
+      <option value='1-1/4"'>1-1/4"</option>
+      <option value='1-1/2"'>1-1/2"</option>
+      <option value='2"'>2"</option>
+    </select>
 
     <label>New Heads</label>
     <input type="number" id="newHeads" value="0">
@@ -25,31 +56,94 @@
     <label>Relocated Heads</label>
     <input type="number" id="relocateHeads" value="0">
 
+    <label>Mechanical Tees Required?</label>
+    <select id="mechanicalTee">
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+
     <label>Labour Rate ($/hr)</label>
     <input type="number" id="labourRate" value="120">
+
+    <label>Material Markup (%)</label>
+    <input type="number" id="markup" value="25">
 
     <button onclick="calculateEstimate()">Calculate Estimate</button>
   </section>
 
   <section class="card results">
-    <h2>Results</h2>
+    <h2>Estimate Results</h2>
+
+    <h3>Material List</h3>
+    <p>Sprinkler Heads: <span id="sprinklerHeads">0</span></p>
+    <p>Drop Assemblies: <span id="dropAssemblies">0</span></p>
+    <p>Branch Pipe: <span id="branchPipe">0</span> ft</p>
+    <p>Couplings: <span id="couplings">0</span></p>
+    <p>Hangers: <span id="hangers">0</span></p>
+    <p>Mechanical Tees: <span id="tees">0</span></p>
+
+    <h3>Labour</h3>
     <p>Total Labour Hours: <span id="hours">0</span></p>
-    <p>Estimated Labour Cost: $<span id="cost">0.00</span></p>
+    <p>Labour Cost: $<span id="labourCost">0.00</span></p>
+
+    <h3>Pricing</h3>
+    <p>Material Cost: $<span id="materialCost">0.00</span></p>
+    <p>Markup: $<span id="markupCost">0.00</span></p>
+    <h2>Total Estimate: $<span id="totalEstimate">0.00</span></h2>
+  </section>
+
+  <section class="card">
+    <h2>Future AI PDF Takeoff</h2>
+    <p>This section will eventually allow contractors to upload sprinkler drawings and automatically generate material and labour estimates.</p>
+    <input type="file" disabled>
   </section>
 
 </main>
 
 <script>
 function calculateEstimate() {
-  let newHeads = Number(document.getElementById("newHeads").value);
-  let relocateHeads = Number(document.getElementById("relocateHeads").value);
-  let labourRate = Number(document.getElementById("labourRate").value);
+  const newHeads = Number(document.getElementById("newHeads").value) || 0;
+  const relocateHeads = Number(document.getElementById("relocateHeads").value) || 0;
+  const labourRate = Number(document.getElementById("labourRate").value) || 0;
+  const markupPercent = Number(document.getElementById("markup").value) || 0;
+  const mechanicalTee = document.getElementById("mechanicalTee").value;
 
-  let totalHours = newHeads + relocateHeads;
-  let labourCost = totalHours * labourRate;
+  const totalHeads = newHeads + relocateHeads;
 
-  document.getElementById("hours").innerText = totalHours;
-  document.getElementById("cost").innerText = labourCost.toFixed(2);
+  const labourHours = totalHeads * 1;
+  const labourCost = labourHours * labourRate;
+
+  const sprinklerHeads = totalHeads;
+  const dropAssemblies = totalHeads;
+  const branchPipe = totalHeads * 10;
+  const couplings = Math.ceil(branchPipe / 10);
+  const hangers = Math.ceil(branchPipe / 10);
+  const tees = mechanicalTee === "yes" ? newHeads : 0;
+
+  const headCost = sprinklerHeads * 18;
+  const dropCost = dropAssemblies * 35;
+  const pipeCost = branchPipe * 4;
+  const couplingCost = couplings * 8;
+  const hangerCost = hangers * 6;
+  const teeCost = tees * 22;
+
+  const materialCost = headCost + dropCost + pipeCost + couplingCost + hangerCost + teeCost;
+  const markupCost = materialCost * (markupPercent / 100);
+  const totalEstimate = materialCost + markupCost + labourCost;
+
+  document.getElementById("sprinklerHeads").innerText = sprinklerHeads;
+  document.getElementById("dropAssemblies").innerText = dropAssemblies;
+  document.getElementById("branchPipe").innerText = branchPipe;
+  document.getElementById("couplings").innerText = couplings;
+  document.getElementById("hangers").innerText = hangers;
+  document.getElementById("tees").innerText = tees;
+
+  document.getElementById("hours").innerText = labourHours;
+  document.getElementById("labourCost").innerText = labourCost.toFixed(2);
+
+  document.getElementById("materialCost").innerText = materialCost.toFixed(2);
+  document.getElementById("markupCost").innerText = markupCost.toFixed(2);
+  document.getElementById("totalEstimate").innerText = totalEstimate.toFixed(2);
 }
 </script>
 
