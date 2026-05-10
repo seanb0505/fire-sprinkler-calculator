@@ -1,73 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fire Sprinkler Estimator</title>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: Arial, sans-serif;
       background: #0f172a;
       color: white;
     }
 
     header {
-      padding: 50px 20px;
+      background: #dc2626;
+      padding: 40px 20px;
       text-align: center;
-      background: linear-gradient(135deg, #dc2626, #7f1d1d);
     }
 
     h1 {
+      margin: 0;
       font-size: 38px;
-      margin-bottom: 10px;
     }
 
-    .hero-text {
+    .hero {
+      margin-top: 10px;
       font-size: 18px;
-      max-width: 750px;
-      margin: auto;
-      color: #f3f4f6;
     }
 
     .container {
-      padding: 30px 16px;
-      max-width: 1100px;
+      max-width: 1000px;
       margin: auto;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-
-    @media (min-width: 800px) {
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
+      padding: 20px;
     }
 
     .card {
       background: #1e293b;
       padding: 24px;
-      border-radius: 14px;
+      border-radius: 12px;
       margin-bottom: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
     label {
       display: block;
-      margin-top: 14px;
-      font-weight: bold;
-      color: #e5e7eb;
+      margin-top: 15px;
+      margin-bottom: 5px;
     }
 
     input, select {
       width: 100%;
       padding: 12px;
-      margin-top: 8px;
       border-radius: 8px;
       border: none;
       font-size: 16px;
@@ -75,15 +58,15 @@
     }
 
     button {
-      background: #dc2626;
-      color: white;
-      padding: 14px 22px;
+      margin-top: 25px;
+      width: 100%;
+      padding: 14px;
       border: none;
       border-radius: 8px;
-      font-size: 17px;
+      background: #dc2626;
+      color: white;
+      font-size: 18px;
       cursor: pointer;
-      margin-top: 20px;
-      width: 100%;
     }
 
     button:hover {
@@ -91,27 +74,14 @@
     }
 
     .results {
-      margin-top: 20px;
       line-height: 1.8;
-      font-size: 16px;
-    }
-
-    .highlight {
-      background: #111827;
-      padding: 16px;
-      border-radius: 10px;
-      margin-top: 12px;
-    }
-
-    .muted {
-      color: #9ca3af;
-      font-size: 14px;
+      margin-top: 20px;
     }
 
     footer {
       text-align: center;
       padding: 30px;
-      color: #9ca3af;
+      color: #94a3b8;
     }
   </style>
 </head>
@@ -120,106 +90,82 @@
 
 <header>
   <h1>Fire Sprinkler Estimator</h1>
-  <p class="hero-text">
-    Material lists, labour estimating, pricing, and project tools for sprinkler contractors.
-  </p>
+  <div class="hero">
+    Material lists, labour estimating, and pricing tools for sprinkler contractors.
+  </div>
 </header>
 
 <div class="container">
 
-  <div class="grid">
-
-    <div class="card">
-      <h2>Sprinkler Head Calculator</h2>
-
-      <label>Job Type</label>
-      <select id="jobType">
-        <option value="new">New Heads</option>
-        <option value="relocate">Relocate Heads</option>
-        <option value="service">Service Work</option>
-      </select>
-
-      <label>Number of Heads</label>
-      <input type="number" id="heads" placeholder="Example: 25">
-
-      <label>Head Type</label>
-      <select id="headType">
-        <option value="pendant">Pendant</option>
-        <option value="upright">Upright</option>
-        <option value="sidewall">Sidewall</option>
-      </select>
-
-      <label>Drop Pipe Size</label>
-      <select id="dropPipeSize">
-        <option value='1"'>1"</option>
-        <option value='3/4"'>3/4"</option>
-        <option value='1/2"'>1/2"</option>
-      </select>
-
-      <label>Main/Branch Pipe Size</label>
-      <select id="branchPipeSize">
-        <option value='1"'>1"</option>
-        <option value='1-1/4"'>1-1/4"</option>
-        <option value='1-1/2"'>1-1/2"</option>
-        <option value='2"'>2"</option>
-        <option value='2-1/2"'>2-1/2"</option>
-        <option value='3"'>3"</option>
-        <option value='4"'>4"</option>
-      </select>
-
-      <label>Feet of Branch Pipe</label>
-      <input type="number" id="branchPipe" placeholder="Example: 200">
-
-      <label>Mechanical Tee Required?</label>
-      <select id="mechTeeRequired">
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
-
-      <button type="button" onclick="calculateEstimate()">Generate Estimate</button>
-    </div>
-
-    <div class="card">
-      <h2>Labour & Pricing</h2>
-
-      <label>Labour Hours Per Head</label>
-      <input type="number" id="hoursPerHead" value="1" step="0.25">
-
-      <label>Hourly Labour Rate ($)</label>
-      <input type="number" id="hourlyRate" value="95">
-
-      <label>Estimated Material Cost Per Head ($)</label>
-      <input type="number" id="materialPerHead" value="45">
-
-      <label>Estimated Pipe Cost Per Foot ($)</label>
-      <input type="number" id="pipeCost" value="6">
-
-      <label>Markup (%)</label>
-      <input type="number" id="markup" value="20">
-
-      <div class="highlight">
-        <strong>Future Supplier Pricing</strong>
-        <p class="muted">
-          This section will later connect to local supplier pricing based on your location.
-        </p>
-      </div>
-
-      <div class="highlight">
-        <strong>Future PDF Takeoff</strong>
-        <p class="muted">
-          PDF upload and AI material takeoff support will be added in a later version.
-        </p>
-        <input type="file" disabled>
-      </div>
-    </div>
-
-  </div>
-
   <div class="card">
-    <h2>Estimate Results</h2>
-    <div class="results" id="results">
-      Enter your job details and tap Generate Estimate.
-    </div>
+
+    <h2>Estimate Calculator</h2>
+
+    <label>Job Type</label>
+    <select id="jobType">
+      <option value="New Heads">New Heads</option>
+      <option value="Relocate Heads">Relocate Heads</option>
+      <option value="Service Work">Service Work</option>
+    </select>
+
+    <label>Number of Heads</label>
+    <input type="number" id="heads">
+
+    <label>Head Type</label>
+    <select id="headType">
+      <option value="Pendant">Pendant</option>
+      <option value="Upright">Upright</option>
+      <option value="Sidewall">Sidewall</option>
+    </select>
+
+    <label>Drop Pipe Size</label>
+    <select id="dropPipeSize">
+      <option value='1"'>1"</option>
+      <option value='3/4"'>3/4"</option>
+      <option value='1/2"'>1/2"</option>
+    </select>
+
+    <label>Branch Pipe Size</label>
+    <select id="branchPipeSize">
+      <option value='1"'>1"</option>
+      <option value='1-1/4"'>1-1/4"</option>
+      <option value='1-1/2"'>1-1/2"</option>
+      <option value='2"'>2"</option>
+      <option value='2-1/2"'>2-1/2"</option>
+      <option value='3"'>3"</option>
+      <option value='4"'>4"</option>
+    </select>
+
+    <label>Feet of Branch Pipe</label>
+    <input type="number" id="branchPipe">
+
+    <label>Mechanical Tee Required?</label>
+    <select id="mechTee">
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+
+    <label>Labour Hours Per Head</label>
+    <input type="number" id="hoursPerHead" value="1">
+
+    <label>Hourly Labour Rate ($)</label>
+    <input type="number" id="hourlyRate" value="95">
+
+    <label>Material Cost Per Head ($)</label>
+    <input type="number" id="materialCost" value="45">
+
+    <label>Pipe Cost Per Foot ($)</label>
+    <input type="number" id="pipeCost" value="6">
+
+    <label>Markup (%)</label>
+    <input type="number" id="markup" value="20">
+
+    <button type="button" onclick="calculateEstimate()">
+      Generate Estimate
+    </button>
+
+    <div class="results" id="results"></div>
+
   </div>
 
 </div>
@@ -229,62 +175,72 @@
 </footer>
 
 <script>
-function calculateEstimate() {
-  const jobType = document.getElementById('jobType').value;
-  const heads = parseInt(document.getElementById('heads').value) || 0;
-  const headType = document.getElementById('headType').value;
-  const dropPipeSize = document.getElementById('dropPipeSize').value;
-  const branchPipeSize = document.getElementById('branchPipeSize').value;
-  const branchPipe = parseFloat(document.getElementById('branchPipe').value) || 0;
-  const mechTeeRequired = document.getElementById('mechTeeRequired').value;
 
-  const hoursPerHead = parseFloat(document.getElementById('hoursPerHead').value) || 1;
-  const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-  const materialPerHead = parseFloat(document.getElementById('materialPerHead').value) || 0;
-  const pipeCost = parseFloat(document.getElementById('pipeCost').value) || 0;
-  const markup = parseFloat(document.getElementById('markup').value) || 0;
+function calculateEstimate() {
+
+  const jobType = document.getElementById("jobType").value;
+  const heads = parseInt(document.getElementById("heads").value) || 0;
+  const headType = document.getElementById("headType").value;
+  const dropPipeSize = document.getElementById("dropPipeSize").value;
+  const branchPipeSize = document.getElementById("branchPipeSize").value;
+  const branchPipe = parseFloat(document.getElementById("branchPipe").value) || 0;
+  const mechTee = document.getElementById("mechTee").value;
+
+  const hoursPerHead = parseFloat(document.getElementById("hoursPerHead").value) || 0;
+  const hourlyRate = parseFloat(document.getElementById("hourlyRate").value) || 0;
+  const materialCostPerHead = parseFloat(document.getElementById("materialCost").value) || 0;
+  const pipeCost = parseFloat(document.getElementById("pipeCost").value) || 0;
+  const markup = parseFloat(document.getElementById("markup").value) || 0;
 
   let mechTees = 0;
-  if (jobType === "new" && mechTeeRequired === "yes") {
+
+  if (jobType === "New Heads" && mechTee === "Yes") {
     mechTees = heads;
   }
 
-  const escutcheons = headType === "pendant" ? heads : 0;
   const couplings = Math.ceil(branchPipe / 10);
   const hangers = Math.ceil(branchPipe / 12);
-
   const labourHours = heads * hoursPerHead;
-  const labourCost = labourHours * hourlyRate;
-  const materialCost = (heads * materialPerHead) + (branchPipe * pipeCost);
-  const subtotal = labourCost + materialCost;
-  const markupAmount = subtotal * (markup / 100);
-  const total = subtotal + markupAmount;
+  const labourTotal = labourHours * hourlyRate;
 
-  document.getElementById('results').innerHTML =
-    '<h3>Job Summary</h3>' +
-    '<p><strong>Job Type:</strong> ' + jobType + '</p>' +
-    '<p><strong>Head Type:</strong> ' + headType + '</p>' +
-    '<p><strong>Total Heads:</strong> ' + heads + '</p>' +
+  const materialTotal =
+    (heads * materialCostPerHead) +
+    (branchPipe * pipeCost);
 
-    '<h3>Estimated Material List</h3>' +
-    '<p>Sprinkler Heads: ' + heads + '</p>' +
-    '<p>' + dropPipeSize + ' Drop Assemblies: ' + heads + '</p>' +
-    '<p>Escutcheons: ' + escutcheons + '</p>' +
-    '<p>' + branchPipeSize + ' Branch Pipe: ' + branchPipe + ' ft</p>' +
-    '<p>' + branchPipeSize + ' Couplings: ' + couplings + '</p>' +
-    '<p>' + branchPipeSize + ' Hangers: ' + hangers + '</p>' +
-    '<p>' + branchPipeSize + ' x ' + dropPipeSize + ' Mechanical Tees: ' + mechTees + '</p>' +
+  const subtotal = labourTotal + materialTotal;
+  const markupTotal = subtotal * (markup / 100);
+  const finalTotal = subtotal + markupTotal;
 
-    '<h3>Labour Estimate</h3>' +
-    '<p>Labour Hours: ' + labourHours.toFixed(2) + '</p>' +
-    '<p>Labour Cost: $' + labourCost.toFixed(2) + '</p>' +
+  document.getElementById("results").innerHTML = `
+    <h3>Job Summary</h3>
 
-    '<h3>Pricing Estimate</h3>' +
-    '<p>Material Cost: $' + materialCost.toFixed(2) + '</p>' +
-    '<p>Subtotal: $' + subtotal.toFixed(2) + '</p>' +
-    '<p>Markup: $' + markupAmount.toFixed(2) + '</p>' +
-    '<p><strong>Total Estimate: $' + total.toFixed(2) + '</strong></p>';
+    <p><strong>Job Type:</strong> ${jobType}</p>
+    <p><strong>Head Type:</strong> ${headType}</p>
+
+    <h3>Material List</h3>
+
+    <p>Sprinkler Heads: ${heads}</p>
+    <p>${dropPipeSize} Drop Assemblies: ${heads}</p>
+    <p>${branchPipeSize} Branch Pipe: ${branchPipe} ft</p>
+    <p>${branchPipeSize} Couplings: ${couplings}</p>
+    <p>${branchPipeSize} Hangers: ${hangers}</p>
+    <p>${branchPipeSize} x ${dropPipeSize} Mechanical Tees: ${mechTees}</p>
+
+    <h3>Labour</h3>
+
+    <p>Labour Hours: ${labourHours.toFixed(2)}</p>
+    <p>Labour Cost: $${labourTotal.toFixed(2)}</p>
+
+    <h3>Pricing</h3>
+
+    <p>Material Cost: $${materialTotal.toFixed(2)}</p>
+    <p>Subtotal: $${subtotal.toFixed(2)}</p>
+    <p>Markup: $${markupTotal.toFixed(2)}</p>
+
+    <h2>Total Estimate: $${finalTotal.toFixed(2)}</h2>
+  `;
 }
+
 </script>
 
 </body>
