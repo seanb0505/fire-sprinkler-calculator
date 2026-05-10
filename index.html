@@ -3,64 +3,87 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fire Sprinkler Calculator</title>
+  <title>Fire Sprinkler Estimator</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background: #111827;
+      background: #0f172a;
       color: white;
     }
 
     header {
-      padding: 60px 20px;
+      padding: 50px 20px;
       text-align: center;
-      background: #dc2626;
+      background: linear-gradient(135deg, #dc2626, #7f1d1d);
     }
 
     h1 {
-      font-size: 42px;
+      font-size: 38px;
       margin-bottom: 10px;
     }
 
     .hero-text {
-      font-size: 20px;
-      max-width: 700px;
+      font-size: 18px;
+      max-width: 750px;
       margin: auto;
+      color: #f3f4f6;
     }
 
     .container {
-      padding: 40px 20px;
-      max-width: 1000px;
+      padding: 30px 16px;
+      max-width: 1100px;
       margin: auto;
     }
 
-    .card {
-      background: #1f2937;
-      padding: 30px;
-      border-radius: 12px;
-      margin-bottom: 20px;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
 
-    input {
+    @media (min-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: bold;
+      color: #e5e7eb;
+    }
+
+    input, select {
       width: 100%;
       padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 20px;
+      margin-top: 8px;
       border-radius: 8px;
       border: none;
       font-size: 16px;
+      box-sizing: border-box;
     }
 
     button {
       background: #dc2626;
       color: white;
-      padding: 14px 24px;
+      padding: 14px 22px;
       border: none;
       border-radius: 8px;
-      font-size: 18px;
+      font-size: 17px;
       cursor: pointer;
+      margin-top: 20px;
+      width: 100%;
     }
 
     button:hover {
@@ -68,9 +91,21 @@
     }
 
     .results {
-      margin-top: 30px;
-      line-height: 2;
-      font-size: 18px;
+      margin-top: 20px;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    .highlight {
+      background: #111827;
+      padding: 16px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .muted {
+      color: #9ca3af;
+      font-size: 14px;
     }
 
     footer {
@@ -84,55 +119,176 @@
 <body>
 
 <header>
-  <h1>Fire Sprinkler Material Calculator</h1>
+  <h1>Fire Sprinkler Estimator</h1>
   <p class="hero-text">
-    Fast sprinkler estimating and material list generation for contractors.
+    Material lists, labour estimating, pricing, and project tools for sprinkler contractors.
   </p>
 </header>
 
 <div class="container">
 
+  <div class="grid">
+
+    <div class="card">
+      <h2>Sprinkler Head Calculator</h2>
+
+      <label>Job Type</label>
+      <select id="jobType">
+        <option value="new">New Heads</option>
+        <option value="relocate">Relocate Heads</option>
+        <option value="service">Service Work</option>
+      </select>
+
+      <label>Number of Heads</label>
+      <input type="number" id="heads" placeholder="Example: 25">
+
+      <label>Head Type</label>
+      <select id="headType">
+        <option value="pendant">Pendant</option>
+        <option value="upright">Upright</option>
+        <option value="sidewall">Sidewall</option>
+      </select>
+
+      <label>Drop Pipe Size</label>
+      <select id="dropPipeSize">
+        <option value='1"'>1"</option>
+        <option value='3/4"'>3/4"</option>
+        <option value='1/2"'>1/2"</option>
+      </select>
+
+      <label>Main/Branch Pipe Size</label>
+      <select id="branchPipeSize">
+        <option value='1"'>1"</option>
+        <option value='1-1/4"'>1-1/4"</option>
+        <option value='1-1/2"'>1-1/2"</option>
+        <option value='2"'>2"</option>
+        <option value='2-1/2"'>2-1/2"</option>
+        <option value='3"'>3"</option>
+        <option value='4"'>4"</option>
+      </select>
+
+      <label>Feet of Branch Pipe</label>
+      <input type="number" id="branchPipe" placeholder="Example: 200">
+
+      <label>Mechanical Tee Required?</label>
+      <select id="mechTeeRequired">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+
+      <button onclick="calculateEstimate()">Generate Estimate</button>
+    </div>
+
+    <div class="card">
+      <h2>Labour & Pricing</h2>
+
+      <label>Labour Hours Per Head</label>
+      <input type="number" id="hoursPerHead" value="1" step="0.25">
+
+      <label>Hourly Labour Rate ($)</label>
+      <input type="number" id="hourlyRate" value="95">
+
+      <label>Estimated Material Cost Per Head ($)</label>
+      <input type="number" id="materialPerHead" value="45">
+
+      <label>Estimated Pipe Cost Per Foot ($)</label>
+      <input type="number" id="pipeCost" value="6">
+
+      <label>Markup (%)</label>
+      <input type="number" id="markup" value="20">
+
+      <div class="highlight">
+        <strong>Future Supplier Pricing</strong>
+        <p class="muted">
+          This section will later connect to local supplier pricing based on your location.
+        </p>
+      </div>
+
+      <div class="highlight">
+        <strong>Future PDF Takeoff</strong>
+        <p class="muted">
+          PDF upload and AI material takeoff support will be added in a later version.
+        </p>
+        <input type="file" disabled>
+      </div>
+    </div>
+
+  </div>
+
   <div class="card">
-    <h2>Quick Estimate Calculator</h2>
-
-    <label>Number of Sprinkler Heads</label>
-    <input type="number" id="heads" placeholder="Enter number of heads">
-
-    <label>Feet of 2” Pipe</label>
-    <input type="number" id="pipe" placeholder="Enter feet of pipe">
-
-    <button onclick="calculateMaterials()">Generate Material List</button>
-
-    <div class="results" id="results"></div>
+    <h2>Estimate Results</h2>
+    <div class="results" id="results">
+      Enter your job details and tap Generate Estimate.
+    </div>
   </div>
 
 </div>
 
 <footer>
-  © 2026 Fire Sprinkler Calculator
+  © 2026 Fire Sprinkler Estimator
 </footer>
 
 <script>
-  function calculateMaterials() {
-
+  function calculateEstimate() {
+    const jobType = document.getElementById('jobType').value;
     const heads = parseInt(document.getElementById('heads').value) || 0;
-    const pipe = parseInt(document.getElementById('pipe').value) || 0;
+    const headType = document.getElementById('headType').value;
+    const dropPipeSize = document.getElementById('dropPipeSize').value;
+    const branchPipeSize = document.getElementById('branchPipeSize').value;
+    const branchPipe = parseFloat(document.getElementById('branchPipe').value) || 0;
+    const mechTeeRequired = document.getElementById('mechTeeRequired').value;
 
-    const couplings = Math.ceil(pipe / 10);
-    const hangers = Math.ceil(pipe / 12);
-    const mechTees = heads;
+    const hoursPerHead = parseFloat(document.getElementById('hoursPerHead').value) || 1;
+    const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+    const materialPerHead = parseFloat(document.getElementById('materialPerHead').value) || 0;
+    const pipeCost = parseFloat(document.getElementById('pipeCost').value) || 0;
+    const markup = parseFloat(document.getElementById('markup').value) || 0;
+
+    let mechTees = 0;
+
+    if (jobType === "new" && mechTeeRequired === "yes") {
+      mechTees = heads;
+    }
+
+    if (jobType === "relocate") {
+      mechTees = 0;
+    }
+
+    const sprinklerHeads = heads;
+    const drops = heads;
+    const escutcheons = headType === "pendant" ? heads : 0;
+    const couplings = Math.ceil(branchPipe / 10);
+    const hangers = Math.ceil(branchPipe / 12);
+
+    const labourHours = heads * hoursPerHead;
+    const labourCost = labourHours * hourlyRate;
+    const materialCost = (heads * materialPerHead) + (branchPipe * pipeCost);
+    const subtotal = labourCost + materialCost;
+    const markupAmount = subtotal * (markup / 100);
+    const total = subtotal + markupAmount;
+
+    let jobLabel = "New Heads";
+    if (jobType === "relocate") jobLabel = "Relocate Heads";
+    if (jobType === "service") jobLabel = "Service Work";
 
     document.getElementById('results').innerHTML = `
+      <h3>Job Summary</h3>
+      <p><strong>Job Type:</strong> ${jobLabel}</p>
+      <p><strong>Head Type:</strong> ${headType}</p>
+      <p><strong>Total Heads:</strong> ${sprinklerHeads}</p>
+
       <h3>Estimated Material List</h3>
+      <p>Sprinkler Heads: ${sprinklerHeads}</p>
+      <p>${dropPipeSize} Drop Assemblies: ${drops}</p>
+      <p>Escutcheons: ${escutcheons}</p>
+      <p>${branchPipeSize} Branch Pipe: ${branchPipe} ft</p>
+      <p>${branchPipeSize} Couplings: ${couplings}</p>
+      <p>${branchPipeSize} Hangers: ${hangers}</p>
+      <p>${branchPipeSize} x ${dropPipeSize} Mechanical Tees: ${mechTees}</p>
 
-      <p>Sprinkler Heads: ${heads}</p>
-      <p>2" Pipe: ${pipe} ft</p>
-      <p>2" Couplings: ${couplings}</p>
-      <p>2" Hangers: ${hangers}</p>
-      <p>2"x1/2" Mechanical Tees: ${mechTees}</p>
-    `;
-  }
-</script>
+      <h3>Labour Estimate</h3>
+      <p>Labour Hours: ${labourHours.toFixed(2)}</p>
+      <p>Labour Cost: $${labourCost.toFixed(2)}</p>
 
-</body>
-</html>
+      <h3>Pricing Estimate</h3>
+      <p>Material Cost: $${materialCost.toFixed(2)}</p
