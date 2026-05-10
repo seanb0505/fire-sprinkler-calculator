@@ -236,65 +236,11 @@
     const dropPipeSize = document.getElementById('dropPipeSize').value;
     const branchPipeSize = document.getElementById('branchPipeSize').value;
     const branchPipe = parseFloat(document.getElementById('branchPipe').value) || 0;
-    const mechTeeRequired = document.getElementById('mechTeeRequired').value;
-
-    const hoursPerHead = parseFloat(document.getElementById('hoursPerHead').value) || 1;
-    const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-    const materialPerHead = parseFloat(document.getElementById('materialPerHead').value) || 0;
-    const pipeCost = parseFloat(document.getElementById('pipeCost').value) || 0;
-    const markup = parseFloat(document.getElementById('markup').value) || 0;
-
-    let mechTees = 0;
-
-    if (jobType === "new" && mechTeeRequired === "yes") {
-      mechTees = heads;
-    }
-
-    if (jobType === "relocate") {
-      mechTees = 0;
-    }
-
-    const sprinklerHeads = heads;
-    const drops = heads;
-    const escutcheons = headType === "pendant" ? heads : 0;
-    const couplings = Math.ceil(branchPipe / 10);
-    const hangers = Math.ceil(branchPipe / 12);
-
-    const labourHours = heads * hoursPerHead;
-    const labourCost = labourHours * hourlyRate;
-    const materialCost = (heads * materialPerHead) + (branchPipe * pipeCost);
-    const subtotal = labourCost + materialCost;
-    const markupAmount = subtotal * (markup / 100);
-    const total = subtotal + markupAmount;
-
-    let jobLabel = "New Heads";
-    if (jobType === "relocate") jobLabel = "Relocate Heads";
-    if (jobType === "service") jobLabel = "Service Work";
-
-    document.getElementById('results').innerHTML = `
-      <h3>Job Summary</h3>
-      <p><strong>Job Type:</strong> ${jobLabel}</p>
-      <p><strong>Head Type:</strong> ${headType}</p>
-      <p><strong>Total Heads:</strong> ${sprinklerHeads}</p>
-
-      <h3>Estimated Material List</h3>
-      <p>Sprinkler Heads: ${sprinklerHeads}</p>
-      <p>${dropPipeSize} Drop Assemblies: ${drops}</p>
-      <p>Escutcheons: ${escutcheons}</p>
-      <p>${branchPipeSize} Branch Pipe: ${branchPipe} ft</p>
-      <p>${branchPipeSize} Couplings: ${couplings}</p>
-      <p>${branchPipeSize} Hangers: ${hangers}</p>
-      <p>${branchPipeSize} x ${dropPipeSize} Mechanical Tees: ${mechTees}</p>
-
-      <h3>Labour Estimate</h3>
-      <p>Labour Hours: ${labourHours.toFixed(2)}</p>
-      <p>Labour Cost: $${labourCost.toFixed(2)}</p>
-
-      <h3>Pricing Estimate</h3>
-            <p>Material Cost: $${materialCost.toFixed(2)}</p>
-      <p>Subtotal: $${subtotal.toFixed(2)}</p>
-      <p>Markup: $${markupAmount.toFixed(2)}</p>
-      <p><strong>Total Estimate: $${total.toFixed(2)}</strong></p>
+    const mechTeeRequired = document.getElementById('mechTeeRequired').
+      <p>Material Cost: $${materialCost.toFixed(2)}</p>
+  <p>Subtotal: $${subtotal.toFixed(2)}</p>
+  <p>Markup: $${markupAmount.toFixed(2)}</p>
+  <p><strong>Total Estimate: $${total.toFixed(2)}</strong></p>
     `;
   }
 </script>
