@@ -2,623 +2,264 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fire Sprinkler Estimator</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: white;
-    }
-
-    header {
-      background: #1f2937;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 34px;
-    }
-
-    header p {
-      color: #d1d5db;
-    }
-
-    main {
-      max-width: 1150px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-
-    .card {
-      background: #1f2937;
-      padding: 22px;
-      border-radius: 14px;
-      margin-bottom: 22px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    label {
-      display: block;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #e5e7eb;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 18px;
-      padding: 15px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    .secondary-btn {
-      background: #374151;
-    }
-
-    .secondary-btn:hover {
-      background: #4b5563;
-    }
-
-    .danger-btn {
-      background: #dc2626;
-    }
-
-    .danger-btn:hover {
-      background: #b91c1c;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .line-item {
-      background: #111827;
-      border: 1px solid #374151;
-      border-radius: 10px;
-      padding: 14px;
-      margin-top: 12px;
-    }
-
-    .results {
-      display: none;
-      background: #111827;
-      padding: 22px;
-      border-radius: 12px;
-      border: 1px solid #374151;
-      margin-top: 22px;
-    }
-
-    .results h3 {
-      color: #93c5fd;
-      margin-top: 22px;
-    }
-
-    ul {
-      padding-left: 22px;
-    }
-
-    li {
-      margin-bottom: 8px;
-    }
-
-    .note {
-      color: #fbbf24;
-      font-size: 14px;
-      margin-top: 15px;
-    }
-
-    @media (max-width: 750px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      header h1 {
-        font-size: 28px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <header>
-    <h1>Fire Sprinkler Estimator</h1>
-    <p>Build full project estimates with multiple sprinkler work items.</p>
+
+  <header class="hero">
+
+    <nav class="nav">
+      <div class="logo">
+        Fire Sprinkler Estimator
+      </div>
+
+      <div class="nav-links">
+        <a href="#estimator">Estimator</a>
+        <a href="#materials">Materials</a>
+        <a href="#labour">Labour</a>
+        <a href="#ai">AI Takeoff</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <h1>Fire Sprinkler Estimating Software</h1>
+
+      <p>
+        Generate sprinkler material lists, labour estimates,
+        contractor pricing, and future AI PDF takeoffs.
+      </p>
+
+      <a href="#estimator" class="button">
+        Start Estimate
+      </a>
+    </div>
+
   </header>
 
   <main>
-    <section class="card">
-      <h2>Project Info</h2>
 
-      <div class="grid">
-        <div>
-          <label>Project Name</label>
-          <input id="projectName" type="text" placeholder="Example: Office Renovation" />
-        </div>
+    <!-- ESTIMATOR -->
 
-        <div>
-          <label>Customer</label>
-          <input id="customerName" type="text" placeholder="Customer name" />
-        </div>
+    <section id="estimator" class="section">
 
-        <div>
-          <label>Location</label>
-          <input id="projectLocation" type="text" placeholder="Project location" />
-        </div>
+      <h2>Project Estimator</h2>
 
-        <div>
-          <label>Date</label>
-          <input id="projectDate" type="date" />
-        </div>
+      <div class="card estimator-grid">
+
+        <label>
+          Project Name
+
+          <input
+            type="text"
+            id="projectName"
+            placeholder="Example: Office Renovation"
+          />
+        </label>
+
+        <label>
+          Job Type
+
+          <select id="jobType">
+            <option value="new">New Drops</option>
+            <option value="relocate">Relocates</option>
+            <option value="mixed">Mixed Job</option>
+            <option value="service">Service Work</option>
+          </select>
+        </label>
+
+        <label>
+          New Heads
+
+          <input
+            type="number"
+            id="newHeads"
+            value="0"
+            min="0"
+          />
+        </label>
+
+        <label>
+          Relocated Heads
+
+          <input
+            type="number"
+            id="relocateHeads"
+            value="0"
+            min="0"
+          />
+        </label>
+
+        <label>
+          Drop Pipe Size
+
+          <select id="dropPipeSize">
+            <option value="1">1" Threaded</option>
+            <option value="1.25">1-1/4"</option>
+            <option value="1.5">1-1/2"</option>
+            <option value="2">2" Grooved</option>
+          </select>
+        </label>
+
+        <label>
+          Mechanical Tee Required?
+
+          <select id="mechanicalTeeRequired">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </label>
+
+        <label>
+          Labour Hours Per Head
+
+          <input
+            type="number"
+            id="hoursPerHead"
+            value="1"
+            step="0.25"
+          />
+        </label>
+
+        <label>
+          Labour Rate / Hour
+
+          <input
+            type="number"
+            id="labourRate"
+            value="95"
+          />
+        </label>
+
+        <label>
+          Material Waste %
+
+          <input
+            type="number"
+            id="wastePercent"
+            value="10"
+          />
+        </label>
+
+        <label>
+          Markup %
+
+          <input
+            type="number"
+            id="markupPercent"
+            value="25"
+          />
+        </label>
+
       </div>
-    </section>
 
-    <section class="card">
-      <h2>Add Work Item</h2>
+      <div class="actions">
 
-      <div class="grid">
-        <div>
-          <label>Category</label>
-          <select id="category" onchange="updateCategoryFields()">
-            <option value="heads">Sprinkler Heads</option>
-            <option value="branch">Branch Line Work</option>
-            <option value="main">Main Line Work</option>
-            <option value="hose">Fire Hose Cabinet</option>
-            <option value="custom">Custom Item</option>
-          </select>
-        </div>
+        <button class="button" onclick="runEstimate()">
+          Generate Estimate
+        </button>
 
-        <div>
-          <label>Quantity</label>
-          <input id="qty" type="number" min="0" value="0" />
-        </div>
+        <button class="button secondary" onclick="clearEstimate()">
+          Clear
+        </button>
 
-        <div id="workTypeBox">
-          <label>Work Type</label>
-          <select id="workType">
-            <option value="new">New</option>
-            <option value="relocate">Relocate</option>
-            <option value="replace">Replace</option>
-          </select>
-        </div>
-
-        <div id="orientationBox">
-          <label>Head Orientation</label>
-          <select id="headOrientation" onchange="updateHeadTypes()">
-            <option value="pendant">Pendant</option>
-            <option value="upright">Upright</option>
-            <option value="sidewall">Sidewall</option>
-          </select>
-        </div>
-
-        <div id="headTypeBox">
-          <label>Specific Head Type</label>
-          <select id="headType"></select>
-        </div>
-
-        <div id="headSizeBox">
-          <label>Head Connection Size</label>
-          <select id="headSize">
-            <option value="1/2">1/2&quot;</option>
-            <option value="3/4">3/4&quot;</option>
-          </select>
-        </div>
-
-        <div id="pipeSizeBox">
-          <label>Pipe Size</label>
-          <select id="pipeSize">
-            <option value="1">1&quot;</option>
-            <option value="1-1/4">1-1/4&quot;</option>
-            <option value="1-1/2">1-1/2&quot;</option>
-            <option value="2">2&quot;</option>
-            <option value="2-1/2">2-1/2&quot;</option>
-            <option value="3">3&quot;</option>
-            <option value="4">4&quot;</option>
-            <option value="6">6&quot;</option>
-          </select>
-        </div>
-
-        <div id="pipeLengthBox">
-          <label>Pipe Length / Footage</label>
-          <input id="pipeLength" type="number" min="0" value="0" />
-        </div>
-
-        <div id="customDescriptionBox">
-          <label>Description</label>
-          <input id="customDescription" type="text" placeholder="Example: Drain valve, test connection, demo work" />
-        </div>
       </div>
 
-      <button onclick="addWorkItem()">Add Item to Estimate</button>
-      <button class="secondary-btn" onclick="generateEstimate()">Generate Full Estimate</button>
-      <button class="danger-btn" onclick="clearEstimate()">Clear Estimate</button>
+      <div id="estimateOutput"></div>
 
-      <p class="note">
-        Add multiple items for one job: new pendants, relocated uprights, sidewalls, branch lines, mains, hose cabinets, and custom work.
-      </p>
     </section>
 
-    <section class="card">
-      <h2>Current Estimate Items</h2>
-      <div id="itemList">
-        <p>No items added yet.</p>
+    <!-- MATERIAL SECTION -->
+
+    <section id="materials" class="section">
+
+      <h2>Material Logic</h2>
+
+      <div class="card">
+
+        <p>
+          Current drop assembly includes:
+        </p>
+
+        <ul>
+          <li>3 × 90s per head</li>
+          <li>1 × 1" x 2" nipple</li>
+          <li>1 hanger assembly</li>
+          <li>1 rod assembly</li>
+        </ul>
+
+        <p>
+          1" pipe is threaded only and does not use grooved couplings.
+        </p>
+
       </div>
+
     </section>
 
-    <section class="card">
-      <h2>Estimate Summary</h2>
-      <div id="results" class="results"></div>
+    <!-- LABOUR -->
+
+    <section id="labour" class="section">
+
+      <h2>Labour Logic</h2>
+
+      <div class="card">
+
+        <p>
+          Default labour rate is currently set to:
+        </p>
+
+        <h3>1 hour per sprinkler head</h3>
+
+        <p>
+          This can be adjusted per project.
+        </p>
+
+      </div>
+
     </section>
+
+    <!-- AI TAKEOFF -->
+
+    <section id="ai" class="section">
+
+      <h2>AI PDF Takeoff</h2>
+
+      <div class="card">
+
+        <p>
+          Future feature:
+        </p>
+
+        <ul>
+          <li>Upload sprinkler PDFs</li>
+          <li>Automatic head counts</li>
+          <li>Pipe sizing detection</li>
+          <li>Material generation</li>
+          <li>Labour estimating</li>
+        </ul>
+
+        <input type="file" disabled />
+
+      </div>
+
+    </section>
+
   </main>
 
-  <script>
-    const estimateItems = [];
+  <footer>
 
-    const headTypes = {
-      pendant: [
-        "Quick Response Pendant",
-        "Standard Response Pendant",
-        "Residential Pendant",
-        "Concealed Pendant",
-        "Dry Pendant"
-      ],
-      upright: [
-        "Quick Response Upright",
-        "Standard Response Upright",
-        "Intermediate Temperature Upright",
-        "High Temperature Upright"
-      ],
-      sidewall: [
-        "Quick Response Sidewall",
-        "Standard Response Sidewall",
-        "Residential Sidewall",
-        "Dry Sidewall"
-      ]
-    };
+    <p>
+      Fire Sprinkler Estimator SaaS
+    </p>
 
-    function updateHeadTypes() {
-      const orientation = document.getElementById("headOrientation").value;
-      const headTypeSelect = document.getElementById("headType");
+  </footer>
 
-      headTypeSelect.innerHTML = "";
+  <script src="materials.js"></script>
+  <script src="labour.js"></script>
+  <script src="calculator.js"></script>
 
-      headTypes[orientation].forEach(function(type) {
-        const option = document.createElement("option");
-        option.value = type;
-        option.textContent = type;
-        headTypeSelect.appendChild(option);
-      });
-    }
-
-    function updateCategoryFields() {
-      const category = document.getElementById("category").value;
-
-      const headFields = [
-        "workTypeBox",
-        "orientationBox",
-        "headTypeBox",
-        "headSizeBox"
-      ];
-
-      headFields.forEach(function(id) {
-        document.getElementById(id).style.display = category === "heads" ? "block" : "none";
-      });
-
-      document.getElementById("pipeSizeBox").style.display =
-        category === "heads" || category === "branch" || category === "main" ? "block" : "none";
-
-      document.getElementById("pipeLengthBox").style.display =
-        category === "branch" || category === "main" ? "block" : "none";
-
-      document.getElementById("customDescriptionBox").style.display =
-        category === "custom" ? "block" : "none";
-    }
-
-    function addWorkItem() {
-      const category = document.getElementById("category").value;
-      const qty = Number(document.getElementById("qty").value);
-
-      if (qty <= 0) {
-        alert("Please enter a quantity greater than 0.");
-        return;
-      }
-
-      let item = {
-        category: category,
-        qty: qty
-      };
-
-      if (category === "heads") {
-        item.workType = document.getElementById("workType").value;
-        item.orientation = document.getElementById("headOrientation").value;
-        item.headType = document.getElementById("headType").value;
-        item.headSize = document.getElementById("headSize").value;
-        item.pipeSize = document.getElementById("pipeSize").value;
-      }
-
-      if (category === "branch" || category === "main") {
-        item.pipeSize = document.getElementById("pipeSize").value;
-        item.pipeLength = Number(document.getElementById("pipeLength").value);
-      }
-
-      if (category === "hose") {
-        item.description = "Fire Hose Cabinet";
-      }
-
-      if (category === "custom") {
-        item.description = document.getElementById("customDescription").value || "Custom Item";
-      }
-
-      estimateItems.push(item);
-      renderItemList();
-    }
-
-    function renderItemList() {
-      const itemList = document.getElementById("itemList");
-
-      if (estimateItems.length === 0) {
-        itemList.innerHTML = "<p>No items added yet.</p>";
-        return;
-      }
-
-      let html = "";
-
-      estimateItems.forEach(function(item, index) {
-        html += "<div class='line-item'>";
-        html += "<strong>Item " + (index + 1) + ":</strong> ";
-
-        if (item.category === "heads") {
-          html += formatWorkType(item.workType) + " — ";
-          html += capitalize(item.orientation) + " — ";
-          html += item.headSize + "\" " + item.headType + " — ";
-          html += "Qty " + item.qty;
-        }
-
-        if (item.category === "branch") {
-          html += "Branch Line Work — " + item.pipeSize + "\" Pipe — ";
-          html += item.pipeLength + " ft — Qty " + item.qty;
-        }
-
-        if (item.category === "main") {
-          html += "Main Line Work — " + item.pipeSize + "\" Pipe — ";
-          html += item.pipeLength + " ft — Qty " + item.qty;
-        }
-
-        if (item.category === "hose") {
-          html += "Fire Hose Cabinet — Qty " + item.qty;
-        }
-
-        if (item.category === "custom") {
-          html += item.description + " — Qty " + item.qty;
-        }
-
-        html += "</div>";
-      });
-
-      itemList.innerHTML = html;
-    }
-
-    function generateEstimate() {
-      const results = document.getElementById("results");
-
-      if (estimateItems.length === 0) {
-        results.style.display = "block";
-        results.innerHTML = "<p>Please add at least one work item.</p>";
-        return;
-      }
-
-      const projectName = document.getElementById("projectName").value || "Not entered";
-      const customerName = document.getElementById("customerName").value || "Not entered";
-      const projectLocation = document.getElementById("projectLocation").value || "Not entered";
-      const projectDate = document.getElementById("projectDate").value || "Not entered";
-
-      let materials = {};
-      let notes = [];
-      let labourHours = 0;
-
-      estimateItems.forEach(function(item) {
-        if (item.category === "heads") {
-          addMaterial(materials, item.headSize + "\" " + item.headType + " Sprinkler Head", item.qty);
-
-          if (item.workType === "new") {
-            addMaterial(materials, item.pipeSize + "\" x " + item.headSize + "\" Mechanical Tee", item.qty);
-
-            if (item.orientation === "pendant") {
-              addPendantDropMaterials(materials, item.qty, item.headSize);
-              notes.push("New pendant heads include drop assembly material.");
-            }
-
-            if (item.orientation === "upright") {
-              notes.push("New upright heads include mechanical tees but no pendant drop assembly.");
-            }
-
-            if (item.orientation === "sidewall") {
-              notes.push("New sidewall heads include mechanical tees. Sidewall extensions should be confirmed.");
-            }
-          }
-
-          if (item.workType === "relocate") {
-            if (item.orientation === "pendant") {
-              addPendantDropMaterials(materials, item.qty, item.headSize);
-              notes.push("Relocated pendant heads include drop assembly material but no mechanical tees.");
-            }
-
-            if (item.orientation === "upright") {
-              notes.push("Relocated upright heads do not include mechanical tees by default.");
-            }
-
-            if (item.orientation === "sidewall") {
-              notes.push("Relocated sidewall heads do not include mechanical tees by default.");
-            }
-          }
-
-          if (item.workType === "replace") {
-            notes.push("Head replacement only includes sprinkler heads.");
-          }
-
-          labourHours += item.qty * 1;
-        }
-
-        if (item.category === "branch") {
-          addMaterial(materials, item.pipeSize + "\" Branch Line Pipe - ft", item.pipeLength);
-          addMaterial(materials, item.pipeSize + "\" Hangers", Math.ceil(item.pipeLength / 10));
-          addMaterial(materials, item.pipeSize + "\" Grooved Couplings", Math.ceil(item.pipeLength / 21));
-          labourHours += item.pipeLength * 0.15;
-          notes.push("Branch line labour is estimated at 0.15 hours per foot.");
-        }
-
-        if (item.category === "main") {
-          addMaterial(materials, item.pipeSize + "\" Main Line Pipe - ft", item.pipeLength);
-          addMaterial(materials, item.pipeSize + "\" Hangers", Math.ceil(item.pipeLength / 10));
-          addMaterial(materials, item.pipeSize + "\" Grooved Couplings", Math.ceil(item.pipeLength / 21));
-          labourHours += item.pipeLength * 0.2;
-          notes.push("Main line labour is estimated at 0.20 hours per foot.");
-        }
-
-        if (item.category === "hose") {
-          addMaterial(materials, "Fire Hose Cabinet", item.qty);
-          labourHours += item.qty * 4;
-          notes.push("Fire hose cabinet labour is estimated at 4 hours each.");
-        }
-
-        if (item.category === "custom") {
-          addMaterial(materials, item.description, item.qty);
-          notes.push("Custom item added. Labour/pricing should be reviewed manually.");
-        }
-      });
-
-      let html = "";
-
-      html += "<h3>Project Info</h3>";
-      html += "<ul>";
-      html += "<li><strong>Project:</strong> " + projectName + "</li>";
-      html += "<li><strong>Customer:</strong> " + customerName + "</li>";
-      html += "<li><strong>Location:</strong> " + projectLocation + "</li>";
-      html += "<li><strong>Date:</strong> " + projectDate + "</li>";
-      html += "</ul>";
-
-      html += "<h3>Work Items</h3>";
-      html += "<ul>";
-      estimateItems.forEach(function(item, index) {
-        html += "<li>Item " + (index + 1) + ": " + describeItem(item) + "</li>";
-      });
-      html += "</ul>";
-
-      html += "<h3>Combined Material List</h3>";
-      html += "<ul>";
-      Object.keys(materials).forEach(function(material) {
-        html += "<li>" + materials[material] + " × " + material + "</li>";
-      });
-      html += "</ul>";
-
-      html += "<h3>Estimated Labour</h3>";
-      html += "<ul>";
-      html += "<li>" + labourHours.toFixed(1) + " total labour hour(s)</li>";
-      html += "</ul>";
-
-      html += "<h3>Notes / Assumptions</h3>";
-      html += "<ul>";
-      [...new Set(notes)].forEach(function(note) {
-        html += "<li>" + note + "</li>";
-      });
-      html += "</ul>";
-
-      results.style.display = "block";
-      results.innerHTML = html;
-    }
-
-    function addPendantDropMaterials(materials, qty, headSize) {
-      addMaterial(materials, "1\" Threaded 90", qty * 3);
-      addMaterial(materials, "1\" x 2\" Nipple", qty);
-      addMaterial(materials, "1\" Hanger", qty);
-      addMaterial(materials, "Rod Assembly", qty);
-      addMaterial(materials, headSize + "\" Sprinkler Nipple / Adapter as required", qty);
-    }
-
-    function addMaterial(materials, name, qty) {
-      if (!materials[name]) {
-        materials[name] = 0;
-      }
-
-      materials[name] += qty;
-    }
-
-    function describeItem(item) {
-      if (item.category === "heads") {
-        return formatWorkType(item.workType) + " — " +
-          capitalize(item.orientation) + " — " +
-          item.headSize + "\" " + item.headType + " — Qty " + item.qty;
-      }
-
-      if (item.category === "branch") {
-        return "Branch Line Work — " + item.pipeSize + "\" Pipe — " + item.pipeLength + " ft";
-      }
-
-      if (item.category === "main") {
-        return "Main Line Work — " + item.pipeSize + "\" Pipe — " + item.pipeLength + " ft";
-      }
-
-      if (item.category === "hose") {
-        return "Fire Hose Cabinet — Qty " + item.qty;
-      }
-
-      if (item.category === "custom") {
-        return item.description + " — Qty " + item.qty;
-      }
-
-      return "Work Item";
-    }
-
-    function clearEstimate() {
-      estimateItems.length = 0;
-      renderItemList();
-      document.getElementById("results").style.display = "none";
-      document.getElementById("results").innerHTML = "";
-    }
-
-    function capitalize(word) {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    }
-
-    function formatWorkType(type) {
-      if (type === "new") return "New";
-      if (type === "relocate") return "Relocate";
-      if (type === "replace") return "Replace";
-      return type;
-    }
-
-    updateHeadTypes();
-    updateCategoryFields();
-  </script>
 </body>
 </html>
