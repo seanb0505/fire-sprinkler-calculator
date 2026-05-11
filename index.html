@@ -26,11 +26,10 @@
 
     header p {
       color: #d1d5db;
-      margin-top: 10px;
     }
 
     main {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: 30px auto;
       padding: 20px;
     }
@@ -66,7 +65,7 @@
 
     button {
       width: 100%;
-      margin-top: 22px;
+      margin-top: 18px;
       padding: 15px;
       background: #2563eb;
       color: white;
@@ -81,10 +80,34 @@
       background: #1d4ed8;
     }
 
+    .secondary-btn {
+      background: #374151;
+    }
+
+    .secondary-btn:hover {
+      background: #4b5563;
+    }
+
+    .danger-btn {
+      background: #dc2626;
+    }
+
+    .danger-btn:hover {
+      background: #b91c1c;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
+    }
+
+    .line-item {
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 12px;
     }
 
     .results {
@@ -115,11 +138,6 @@
       margin-top: 15px;
     }
 
-    .coming-soon {
-      color: #9ca3af;
-      font-size: 14px;
-    }
-
     @media (max-width: 750px) {
       .grid {
         grid-template-columns: 1fr;
@@ -135,7 +153,7 @@
 <body>
   <header>
     <h1>Fire Sprinkler Estimator</h1>
-    <p>Material and labour calculator for sprinkler contractors.</p>
+    <p>Build full project estimates with multiple sprinkler work items.</p>
   </header>
 
   <main>
@@ -166,24 +184,35 @@
     </section>
 
     <section class="card">
-      <h2>Sprinkler Head Calculator</h2>
+      <h2>Add Work Item</h2>
 
       <div class="grid">
         <div>
-          <label>Work Type</label>
-          <select id="workType">
-            <option value="new">New Heads</option>
-            <option value="relocate">Relocate Heads</option>
-            <option value="replace">Replace Existing Heads</option>
+          <label>Category</label>
+          <select id="category" onchange="updateCategoryFields()">
+            <option value="heads">Sprinkler Heads</option>
+            <option value="branch">Branch Line Work</option>
+            <option value="main">Main Line Work</option>
+            <option value="hose">Fire Hose Cabinet</option>
+            <option value="custom">Custom Item</option>
           </select>
         </div>
 
         <div>
-          <label>Quantity of Heads</label>
-          <input id="headQty" type="number" min="0" value="0" />
+          <label>Quantity</label>
+          <input id="qty" type="number" min="0" value="0" />
         </div>
 
-        <div>
+        <div id="workTypeBox">
+          <label>Work Type</label>
+          <select id="workType">
+            <option value="new">New</option>
+            <option value="relocate">Relocate</option>
+            <option value="replace">Replace</option>
+          </select>
+        </div>
+
+        <div id="orientationBox">
           <label>Head Orientation</label>
           <select id="headOrientation" onchange="updateHeadTypes()">
             <option value="pendant">Pendant</option>
@@ -192,12 +221,12 @@
           </select>
         </div>
 
-        <div>
+        <div id="headTypeBox">
           <label>Specific Head Type</label>
           <select id="headType"></select>
         </div>
 
-        <div>
+        <div id="headSizeBox">
           <label>Head Connection Size</label>
           <select id="headSize">
             <option value="1/2">1/2&quot;</option>
@@ -205,35 +234,56 @@
           </select>
         </div>
 
-        <div>
-          <label>Branch Line / Pipe Size</label>
+        <div id="pipeSizeBox">
+          <label>Pipe Size</label>
           <select id="pipeSize">
             <option value="1">1&quot;</option>
             <option value="1-1/4">1-1/4&quot;</option>
             <option value="1-1/2">1-1/2&quot;</option>
             <option value="2">2&quot;</option>
+            <option value="2-1/2">2-1/2&quot;</option>
+            <option value="3">3&quot;</option>
+            <option value="4">4&quot;</option>
+            <option value="6">6&quot;</option>
           </select>
+        </div>
+
+        <div id="pipeLengthBox">
+          <label>Pipe Length / Footage</label>
+          <input id="pipeLength" type="number" min="0" value="0" />
+        </div>
+
+        <div id="customDescriptionBox">
+          <label>Description</label>
+          <input id="customDescription" type="text" placeholder="Example: Drain valve, test connection, demo work" />
         </div>
       </div>
 
+      <button onclick="addWorkItem()">Add Item to Estimate</button>
+      <button class="secondary-btn" onclick="generateEstimate()">Generate Full Estimate</button>
+      <button class="danger-btn" onclick="clearEstimate()">Clear Estimate</button>
+
       <p class="note">
-        Pendant heads include drop assembly material. Upright and sidewall logic is separated so we can make it more accurate later.
+        Add multiple items for one job: new pendants, relocated uprights, sidewalls, branch lines, mains, hose cabinets, and custom work.
       </p>
-
-      <button onclick="calculateEstimate()">Generate Material List</button>
-
-      <div id="results" class="results"></div>
     </section>
 
     <section class="card">
-      <h2>Future AI PDF Takeoff</h2>
-      <p class="coming-soon">
-        Coming soon: upload sprinkler drawings, review AI-assisted counts, and generate draft material takeoffs.
-      </p>
+      <h2>Current Estimate Items</h2>
+      <div id="itemList">
+        <p>No items added yet.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Estimate Summary</h2>
+      <div id="results" class="results"></div>
     </section>
   </main>
 
   <script>
+    const estimateItems = [];
+
     const headTypes = {
       pendant: [
         "Quick Response Pendant",
@@ -270,86 +320,202 @@
       });
     }
 
-    function calculateEstimate() {
+    function updateCategoryFields() {
+      const category = document.getElementById("category").value;
+
+      const headFields = [
+        "workTypeBox",
+        "orientationBox",
+        "headTypeBox",
+        "headSizeBox"
+      ];
+
+      headFields.forEach(function(id) {
+        document.getElementById(id).style.display = category === "heads" ? "block" : "none";
+      });
+
+      document.getElementById("pipeSizeBox").style.display =
+        category === "heads" || category === "branch" || category === "main" ? "block" : "none";
+
+      document.getElementById("pipeLengthBox").style.display =
+        category === "branch" || category === "main" ? "block" : "none";
+
+      document.getElementById("customDescriptionBox").style.display =
+        category === "custom" ? "block" : "none";
+    }
+
+    function addWorkItem() {
+      const category = document.getElementById("category").value;
+      const qty = Number(document.getElementById("qty").value);
+
+      if (qty <= 0) {
+        alert("Please enter a quantity greater than 0.");
+        return;
+      }
+
+      let item = {
+        category: category,
+        qty: qty
+      };
+
+      if (category === "heads") {
+        item.workType = document.getElementById("workType").value;
+        item.orientation = document.getElementById("headOrientation").value;
+        item.headType = document.getElementById("headType").value;
+        item.headSize = document.getElementById("headSize").value;
+        item.pipeSize = document.getElementById("pipeSize").value;
+      }
+
+      if (category === "branch" || category === "main") {
+        item.pipeSize = document.getElementById("pipeSize").value;
+        item.pipeLength = Number(document.getElementById("pipeLength").value);
+      }
+
+      if (category === "hose") {
+        item.description = "Fire Hose Cabinet";
+      }
+
+      if (category === "custom") {
+        item.description = document.getElementById("customDescription").value || "Custom Item";
+      }
+
+      estimateItems.push(item);
+      renderItemList();
+    }
+
+    function renderItemList() {
+      const itemList = document.getElementById("itemList");
+
+      if (estimateItems.length === 0) {
+        itemList.innerHTML = "<p>No items added yet.</p>";
+        return;
+      }
+
+      let html = "";
+
+      estimateItems.forEach(function(item, index) {
+        html += "<div class='line-item'>";
+        html += "<strong>Item " + (index + 1) + ":</strong> ";
+
+        if (item.category === "heads") {
+          html += formatWorkType(item.workType) + " — ";
+          html += capitalize(item.orientation) + " — ";
+          html += item.headSize + "\" " + item.headType + " — ";
+          html += "Qty " + item.qty;
+        }
+
+        if (item.category === "branch") {
+          html += "Branch Line Work — " + item.pipeSize + "\" Pipe — ";
+          html += item.pipeLength + " ft — Qty " + item.qty;
+        }
+
+        if (item.category === "main") {
+          html += "Main Line Work — " + item.pipeSize + "\" Pipe — ";
+          html += item.pipeLength + " ft — Qty " + item.qty;
+        }
+
+        if (item.category === "hose") {
+          html += "Fire Hose Cabinet — Qty " + item.qty;
+        }
+
+        if (item.category === "custom") {
+          html += item.description + " — Qty " + item.qty;
+        }
+
+        html += "</div>";
+      });
+
+      itemList.innerHTML = html;
+    }
+
+    function generateEstimate() {
+      const results = document.getElementById("results");
+
+      if (estimateItems.length === 0) {
+        results.style.display = "block";
+        results.innerHTML = "<p>Please add at least one work item.</p>";
+        return;
+      }
+
       const projectName = document.getElementById("projectName").value || "Not entered";
       const customerName = document.getElementById("customerName").value || "Not entered";
       const projectLocation = document.getElementById("projectLocation").value || "Not entered";
       const projectDate = document.getElementById("projectDate").value || "Not entered";
 
-      const workType = document.getElementById("workType").value;
-      const qty = Number(document.getElementById("headQty").value);
-      const orientation = document.getElementById("headOrientation").value;
-      const headType = document.getElementById("headType").value;
-      const headSize = document.getElementById("headSize").value;
-      const pipeSize = document.getElementById("pipeSize").value;
-
-      const results = document.getElementById("results");
-
-      if (qty <= 0) {
-        results.style.display = "block";
-        results.innerHTML = "<p>Please enter a head quantity greater than 0.</p>";
-        return;
-      }
-
-      let materialList = [];
-      let dropAssembly = [];
+      let materials = {};
       let notes = [];
+      let labourHours = 0;
 
-      materialList.push(qty + " × " + headSize + "\" " + headType + " Sprinkler Head");
+      estimateItems.forEach(function(item) {
+        if (item.category === "heads") {
+          addMaterial(materials, item.headSize + "\" " + item.headType + " Sprinkler Head", item.qty);
 
-      if (workType === "new") {
-        materialList.push(qty + " × " + pipeSize + "\" x " + headSize + "\" Mechanical Tee");
+          if (item.workType === "new") {
+            addMaterial(materials, item.pipeSize + "\" x " + item.headSize + "\" Mechanical Tee", item.qty);
 
-        if (orientation === "pendant") {
-          dropAssembly.push((qty * 3) + " × 1\" Threaded 90s");
-          dropAssembly.push(qty + " × 1\" x 2\" Nipple");
-          dropAssembly.push(qty + " × 1\" Hanger");
-          dropAssembly.push(qty + " × Rod Assembly");
-          dropAssembly.push(qty + " × " + headSize + "\" Sprinkler Nipple / Adapter as required");
+            if (item.orientation === "pendant") {
+              addPendantDropMaterials(materials, item.qty, item.headSize);
+              notes.push("New pendant heads include drop assembly material.");
+            }
 
-          notes.push("Pendant new heads include drop assembly material.");
-          notes.push("No grooved couplings are included for drops-only work.");
+            if (item.orientation === "upright") {
+              notes.push("New upright heads include mechanical tees but no pendant drop assembly.");
+            }
+
+            if (item.orientation === "sidewall") {
+              notes.push("New sidewall heads include mechanical tees. Sidewall extensions should be confirmed.");
+            }
+          }
+
+          if (item.workType === "relocate") {
+            if (item.orientation === "pendant") {
+              addPendantDropMaterials(materials, item.qty, item.headSize);
+              notes.push("Relocated pendant heads include drop assembly material but no mechanical tees.");
+            }
+
+            if (item.orientation === "upright") {
+              notes.push("Relocated upright heads do not include mechanical tees by default.");
+            }
+
+            if (item.orientation === "sidewall") {
+              notes.push("Relocated sidewall heads do not include mechanical tees by default.");
+            }
+          }
+
+          if (item.workType === "replace") {
+            notes.push("Head replacement only includes sprinkler heads.");
+          }
+
+          labourHours += item.qty * 1;
         }
 
-        if (orientation === "upright") {
-          notes.push("Upright heads usually do not require pendant drop assemblies.");
-          notes.push("Confirm if upright heads are installed directly into mechanical tees or threaded outlets.");
+        if (item.category === "branch") {
+          addMaterial(materials, item.pipeSize + "\" Branch Line Pipe - ft", item.pipeLength);
+          addMaterial(materials, item.pipeSize + "\" Hangers", Math.ceil(item.pipeLength / 10));
+          addMaterial(materials, item.pipeSize + "\" Grooved Couplings", Math.ceil(item.pipeLength / 21));
+          labourHours += item.pipeLength * 0.15;
+          notes.push("Branch line labour is estimated at 0.15 hours per foot.");
         }
 
-        if (orientation === "sidewall") {
-          notes.push("Sidewall heads may need nipples, elbows, or extensions depending on wall location.");
-          notes.push("Sidewall assembly logic should be reviewed separately.");
-        }
-      }
-
-      if (workType === "relocate") {
-        if (orientation === "pendant") {
-          dropAssembly.push((qty * 3) + " × 1\" Threaded 90s");
-          dropAssembly.push(qty + " × 1\" x 2\" Nipple");
-          dropAssembly.push(qty + " × 1\" Hanger");
-          dropAssembly.push(qty + " × Rod Assembly");
-          dropAssembly.push(qty + " × " + headSize + "\" Sprinkler Nipple / Adapter as required");
-
-          notes.push("Relocated pendant heads do not include mechanical tees.");
-          notes.push("Pendant relocate work includes drop assembly material.");
+        if (item.category === "main") {
+          addMaterial(materials, item.pipeSize + "\" Main Line Pipe - ft", item.pipeLength);
+          addMaterial(materials, item.pipeSize + "\" Hangers", Math.ceil(item.pipeLength / 10));
+          addMaterial(materials, item.pipeSize + "\" Grooved Couplings", Math.ceil(item.pipeLength / 21));
+          labourHours += item.pipeLength * 0.2;
+          notes.push("Main line labour is estimated at 0.20 hours per foot.");
         }
 
-        if (orientation === "upright") {
-          notes.push("Relocated upright heads do not include mechanical tees by default.");
-          notes.push("Confirm existing branch line condition before ordering fittings.");
+        if (item.category === "hose") {
+          addMaterial(materials, "Fire Hose Cabinet", item.qty);
+          labourHours += item.qty * 4;
+          notes.push("Fire hose cabinet labour is estimated at 4 hours each.");
         }
 
-        if (orientation === "sidewall") {
-          notes.push("Relocated sidewall heads do not include mechanical tees by default.");
-          notes.push("Confirm wall location and extension requirements.");
+        if (item.category === "custom") {
+          addMaterial(materials, item.description, item.qty);
+          notes.push("Custom item added. Labour/pricing should be reviewed manually.");
         }
-      }
-
-      if (workType === "replace") {
-        notes.push("Head replacement only. No pipe, tees, hangers, or drop assembly material included.");
-      }
-
-      const labourHours = qty * 1;
+      });
 
       let html = "";
 
@@ -361,40 +527,28 @@
       html += "<li><strong>Date:</strong> " + projectDate + "</li>";
       html += "</ul>";
 
-      html += "<h3>Selected Sprinkler Head</h3>";
+      html += "<h3>Work Items</h3>";
       html += "<ul>";
-      html += "<li><strong>Work Type:</strong> " + formatWorkType(workType) + "</li>";
-      html += "<li><strong>Orientation:</strong> " + capitalize(orientation) + "</li>";
-      html += "<li><strong>Head Type:</strong> " + headType + "</li>";
-      html += "<li><strong>Head Size:</strong> " + headSize + "\"</li>";
-      html += "<li><strong>Pipe Size:</strong> " + pipeSize + "\"</li>";
-      html += "<li><strong>Quantity:</strong> " + qty + "</li>";
-      html += "</ul>";
-
-      html += "<h3>Material List</h3>";
-      html += "<ul>";
-      materialList.forEach(function(item) {
-        html += "<li>" + item + "</li>";
+      estimateItems.forEach(function(item, index) {
+        html += "<li>Item " + (index + 1) + ": " + describeItem(item) + "</li>";
       });
       html += "</ul>";
 
-      if (dropAssembly.length > 0) {
-        html += "<h3>Drop Assembly Material</h3>";
-        html += "<ul>";
-        dropAssembly.forEach(function(item) {
-          html += "<li>" + item + "</li>";
-        });
-        html += "</ul>";
-      }
+      html += "<h3>Combined Material List</h3>";
+      html += "<ul>";
+      Object.keys(materials).forEach(function(material) {
+        html += "<li>" + materials[material] + " × " + material + "</li>";
+      });
+      html += "</ul>";
 
       html += "<h3>Estimated Labour</h3>";
       html += "<ul>";
-      html += "<li>" + labourHours + " labour hour(s)</li>";
+      html += "<li>" + labourHours.toFixed(1) + " total labour hour(s)</li>";
       html += "</ul>";
 
       html += "<h3>Notes / Assumptions</h3>";
       html += "<ul>";
-      notes.forEach(function(note) {
+      [...new Set(notes)].forEach(function(note) {
         html += "<li>" + note + "</li>";
       });
       html += "</ul>";
@@ -403,18 +557,68 @@
       results.innerHTML = html;
     }
 
+    function addPendantDropMaterials(materials, qty, headSize) {
+      addMaterial(materials, "1\" Threaded 90", qty * 3);
+      addMaterial(materials, "1\" x 2\" Nipple", qty);
+      addMaterial(materials, "1\" Hanger", qty);
+      addMaterial(materials, "Rod Assembly", qty);
+      addMaterial(materials, headSize + "\" Sprinkler Nipple / Adapter as required", qty);
+    }
+
+    function addMaterial(materials, name, qty) {
+      if (!materials[name]) {
+        materials[name] = 0;
+      }
+
+      materials[name] += qty;
+    }
+
+    function describeItem(item) {
+      if (item.category === "heads") {
+        return formatWorkType(item.workType) + " — " +
+          capitalize(item.orientation) + " — " +
+          item.headSize + "\" " + item.headType + " — Qty " + item.qty;
+      }
+
+      if (item.category === "branch") {
+        return "Branch Line Work — " + item.pipeSize + "\" Pipe — " + item.pipeLength + " ft";
+      }
+
+      if (item.category === "main") {
+        return "Main Line Work — " + item.pipeSize + "\" Pipe — " + item.pipeLength + " ft";
+      }
+
+      if (item.category === "hose") {
+        return "Fire Hose Cabinet — Qty " + item.qty;
+      }
+
+      if (item.category === "custom") {
+        return item.description + " — Qty " + item.qty;
+      }
+
+      return "Work Item";
+    }
+
+    function clearEstimate() {
+      estimateItems.length = 0;
+      renderItemList();
+      document.getElementById("results").style.display = "none";
+      document.getElementById("results").innerHTML = "";
+    }
+
     function capitalize(word) {
       return word.charAt(0).toUpperCase() + word.slice(1);
     }
 
     function formatWorkType(type) {
-      if (type === "new") return "New Heads";
-      if (type === "relocate") return "Relocate Heads";
-      if (type === "replace") return "Replace Existing Heads";
+      if (type === "new") return "New";
+      if (type === "relocate") return "Relocate";
+      if (type === "replace") return "Replace";
       return type;
     }
 
     updateHeadTypes();
+    updateCategoryFields();
   </script>
 </body>
 </html>
