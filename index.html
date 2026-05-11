@@ -4,260 +4,163 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fire Sprinkler Estimator</title>
-
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <header class="hero">
-
-    <nav class="nav">
-      <div class="logo">
-        Fire Sprinkler Estimator
-      </div>
-
-      <div class="nav-links">
-        <a href="#estimator">Estimator</a>
-        <a href="#materials">Materials</a>
-        <a href="#labour">Labour</a>
-        <a href="#ai">AI Takeoff</a>
-      </div>
-    </nav>
-
-    <div class="hero-content">
-      <h1>Fire Sprinkler Estimating Software</h1>
-
-      <p>
-        Generate sprinkler material lists, labour estimates,
-        contractor pricing, and future AI PDF takeoffs.
-      </p>
-
-      <a href="#estimator" class="button">
-        Start Estimate
-      </a>
+<header class="hero">
+  <nav class="nav">
+    <div class="logo">Fire Sprinkler Estimator</div>
+    <div class="nav-links">
+      <a href="#estimator">Estimator</a>
+      <a href="#proposal">Proposal</a>
+      <a href="#ai">AI Takeoff</a>
     </div>
+  </nav>
 
-  </header>
-
-  <main>
-
-    <!-- ESTIMATOR -->
-
-    <section id="estimator" class="section">
-
-      <h2>Project Estimator</h2>
-
-      <div class="card estimator-grid">
-
-        <label>
-          Project Name
-
-          <input
-            type="text"
-            id="projectName"
-            placeholder="Example: Office Renovation"
-          />
-        </label>
-
-        <label>
-          Job Type
-
-          <select id="jobType">
-            <option value="new">New Drops</option>
-            <option value="relocate">Relocates</option>
-            <option value="mixed">Mixed Job</option>
-            <option value="service">Service Work</option>
-          </select>
-        </label>
-
-        <label>
-          New Heads
-
-          <input
-            type="number"
-            id="newHeads"
-            value="0"
-            min="0"
-          />
-        </label>
-
-        <label>
-          Relocated Heads
-
-          <input
-            type="number"
-            id="relocateHeads"
-            value="0"
-            min="0"
-          />
-        </label>
-
-        <label>
-          Drop Pipe Size
-
-          <select id="dropPipeSize">
-            <option value="1">1" Threaded</option>
-            <option value="1.25">1-1/4"</option>
-            <option value="1.5">1-1/2"</option>
-            <option value="2">2" Grooved</option>
-          </select>
-        </label>
-
-        <label>
-          Mechanical Tee Required?
-
-          <select id="mechanicalTeeRequired">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </label>
-
-        <label>
-          Labour Hours Per Head
-
-          <input
-            type="number"
-            id="hoursPerHead"
-            value="1"
-            step="0.25"
-          />
-        </label>
-
-        <label>
-          Labour Rate / Hour
-
-          <input
-            type="number"
-            id="labourRate"
-            value="95"
-          />
-        </label>
-
-        <label>
-          Material Waste %
-
-          <input
-            type="number"
-            id="wastePercent"
-            value="10"
-          />
-        </label>
-
-        <label>
-          Markup %
-
-          <input
-            type="number"
-            id="markupPercent"
-            value="25"
-          />
-        </label>
-
-      </div>
-
-      <div class="actions">
-
-        <button class="button" onclick="runEstimate()">
-          Generate Estimate
-        </button>
-
-        <button class="button secondary" onclick="clearEstimate()">
-          Clear
-        </button>
-
-      </div>
-
-      <div id="estimateOutput"></div>
-
-    </section>
-
-    <!-- MATERIAL SECTION -->
-
-    <section id="materials" class="section">
-
-      <h2>Material Logic</h2>
-
-      <div class="card">
-
-        <p>
-          Current drop assembly includes:
-        </p>
-
-        <ul>
-          <li>3 × 90s per head</li>
-          <li>1 × 1" x 2" nipple</li>
-          <li>1 hanger assembly</li>
-          <li>1 rod assembly</li>
-        </ul>
-
-        <p>
-          1" pipe is threaded only and does not use grooved couplings.
-        </p>
-
-      </div>
-
-    </section>
-
-    <!-- LABOUR -->
-
-    <section id="labour" class="section">
-
-      <h2>Labour Logic</h2>
-
-      <div class="card">
-
-        <p>
-          Default labour rate is currently set to:
-        </p>
-
-        <h3>1 hour per sprinkler head</h3>
-
-        <p>
-          This can be adjusted per project.
-        </p>
-
-      </div>
-
-    </section>
-
-    <!-- AI TAKEOFF -->
-
-    <section id="ai" class="section">
-
-      <h2>AI PDF Takeoff</h2>
-
-      <div class="card">
-
-        <p>
-          Future feature:
-        </p>
-
-        <ul>
-          <li>Upload sprinkler PDFs</li>
-          <li>Automatic head counts</li>
-          <li>Pipe sizing detection</li>
-          <li>Material generation</li>
-          <li>Labour estimating</li>
-        </ul>
-
-        <input type="file" disabled />
-
-      </div>
-
-    </section>
-
-  </main>
-
-  <footer>
-
+  <div class="hero-content">
+    <h1>Professional Fire Sprinkler Estimates</h1>
     <p>
-      Fire Sprinkler Estimator SaaS
+      Generate material lists, labour pricing, contractor totals,
+      and printable PDF proposals.
     </p>
+    <a href="#estimator" class="button">Start Estimate</a>
+  </div>
+</header>
 
-  </footer>
+<main>
 
-  
+<section id="estimator" class="section">
+  <h2>Estimate Details</h2>
+
+  <div class="card estimator-grid">
+
+    <label>
+      Company Name
+      <input id="companyName" type="text" placeholder="Your Company Name" />
+    </label>
+
+    <label>
+      Customer Name
+      <input id="customerName" type="text" placeholder="Customer / Client" />
+    </label>
+
+    <label>
+      Project Name
+      <input id="projectName" type="text" placeholder="Example: Office Renovation" />
+    </label>
+
+    <label>
+      Project Location
+      <input id="projectLocation" type="text" placeholder="City / Address" />
+    </label>
+
+    <label>
+      Job Type
+      <select id="jobType">
+        <option value="new">New Drops</option>
+        <option value="relocate">Relocates</option>
+        <option value="mixed">Mixed Job</option>
+        <option value="service">Service Work</option>
+      </select>
+    </label>
+
+    <label>
+      New Heads
+      <input id="newHeads" type="number" value="0" min="0" />
+    </label>
+
+    <label>
+      Relocated Heads
+      <input id="relocateHeads" type="number" value="0" min="0" />
+    </label>
+
+    <label>
+      Drop Pipe Size
+      <select id="dropPipeSize">
+        <option value="1">1" Threaded</option>
+        <option value="1.25">1-1/4"</option>
+        <option value="1.5">1-1/2"</option>
+        <option value="2">2" Grooved</option>
+      </select>
+    </label>
+
+    <label>
+      Mechanical Tee Required?
+      <select id="mechanicalTeeRequired">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </label>
+
+    <label>
+      Labour Hours Per Head
+      <input id="hoursPerHead" type="number" value="1" step="0.25" />
+    </label>
+
+    <label>
+      Labour Rate / Hour
+      <input id="labourRate" type="number" value="95" />
+    </label>
+
+    <label>
+      Material Waste %
+      <input id="wastePercent" type="number" value="10" />
+    </label>
+
+    <label>
+      Overhead %
+      <input id="overheadPercent" type="number" value="10" />
+    </label>
+
+    <label>
+      Profit %
+      <input id="profitPercent" type="number" value="15" />
+    </label>
+
+  </div>
+
+  <div class="actions">
+    <button class="button" onclick="runEstimate()">Generate Estimate</button>
+    <button class="button secondary" onclick="printEstimate()">Export PDF</button>
+    <button class="button secondary" onclick="clearEstimate()">Clear</button>
+  </div>
+
+  <div id="estimateOutput"></div>
+</section>
+
+<section id="proposal" class="section">
+  <h2>Professional Proposal Output</h2>
+  <div class="card">
+    <p>
+      After generating an estimate, click <strong>Export PDF</strong>.
+      On iPhone, choose print/share, then save as PDF.
+    </p>
+  </div>
+</section>
+
+<section id="ai" class="section">
+  <h2>AI PDF Takeoff</h2>
+  <div class="card">
+    <p>Future feature:</p>
+    <ul>
+      <li>Upload sprinkler drawings</li>
+      <li>Automatic head counts</li>
+      <li>Pipe and fitting takeoff</li>
+      <li>Labour estimate generation</li>
+      <li>Material list export</li>
+    </ul>
+    <input type="file" disabled />
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Fire Sprinkler Estimator SaaS</p>
+</footer>
+
 <script>
 
 const MATERIAL_PRICES = {
@@ -272,108 +175,53 @@ const MATERIAL_PRICES = {
   threadedPipe1: 4.5
 };
 
+function getInputs() {
+  return {
+    companyName: document.getElementById("companyName").value || "Fire Sprinkler Contractor",
+    customerName: document.getElementById("customerName").value || "Customer",
+    projectName: document.getElementById("projectName").value || "Untitled Project",
+    projectLocation: document.getElementById("projectLocation").value || "Not Provided",
+    jobType: document.getElementById("jobType").value,
+    newHeads: Number(document.getElementById("newHeads").value) || 0,
+    relocateHeads: Number(document.getElementById("relocateHeads").value) || 0,
+    dropPipeSize: document.getElementById("dropPipeSize").value,
+    mechanicalTeeRequired: document.getElementById("mechanicalTeeRequired").value,
+    hoursPerHead: Number(document.getElementById("hoursPerHead").value) || 0,
+    labourRate: Number(document.getElementById("labourRate").value) || 0,
+    wastePercent: Number(document.getElementById("wastePercent").value) || 0,
+    overheadPercent: Number(document.getElementById("overheadPercent").value) || 0,
+    profitPercent: Number(document.getElementById("profitPercent").value) || 0
+  };
+}
+
 function calculateMaterials(inputs) {
-
-  const newHeads = inputs.newHeads;
-  const relocateHeads = inputs.relocateHeads;
-
-  const totalHeads = newHeads + relocateHeads;
-
+  const totalHeads = inputs.newHeads + inputs.relocateHeads;
   const materials = [];
 
-  addMaterial(
-    materials,
-    "Sprinkler Heads",
-    totalHeads,
-    MATERIAL_PRICES.sprinklerHead
-  );
+  addMaterial(materials, "Sprinkler Heads", totalHeads, MATERIAL_PRICES.sprinklerHead);
+  addMaterial(materials, "Threaded 90s", totalHeads * 3, MATERIAL_PRICES.threaded90);
+  addMaterial(materials, '1" x 2" Nipples', totalHeads, MATERIAL_PRICES.nipple1x2);
+  addMaterial(materials, "Hangers", totalHeads, MATERIAL_PRICES.hanger);
+  addMaterial(materials, "Rod Assemblies", totalHeads, MATERIAL_PRICES.rodAssembly);
 
-  addMaterial(
-    materials,
-    "Threaded 90s",
-    totalHeads * 3,
-    MATERIAL_PRICES.threaded90
-  );
-
-  addMaterial(
-    materials,
-    '1" x 2" Nipples',
-    totalHeads,
-    MATERIAL_PRICES.nipple1x2
-  );
-
-  addMaterial(
-    materials,
-    "Hangers",
-    totalHeads,
-    MATERIAL_PRICES.hanger
-  );
-
-  addMaterial(
-    materials,
-    "Rod Assemblies",
-    totalHeads,
-    MATERIAL_PRICES.rodAssembly
-  );
-
-  if (
-    newHeads > 0 &&
-    inputs.mechanicalTeeRequired === "yes"
-  ) {
-
+  if (inputs.newHeads > 0 && inputs.mechanicalTeeRequired === "yes") {
     if (inputs.dropPipeSize === "1") {
-
-      addMaterial(
-        materials,
-        '2" x 1" Mechanical Tees',
-        newHeads,
-        MATERIAL_PRICES.mechanicalTee2x1
-      );
-
+      addMaterial(materials, '2" x 1" Mechanical Tees', inputs.newHeads, MATERIAL_PRICES.mechanicalTee2x1);
     } else {
-
-      addMaterial(
-        materials,
-        `${inputs.dropPipeSize}" Mechanical Tees`,
-        newHeads,
-        MATERIAL_PRICES.mechanicalTeeLarge
-      );
-
+      addMaterial(materials, `${inputs.dropPipeSize}" Mechanical Tees`, inputs.newHeads, MATERIAL_PRICES.mechanicalTeeLarge);
     }
-
   }
 
-  if (
-    inputs.dropPipeSize !== "1" &&
-    totalHeads > 0
-  ) {
-
-    addMaterial(
-      materials,
-      `${inputs.dropPipeSize}" Grooved Couplings`,
-      totalHeads * 2,
-      MATERIAL_PRICES.groovedCoupling2
-    );
-
+  if (inputs.dropPipeSize !== "1" && totalHeads > 0) {
+    addMaterial(materials, `${inputs.dropPipeSize}" Grooved Couplings`, totalHeads * 2, MATERIAL_PRICES.groovedCoupling2);
   }
 
-  addMaterial(
-    materials,
-    '1" Threaded Pipe Allowance',
-    totalHeads,
-    MATERIAL_PRICES.threadedPipe1
-  );
+  addMaterial(materials, '1" Threaded Pipe Allowance', totalHeads, MATERIAL_PRICES.threadedPipe1);
 
   return materials;
 }
 
-function addMaterial(
-  materials,
-  name,
-  quantity,
-  unitCost
-) {
-
+function addMaterial(materials, name, quantity, unitCost) {
   if (quantity <= 0) return;
 
   materials.push({
@@ -382,118 +230,32 @@ function addMaterial(
     unitCost,
     total: quantity * unitCost
   });
-
-}
-
-function calculateMaterialSubtotal(materials) {
-
-  return materials.reduce(
-    (sum, item) => sum + item.total,
-    0
-  );
-
 }
 
 function calculateLabour(inputs) {
-
-  const totalHeads =
-    inputs.newHeads + inputs.relocateHeads;
-
-  const labourHours =
-    totalHeads * inputs.hoursPerHead;
-
-  const labourCost =
-    labourHours * inputs.labourRate;
+  const totalHeads = inputs.newHeads + inputs.relocateHeads;
+  const labourHours = totalHeads * inputs.hoursPerHead;
+  const labourCost = labourHours * inputs.labourRate;
 
   return {
     totalHeads,
     labourHours,
     labourCost
   };
-
-}
-
-function getInputs() {
-
-  return {
-
-    projectName:
-      document.getElementById("projectName").value ||
-      "Untitled Project",
-
-    jobType:
-      document.getElementById("jobType").value,
-
-    newHeads:
-      Number(
-        document.getElementById("newHeads").value
-      ) || 0,
-
-    relocateHeads:
-      Number(
-        document.getElementById("relocateHeads").value
-      ) || 0,
-
-    dropPipeSize:
-      document.getElementById("dropPipeSize").value,
-
-    mechanicalTeeRequired:
-      document.getElementById("mechanicalTeeRequired").value,
-
-    hoursPerHead:
-      Number(
-        document.getElementById("hoursPerHead").value
-      ) || 0,
-
-    labourRate:
-      Number(
-        document.getElementById("labourRate").value
-      ) || 0,
-
-    wastePercent:
-      Number(
-        document.getElementById("wastePercent").value
-      ) || 0,
-
-    markupPercent:
-      Number(
-        document.getElementById("markupPercent").value
-      ) || 0
-
-  };
-
 }
 
 function runEstimate() {
-
   const inputs = getInputs();
+  const materials = calculateMaterials(inputs);
+  const labour = calculateLabour(inputs);
 
-  const materials =
-    calculateMaterials(inputs);
-
-  const labour =
-    calculateLabour(inputs);
-
-  const materialSubtotal =
-    calculateMaterialSubtotal(materials);
-
-  const wasteAmount =
-    materialSubtotal *
-    (inputs.wastePercent / 100);
-
-  const materialWithWaste =
-    materialSubtotal + wasteAmount;
-
-  const directCost =
-    materialWithWaste +
-    labour.labourCost;
-
-  const markupAmount =
-    directCost *
-    (inputs.markupPercent / 100);
-
-  const totalEstimate =
-    directCost + markupAmount;
+  const materialSubtotal = materials.reduce((sum, item) => sum + item.total, 0);
+  const wasteAmount = materialSubtotal * (inputs.wastePercent / 100);
+  const materialWithWaste = materialSubtotal + wasteAmount;
+  const directCost = materialWithWaste + labour.labourCost;
+  const overheadAmount = directCost * (inputs.overheadPercent / 100);
+  const profitAmount = directCost * (inputs.profitPercent / 100);
+  const totalEstimate = directCost + overheadAmount + profitAmount;
 
   renderEstimate({
     inputs,
@@ -503,148 +265,169 @@ function runEstimate() {
     wasteAmount,
     materialWithWaste,
     directCost,
-    markupAmount,
+    overheadAmount,
+    profitAmount,
     totalEstimate
   });
-
 }
 
 function renderEstimate(data) {
-
-  const output =
-    document.getElementById("estimateOutput");
+  const output = document.getElementById("estimateOutput");
 
   output.innerHTML = `
+    <div class="proposal">
 
-    <div class="result-grid">
-
-      <div class="stat">
-        <span>Total Heads</span>
-        <strong>${data.labour.totalHeads}</strong>
+      <div class="proposal-header">
+        <div>
+          <h2>${data.inputs.companyName}</h2>
+          <p>Fire Sprinkler Estimate</p>
+        </div>
+        <div class="proposal-total">
+          <span>Total Estimate</span>
+          <strong>${formatMoney(data.totalEstimate)}</strong>
+        </div>
       </div>
 
-      <div class="stat">
-        <span>Labour Hours</span>
-        <strong>${data.labour.labourHours.toFixed(2)}</strong>
+      <div class="proposal-info">
+        <div>
+          <h4>Customer</h4>
+          <p>${data.inputs.customerName}</p>
+        </div>
+        <div>
+          <h4>Project</h4>
+          <p>${data.inputs.projectName}</p>
+        </div>
+        <div>
+          <h4>Location</h4>
+          <p>${data.inputs.projectLocation}</p>
+        </div>
+        <div>
+          <h4>Job Type</h4>
+          <p>${labelJobType(data.inputs.jobType)}</p>
+        </div>
       </div>
 
-      <div class="stat">
-        <span>Material Cost</span>
-        <strong>${formatMoney(data.materialWithWaste)}</strong>
+      <div class="result-grid">
+        <div class="stat">
+          <span>Total Heads</span>
+          <strong>${data.labour.totalHeads}</strong>
+        </div>
+        <div class="stat">
+          <span>Labour Hours</span>
+          <strong>${data.labour.labourHours.toFixed(2)}</strong>
+        </div>
+        <div class="stat">
+          <span>Material Cost</span>
+          <strong>${formatMoney(data.materialWithWaste)}</strong>
+        </div>
+        <div class="stat">
+          <span>Labour Cost</span>
+          <strong>${formatMoney(data.labour.labourCost)}</strong>
+        </div>
       </div>
 
-      <div class="stat">
-        <span>Total Estimate</span>
-        <strong>${formatMoney(data.totalEstimate)}</strong>
-      </div>
+      <h3>Material List</h3>
 
-    </div>
-
-    <div class="card">
-
-      <h3>${data.inputs.projectName}</h3>
-
-      <p>
-        <strong>Job Type:</strong>
-        ${labelJobType(data.inputs.jobType)}
-      </p>
-
-    </div>
-
-    <h3>Material List</h3>
-
-    <div class="table-wrapper">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th>Qty</th>
-            <th>Unit Cost</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          ${data.materials.map(item => `
-
+      <div class="table-wrapper">
+        <table>
+          <thead>
             <tr>
-              <td>${item.name}</td>
-              <td>${item.quantity}</td>
-              <td>${formatMoney(item.unitCost)}</td>
-              <td>${formatMoney(item.total)}</td>
+              <th>Material</th>
+              <th>Qty</th>
+              <th>Unit Cost</th>
+              <th>Total</th>
             </tr>
+          </thead>
+          <tbody>
+            ${data.materials.map(item => `
+              <tr>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${formatMoney(item.unitCost)}</td>
+                <td>${formatMoney(item.total)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
 
-          `).join("")}
+      <h3>Estimate Summary</h3>
 
-        </tbody>
+      <div class="summary-box">
+        <div><span>Material Subtotal</span><strong>${formatMoney(data.materialSubtotal)}</strong></div>
+        <div><span>Waste</span><strong>${formatMoney(data.wasteAmount)}</strong></div>
+        <div><span>Material With Waste</span><strong>${formatMoney(data.materialWithWaste)}</strong></div>
+        <div><span>Labour</span><strong>${formatMoney(data.labour.labourCost)}</strong></div>
+        <div><span>Direct Cost</span><strong>${formatMoney(data.directCost)}</strong></div>
+        <div><span>Overhead</span><strong>${formatMoney(data.overheadAmount)}</strong></div>
+        <div><span>Profit</span><strong>${formatMoney(data.profitAmount)}</strong></div>
+        <div class="grand-total"><span>Total Estimate</span><strong>${formatMoney(data.totalEstimate)}</strong></div>
+      </div>
 
-      </table>
+      <div class="proposal-notes">
+        <h3>Notes</h3>
+        <p>
+          This estimate is based on the entered head count, material assumptions,
+          labour rate, waste factor, overhead, and profit settings.
+        </p>
+        <p>
+          Final pricing may change after site review, drawing review, supplier pricing,
+          permit requirements, fire alarm coordination, shutdowns, or after-hours work.
+        </p>
+      </div>
 
     </div>
-
   `;
+}
 
+function printEstimate() {
+  const estimate = document.getElementById("estimateOutput");
+
+  if (!estimate.innerHTML.trim()) {
+    alert("Generate an estimate first.");
+    return;
+  }
+
+  window.print();
 }
 
 function clearEstimate() {
-
+  document.getElementById("companyName").value = "";
+  document.getElementById("customerName").value = "";
   document.getElementById("projectName").value = "";
-
+  document.getElementById("projectLocation").value = "";
   document.getElementById("jobType").value = "new";
-
   document.getElementById("newHeads").value = 0;
-
   document.getElementById("relocateHeads").value = 0;
-
   document.getElementById("dropPipeSize").value = "1";
-
   document.getElementById("mechanicalTeeRequired").value = "yes";
-
   document.getElementById("hoursPerHead").value = 1;
-
   document.getElementById("labourRate").value = 95;
-
   document.getElementById("wastePercent").value = 10;
-
-  document.getElementById("markupPercent").value = 25;
-
+  document.getElementById("overheadPercent").value = 10;
+  document.getElementById("profitPercent").value = 15;
   document.getElementById("estimateOutput").innerHTML = "";
-
 }
 
 function formatMoney(amount) {
-
-  return new Intl.NumberFormat(
-    "en-CA",
-    {
-      style: "currency",
-      currency: "CAD"
-    }
-  ).format(amount);
-
+  return new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD"
+  }).format(amount);
 }
 
 function labelJobType(value) {
-
   const labels = {
-
     new: "New Drops",
-
     relocate: "Relocates",
-
     mixed: "Mixed Job",
-
     service: "Service Work"
-
   };
 
   return labels[value] || value;
-
 }
 
 </script>
+
 </body>
 </html>
