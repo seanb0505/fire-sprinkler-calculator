@@ -9,14 +9,14 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #0f172a;
+      background: #111827;
       color: white;
     }
 
     header {
-      text-align: center;
+      background: #1f2937;
       padding: 40px 20px;
-      background: #111827;
+      text-align: center;
     }
 
     header h1 {
@@ -25,329 +25,396 @@
     }
 
     header p {
-      color: #cbd5e1;
+      color: #d1d5db;
+      margin-top: 10px;
     }
 
-    .container {
+    main {
       max-width: 1100px;
-      margin: auto;
+      margin: 30px auto;
       padding: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
     }
 
     .card {
-      background: #1e293b;
-      padding: 20px;
+      background: #1f2937;
+      padding: 22px;
       border-radius: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      margin-bottom: 22px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
     }
 
     h2 {
       margin-top: 0;
-      color: #38bdf8;
     }
 
     label {
       display: block;
-      margin-top: 12px;
-      color: #e5e7eb;
+      margin-top: 14px;
+      margin-bottom: 6px;
       font-weight: bold;
+      color: #e5e7eb;
     }
 
     input, select {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
+      padding: 12px;
       border-radius: 8px;
       border: none;
-      font-size: 15px;
+      font-size: 16px;
       box-sizing: border-box;
     }
 
     button {
-      margin-top: 20px;
       width: 100%;
-      padding: 14px;
+      margin-top: 22px;
+      padding: 15px;
+      background: #2563eb;
+      color: white;
       border: none;
-      border-radius: 10px;
-      background: #38bdf8;
-      color: #0f172a;
-      font-size: 18px;
+      border-radius: 8px;
+      font-size: 17px;
       font-weight: bold;
       cursor: pointer;
     }
 
     button:hover {
-      background: #0ea5e9;
+      background: #1d4ed8;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
     }
 
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #334155;
-      text-align: left;
+    .results {
+      display: none;
+      background: #111827;
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid #374151;
+      margin-top: 22px;
     }
 
-    th {
-      color: #38bdf8;
+    .results h3 {
+      color: #93c5fd;
+      margin-top: 22px;
     }
 
-    .summary {
-      font-size: 18px;
-      line-height: 1.7;
+    ul {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 8px;
     }
 
     .note {
-      color: #cbd5e1;
+      color: #fbbf24;
       font-size: 14px;
+      margin-top: 15px;
+    }
+
+    .coming-soon {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    @media (max-width: 750px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
 
 <body>
+  <header>
+    <h1>Fire Sprinkler Estimator</h1>
+    <p>Material and labour calculator for sprinkler contractors.</p>
+  </header>
 
-<header>
-  <h1>Fire Sprinkler Estimator</h1>
-  <p>Estimate sprinkler drops, relocates, materials, labour, and pricing.</p>
-</header>
+  <main>
+    <section class="card">
+      <h2>Project Info</h2>
 
-<div class="container">
+      <div class="grid">
+        <div>
+          <label>Project Name</label>
+          <input id="projectName" type="text" placeholder="Example: Office Renovation" />
+        </div>
 
-  <div class="grid">
+        <div>
+          <label>Customer</label>
+          <input id="customerName" type="text" placeholder="Customer name" />
+        </div>
 
-    <div class="card">
-      <h2>Job Information</h2>
+        <div>
+          <label>Location</label>
+          <input id="projectLocation" type="text" placeholder="Project location" />
+        </div>
 
-      <label>Project Name</label>
-      <input type="text" id="projectName" placeholder="Example: Office Renovation" />
+        <div>
+          <label>Date</label>
+          <input id="projectDate" type="date" />
+        </div>
+      </div>
+    </section>
 
-      <label>Job Type</label>
-      <select id="jobType">
-        <option>Small Contract</option>
-        <option>Large Contract</option>
-        <option>Service Job</option>
-        <option>Tenant Improvement</option>
-      </select>
+    <section class="card">
+      <h2>Sprinkler Head Calculator</h2>
 
-      <label>Location</label>
-      <input type="text" id="location" placeholder="Example: Barrie, ON" />
-    </div>
+      <div class="grid">
+        <div>
+          <label>Work Type</label>
+          <select id="workType">
+            <option value="new">New Heads</option>
+            <option value="relocate">Relocate Heads</option>
+            <option value="replace">Replace Existing Heads</option>
+          </select>
+        </div>
 
-    <div class="card">
-      <h2>Sprinkler Heads</h2>
+        <div>
+          <label>Quantity of Heads</label>
+          <input id="headQty" type="number" min="0" value="0" />
+        </div>
 
-      <label>New Pendant Heads</label>
-      <input type="number" id="newHeads" value="0" min="0" />
+        <div>
+          <label>Head Orientation</label>
+          <select id="headOrientation" onchange="updateHeadTypes()">
+            <option value="pendant">Pendant</option>
+            <option value="upright">Upright</option>
+            <option value="sidewall">Sidewall</option>
+          </select>
+        </div>
 
-      <label>Relocated Heads</label>
-      <input type="number" id="relocatedHeads" value="0" min="0" />
+        <div>
+          <label>Specific Head Type</label>
+          <select id="headType"></select>
+        </div>
 
-      <label>New Head Branch Pipe Size</label>
-      <select id="branchPipeSize">
-        <option value="2">2&quot; Pipe</option>
-        <option value="1.5">1-1/2&quot; Pipe</option>
-        <option value="1.25">1-1/4&quot; Pipe</option>
-      </select>
+        <div>
+          <label>Head Connection Size</label>
+          <select id="headSize">
+            <option value="1/2">1/2&quot;</option>
+            <option value="3/4">3/4&quot;</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Branch Line / Pipe Size</label>
+          <select id="pipeSize">
+            <option value="1">1&quot;</option>
+            <option value="1-1/4">1-1/4&quot;</option>
+            <option value="1-1/2">1-1/2&quot;</option>
+            <option value="2">2&quot;</option>
+          </select>
+        </div>
+      </div>
 
       <p class="note">
-        Pendant drops are estimated with 1&quot; threaded pipe. No 1&quot; couplings are included.
+        Pendant heads include drop assembly material. Upright and sidewall logic is separated so we can make it more accurate later.
       </p>
-    </div>
 
-    <div class="card">
-      <h2>Labour</h2>
+      <button onclick="calculateEstimate()">Generate Material List</button>
 
-      <label>Labour Hours Per Head</label>
-      <input type="number" id="hoursPerHead" value="1" step="0.25" min="0" />
+      <div id="results" class="results"></div>
+    </section>
 
-      <label>Hourly Labour Rate</label>
-      <input type="number" id="labourRate" value="95" min="0" />
+    <section class="card">
+      <h2>Future AI PDF Takeoff</h2>
+      <p class="coming-soon">
+        Coming soon: upload sprinkler drawings, review AI-assisted counts, and generate draft material takeoffs.
+      </p>
+    </section>
+  </main>
 
-      <label>Markup %</label>
-      <input type="number" id="markup" value="20" min="0" />
-    </div>
+  <script>
+    const headTypes = {
+      pendant: [
+        "Quick Response Pendant",
+        "Standard Response Pendant",
+        "Residential Pendant",
+        "Concealed Pendant",
+        "Dry Pendant"
+      ],
+      upright: [
+        "Quick Response Upright",
+        "Standard Response Upright",
+        "Intermediate Temperature Upright",
+        "High Temperature Upright"
+      ],
+      sidewall: [
+        "Quick Response Sidewall",
+        "Standard Response Sidewall",
+        "Residential Sidewall",
+        "Dry Sidewall"
+      ]
+    };
 
-    <div class="card">
-      <h2>Material Pricing</h2>
+    function updateHeadTypes() {
+      const orientation = document.getElementById("headOrientation").value;
+      const headTypeSelect = document.getElementById("headType");
 
-      <label>Sprinkler Head Cost</label>
-      <input type="number" id="headCost" value="18" min="0" />
+      headTypeSelect.innerHTML = "";
 
-      <label>1&quot; Drop Assembly Cost</label>
-      <input type="number" id="dropCost" value="32" min="0" />
+      headTypes[orientation].forEach(function(type) {
+        const option = document.createElement("option");
+        option.value = type;
+        option.textContent = type;
+        headTypeSelect.appendChild(option);
+      });
+    }
 
-      <label>Mechanical Tee Cost</label>
-      <input type="number" id="teeCost" value="28" min="0" />
+    function calculateEstimate() {
+      const projectName = document.getElementById("projectName").value || "Not entered";
+      const customerName = document.getElementById("customerName").value || "Not entered";
+      const projectLocation = document.getElementById("projectLocation").value || "Not entered";
+      const projectDate = document.getElementById("projectDate").value || "Not entered";
 
-      <label>Misc. Material Cost</label>
-      <input type="number" id="miscCost" value="0" min="0" />
-    </div>
+      const workType = document.getElementById("workType").value;
+      const qty = Number(document.getElementById("headQty").value);
+      const orientation = document.getElementById("headOrientation").value;
+      const headType = document.getElementById("headType").value;
+      const headSize = document.getElementById("headSize").value;
+      const pipeSize = document.getElementById("pipeSize").value;
 
-  </div>
+      const results = document.getElementById("results");
 
-  <button onclick="calculateEstimate()">Calculate Estimate</button>
+      if (qty <= 0) {
+        results.style.display = "block";
+        results.innerHTML = "<p>Please enter a head quantity greater than 0.</p>";
+        return;
+      }
 
-  <div class="card" style="margin-top: 25px;">
-    <h2>Estimate Summary</h2>
-    <div id="estimateSummary" class="summary">
-      Enter job information and click calculate.
-    </div>
-  </div>
+      let materialList = [];
+      let dropAssembly = [];
+      let notes = [];
 
-  <div class="card" style="margin-top: 25px;">
-    <h2>Material List</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Material</th>
-          <th>Quantity</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody id="materialTable">
-        <tr>
-          <td colspan="3">No estimate calculated yet.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+      materialList.push(qty + " × " + headSize + "\" " + headType + " Sprinkler Head");
 
-</div>
+      if (workType === "new") {
+        materialList.push(qty + " × " + pipeSize + "\" x " + headSize + "\" Mechanical Tee");
 
-<script>
-  function calculateEstimate() {
-    const projectName = document.getElementById("projectName").value || "Untitled Project";
-    const jobType = document.getElementById("jobType").value;
-    const location = document.getElementById("location").value || "Not entered";
+        if (orientation === "pendant") {
+          dropAssembly.push((qty * 3) + " × 1\" Threaded 90s");
+          dropAssembly.push(qty + " × 1\" x 2\" Nipple");
+          dropAssembly.push(qty + " × 1\" Hanger");
+          dropAssembly.push(qty + " × Rod Assembly");
+          dropAssembly.push(qty + " × " + headSize + "\" Sprinkler Nipple / Adapter as required");
 
-    const newHeads = Number(document.getElementById("newHeads").value) || 0;
-    const relocatedHeads = Number(document.getElementById("relocatedHeads").value) || 0;
-    const branchPipeSize = document.getElementById("branchPipeSize").value;
+          notes.push("Pendant new heads include drop assembly material.");
+          notes.push("No grooved couplings are included for drops-only work.");
+        }
 
-    const hoursPerHead = Number(document.getElementById("hoursPerHead").value) || 0;
-    const labourRate = Number(document.getElementById("labourRate").value) || 0;
-    const markup = Number(document.getElementById("markup").value) || 0;
+        if (orientation === "upright") {
+          notes.push("Upright heads usually do not require pendant drop assemblies.");
+          notes.push("Confirm if upright heads are installed directly into mechanical tees or threaded outlets.");
+        }
 
-    const headCost = Number(document.getElementById("headCost").value) || 0;
-    const dropCost = Number(document.getElementById("dropCost").value) || 0;
-    const teeCost = Number(document.getElementById("teeCost").value) || 0;
-    const miscCost = Number(document.getElementById("miscCost").value) || 0;
+        if (orientation === "sidewall") {
+          notes.push("Sidewall heads may need nipples, elbows, or extensions depending on wall location.");
+          notes.push("Sidewall assembly logic should be reviewed separately.");
+        }
+      }
 
-    const totalHeads = newHeads + relocatedHeads;
+      if (workType === "relocate") {
+        if (orientation === "pendant") {
+          dropAssembly.push((qty * 3) + " × 1\" Threaded 90s");
+          dropAssembly.push(qty + " × 1\" x 2\" Nipple");
+          dropAssembly.push(qty + " × 1\" Hanger");
+          dropAssembly.push(qty + " × Rod Assembly");
+          dropAssembly.push(qty + " × " + headSize + "\" Sprinkler Nipple / Adapter as required");
 
-    const sprinklerHeads = totalHeads;
-    const dropAssemblies = totalHeads;
-    const mechanicalTees = newHeads;
+          notes.push("Relocated pendant heads do not include mechanical tees.");
+          notes.push("Pendant relocate work includes drop assembly material.");
+        }
 
-    const oneInchPipeFeet = totalHeads * 3;
-    const oneInch90s = totalHeads * 3;
-    const oneByTwoNipples = totalHeads;
-    const hangers = totalHeads;
-    const rodAssemblies = totalHeads;
-    const escutcheons = totalHeads;
+        if (orientation === "upright") {
+          notes.push("Relocated upright heads do not include mechanical tees by default.");
+          notes.push("Confirm existing branch line condition before ordering fittings.");
+        }
 
-    const branchPipeFeet = newHeads * 4;
-    const branchCouplings = newHeads > 0 ? Math.ceil(branchPipeFeet / 21) : 0;
+        if (orientation === "sidewall") {
+          notes.push("Relocated sidewall heads do not include mechanical tees by default.");
+          notes.push("Confirm wall location and extension requirements.");
+        }
+      }
 
-    const totalLabourHours = totalHeads * hoursPerHead;
-    const labourTotal = totalLabourHours * labourRate;
+      if (workType === "replace") {
+        notes.push("Head replacement only. No pipe, tees, hangers, or drop assembly material included.");
+      }
 
-    const materialTotal =
-      (sprinklerHeads * headCost) +
-      (dropAssemblies * dropCost) +
-      (mechanicalTees * teeCost) +
-      miscCost;
+      const labourHours = qty * 1;
 
-    const subtotal = labourTotal + materialTotal;
-    const markupAmount = subtotal * (markup / 100);
-    const totalPrice = subtotal + markupAmount;
+      let html = "";
 
-    document.getElementById("estimateSummary").innerHTML = `
-      <strong>Project:</strong> ${projectName}<br>
-      <strong>Job Type:</strong> ${jobType}<br>
-      <strong>Location:</strong> ${location}<br><br>
+      html += "<h3>Project Info</h3>";
+      html += "<ul>";
+      html += "<li><strong>Project:</strong> " + projectName + "</li>";
+      html += "<li><strong>Customer:</strong> " + customerName + "</li>";
+      html += "<li><strong>Location:</strong> " + projectLocation + "</li>";
+      html += "<li><strong>Date:</strong> " + projectDate + "</li>";
+      html += "</ul>";
 
-      <strong>Total Heads:</strong> ${totalHeads}<br>
-      <strong>New Heads:</strong> ${newHeads}<br>
-      <strong>Relocated Heads:</strong> ${relocatedHeads}<br><br>
+      html += "<h3>Selected Sprinkler Head</h3>";
+      html += "<ul>";
+      html += "<li><strong>Work Type:</strong> " + formatWorkType(workType) + "</li>";
+      html += "<li><strong>Orientation:</strong> " + capitalize(orientation) + "</li>";
+      html += "<li><strong>Head Type:</strong> " + headType + "</li>";
+      html += "<li><strong>Head Size:</strong> " + headSize + "\"</li>";
+      html += "<li><strong>Pipe Size:</strong> " + pipeSize + "\"</li>";
+      html += "<li><strong>Quantity:</strong> " + qty + "</li>";
+      html += "</ul>";
 
-      <strong>Labour Hours:</strong> ${totalLabourHours.toFixed(2)} hrs<br>
-      <strong>Labour Cost:</strong> $${labourTotal.toFixed(2)}<br>
-      <strong>Material Cost:</strong> $${materialTotal.toFixed(2)}<br>
-      <strong>Markup:</strong> $${markupAmount.toFixed(2)}<br><br>
+      html += "<h3>Material List</h3>";
+      html += "<ul>";
+      materialList.forEach(function(item) {
+        html += "<li>" + item + "</li>";
+      });
+      html += "</ul>";
 
-      <strong>Estimated Total:</strong> $${totalPrice.toFixed(2)}
-    `;
+      if (dropAssembly.length > 0) {
+        html += "<h3>Drop Assembly Material</h3>";
+        html += "<ul>";
+        dropAssembly.forEach(function(item) {
+          html += "<li>" + item + "</li>";
+        });
+        html += "</ul>";
+      }
 
-    document.getElementById("materialTable").innerHTML = `
-      <tr>
-        <td>Sprinkler Heads</td>
-        <td>${sprinklerHeads}</td>
-        <td>Includes new and relocated heads</td>
-      </tr>
-      <tr>
-        <td>1&quot; Threaded Drop Assemblies</td>
-        <td>${dropAssemblies}</td>
-        <td>Each drop assembly includes threaded pipe, 90s, nipple, hanger, and rod assembly</td>
-      </tr>
-      <tr>
-        <td>1&quot; Threaded Pipe</td>
-        <td>${oneInchPipeFeet} ft</td>
-        <td>Estimated at 3 ft per pendant drop</td>
-      </tr>
-      <tr>
-        <td>1&quot; Threaded 90s</td>
-        <td>${oneInch90s}</td>
-        <td>Three 90s per drop</td>
-      </tr>
-      <tr>
-        <td>1&quot; x 2&quot; Nipples</td>
-        <td>${oneByTwoNipples}</td>
-        <td>One per drop</td>
-      </tr>
-      <tr>
-        <td>Hangers</td>
-        <td>${hangers}</td>
-        <td>One hanger per drop</td>
-      </tr>
-      <tr>
-        <td>Rod Assemblies</td>
-        <td>${rodAssemblies}</td>
-        <td>One rod assembly per drop</td>
-      </tr>
-      <tr>
-        <td>Escutcheons</td>
-        <td>${escutcheons}</td>
-        <td>One per finished pendant head</td>
-      </tr>
-      <tr>
-        <td>${branchPipeSize}&quot; x 1&quot; Mechanical Tees</td>
-        <td>${mechanicalTees}</td>
-        <td>Only for new heads, not relocated heads</td>
-      </tr>
-      <tr>
-        <td>${branchPipeSize}&quot; Branch Pipe</td>
-        <td>${branchPipeFeet} ft</td>
-        <td>Estimated at 4 ft per new head</td>
-      </tr>
-      <tr>
-        <td>${branchPipeSize}&quot; Grooved Couplings</td>
-        <td>${branchCouplings}</td>
-        <td>Only included when new branch piping is required. No couplings for drop-only work.</td>
-      </tr>
-    `;
-  }
-</script>
+      html += "<h3>Estimated Labour</h3>";
+      html += "<ul>";
+      html += "<li>" + labourHours + " labour hour(s)</li>";
+      html += "</ul>";
 
+      html += "<h3>Notes / Assumptions</h3>";
+      html += "<ul>";
+      notes.forEach(function(note) {
+        html += "<li>" + note + "</li>";
+      });
+      html += "</ul>";
+
+      results.style.display = "block";
+      results.innerHTML = html;
+    }
+
+    function capitalize(word) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+
+    function formatWorkType(type) {
+      if (type === "new") return "New Heads";
+      if (type === "relocate") return "Relocate Heads";
+      if (type === "replace") return "Replace Existing Heads";
+      return type;
+    }
+
+    updateHeadTypes();
+  </script>
 </body>
 </html>
