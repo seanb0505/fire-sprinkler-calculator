@@ -46,7 +46,6 @@
 
     h2 {
       margin-top: 0;
-      color: #f9fafb;
     }
 
     label {
@@ -166,11 +165,13 @@
         <option value="new">New Drops</option>
         <option value="relocate">Relocates</option>
       </select>
-<label>Drop Type</label>
-<select id="dropType">
-  <option value="hardpipe">Hard Pipe</option>
-  <option value="flex">Flex Drop</option>
-</select>
+
+      <label>Drop Type</label>
+      <select id="dropType">
+        <option value="hardpipe">Hard Pipe</option>
+        <option value="flex">Flex Drop</option>
+      </select>
+
       <label>Number of Heads</label>
       <input type="number" id="heads" value="1" min="0" />
 
@@ -267,8 +268,9 @@
 
     function calculateEstimate() {
       const workType = document.getElementById("workType").value;
+      const dropType = document.getElementById("dropType").value;
       const heads = Number(document.getElementById("heads").value) || 0;
-      const mainPipeSize = document.getElementById("mainPipeSize").const dropType = document.getElementById("dropType").value;
+      const mainPipeSize = document.getElementById("mainPipeSize").value;
       const pipePerHead = Number(document.getElementById("pipePerHead").value) || 0;
       const hoursPerHead = Number(document.getElementById("hoursPerHead").value) || 0;
       const labourRate = Number(document.getElementById("labourRate").value) || 0;
@@ -280,26 +282,37 @@
 
       let materials = [];
 
-      materials.push({
-        name: "1&quot; Schedule 40 Black Pipe",
-        qty: totalPipeFeet + " ft",
-        unitCost: 4.50,
-        total: totalPipeFeet * 4.50
-      });
+      if (dropType === "hardpipe") {
+        materials.push({
+          name: "1&quot; Schedule 40 Black Pipe",
+          qty: totalPipeFeet + " ft",
+          unitCost: 4.50,
+          total: totalPipeFeet * 4.50
+        });
 
-      materials.push({
-        name: "1&quot; 90° Elbows",
-        qty: heads * 3,
-        unitCost: 3.25,
-        total: heads * 3 * 3.25
-      });
+        materials.push({
+          name: "1&quot; 90° Elbows",
+          qty: heads * 3,
+          unitCost: 3.25,
+          total: heads * 3 * 3.25
+        });
 
-      materials.push({
-        name: "1&quot; x 2&quot; Nipple",
-        qty: heads,
-        unitCost: 2.75,
-        total: heads * 2.75
-      });
+        materials.push({
+          name: "1&quot; x 2&quot; Nipple",
+          qty: heads,
+          unitCost: 2.75,
+          total: heads * 2.75
+        });
+      }
+
+      if (dropType === "flex") {
+        materials.push({
+          name: "Flex Drop Assembly",
+          qty: heads,
+          unitCost: 42.00,
+          total: heads * 42.00
+        });
+      }
 
       materials.push({
         name: "1&quot; Hanger",
@@ -347,7 +360,7 @@
       let totalEstimate = materialTotal + labourTotal;
 
       document.getElementById("summaryHeads").innerText = heads;
-      document.getElementById("summaryPipe").innerText = totalPipeFeet + " ft";
+      document.getElementById("summaryPipe").innerText = dropType === "hardpipe" ? totalPipeFeet + " ft" : "N/A";
       document.getElementById("summaryHours").innerText = labourHours + " hrs";
       document.getElementById("summaryMaterial").innerText = money(materialTotal);
       document.getElementById("summaryLabour").innerText = money(labourTotal);
