@@ -36,7 +36,7 @@
       font-weight: bold;
     }
 
-    input, select, button {
+    input, select, button, textarea {
       width: 100%;
       padding: 12px;
       margin-top: 5px;
@@ -46,10 +46,28 @@
       box-sizing: border-box;
     }
 
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
     button {
       background: #2563eb;
       color: white;
       margin-top: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary-button {
+      background: #374151;
+    }
+
+    .secondary-button:hover {
+      background: #4b5563;
     }
 
     table {
@@ -67,13 +85,44 @@
     th {
       color: #93c5fd;
     }
+
+    .notice {
+      background: #78350f;
+      color: #fde68a;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .success {
+      background: #064e3b;
+      color: #a7f3d0;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
     <h1>Fire Sprinkler Estimator</h1>
-    <p>Basic material and labour calculator</p>
+    <p>Material, labour, and drawing takeoff tool</p>
   </header>
 
   <main>
@@ -91,7 +140,60 @@
     </div>
 
     <div class="box">
-      <h2>Sprinkler Work</h2>
+      <h2>AI PDF Drawing Takeoff</h2>
+
+      <p>
+        Upload a sprinkler drawing PDF and run a takeoff preview.
+        This first version creates a sample material list so we can build the workflow before connecting real AI.
+      </p>
+
+      <label>Upload Sprinkler Drawing PDF</label>
+      <input id="pdfUpload" type="file" accept="application/pdf">
+
+      <label>Drawing Notes</label>
+      <textarea id="drawingNotes" placeholder="Example: Office renovation, pendant heads, 1 inch drops, existing 2 inch mains, relocates, new heads, demo areas, etc."></textarea>
+
+      <button onclick="runPdfTakeoff()">Analyze Drawing</button>
+
+      <div id="takeoffSuccess" class="success">
+        PDF takeoff preview created. Review the material list below.
+      </div>
+
+      <div class="notice">
+        Real AI PDF reading will require a backend/API later. This version builds the website workflow first.
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>PDF Takeoff Result</h2>
+
+      <div class="grid">
+        <p><strong>Uploaded File:</strong> <span id="uploadedFileName">None</span></p>
+        <p><strong>Detected Work Type:</strong> <span id="detectedWorkType">Not analyzed</span></p>
+        <p><strong>Estimated Heads:</strong> <span id="detectedHeads">0</span></p>
+        <p><strong>Estimated Labour:</strong> <span id="detectedLabour">0 hrs</span></p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Qty</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="takeoffTable">
+          <tr>
+            <td colspan="3">Upload a PDF and click Analyze Drawing.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="secondary-button" onclick="sendTakeoffToEstimator()">Use This Takeoff In Calculator</button>
+    </div>
+
+    <div class="box">
+      <h2>Manual Sprinkler Calculator</h2>
 
       <label>Work Type</label>
       <select id="workType">
@@ -142,7 +244,7 @@
     </div>
 
     <div class="box">
-      <h2>Material List</h2>
+      <h2>Estimator Material List</h2>
       <table>
         <thead>
           <tr>
@@ -158,6 +260,8 @@
   </main>
 
   <script>
+    var lastTakeoffHeads = 0;
+
     function money(amount) {
       return "$" + amount.toFixed(2);
     }
@@ -169,6 +273,90 @@
         unitCost: unitCost,
         total: qty * unitCost
       });
+    }
+
+    function runPdfTakeoff() {
+      var fileInput = document.getElementById("pdfUpload");
+      var notes = document.getElementById("drawingNotes").value.toLowerCase();
+
+      var fileName = "No file selected";
+
+      if (fileInput.files.length > 0) {
+        fileName = fileInput.files[0].name;
+      }
+
+      var estimatedHeads = 12;
+      var workType = "Office alteration / sprinkler modification";
+      var labourHours = estimatedHeads * 1;
+
+      if (notes.indexOf("relocate") !== -1 || notes.indexOf("relocates") !== -1) {
+        estimatedHeads = 8;
+        workType = "Relocates";
+        labourHours = estimatedHeads * 1;
+      }
+
+      if (notes.indexOf("new") !== -1 || notes.indexOf("new heads") !== -1) {
+        estimatedHeads = 12;
+        workType = "New Drops";
+        labourHours = estimatedHeads * 1;
+      }
+
+      if (notes.indexOf("flex") !== -1) {
+        workType = workType + " with flex drops";
+      }
+
+      lastTakeoffHeads = estimatedHeads;
+
+      document.getElementById("uploadedFileName").innerText = fileName;
+      document.getElementById("detectedWorkType").innerText = workType;
+      document.getElementById("detectedHeads").innerText = estimatedHeads;
+      document.getElementById("detectedLabour").innerText = labourHours + " hrs";
+      document.getElementById("takeoffSuccess").style.display = "block";
+
+      var table = document.getElementById("takeoffTable");
+      table.innerHTML = "";
+
+      var rows = [
+        ["Sprinkler Heads", estimatedHeads, "Estimated from drawing preview"],
+        ["1 inch Schedule 40 Pipe", estimatedHeads * 10 + " ft", "Allowance based on 10 ft per head"],
+        ["1 inch 90 Elbows", estimatedHeads * 3, "3 elbows per hard-piped drop"],
+        ["1 inch x 2 inch Nipples", estimatedHeads, "1 per drop"],
+        ["1 inch Hangers", estimatedHeads, "1 per drop"],
+        ["Rod Assemblies", estimatedHeads, "1 per drop"],
+        ["Mechanical Tees", estimatedHeads, "For new drops only"]
+      ];
+
+      if (notes.indexOf("flex") !== -1) {
+        rows = [
+          ["Sprinkler Heads", estimatedHeads, "Estimated from drawing preview"],
+          ["Flex Drop Assemblies", estimatedHeads, "1 per head"],
+          ["1 inch Hangers", estimatedHeads, "1 per head"],
+          ["Rod Assemblies", estimatedHeads, "1 per head"],
+          ["Mechanical Tees", estimatedHeads, "For new drops only"]
+        ];
+      }
+
+      for (var i = 0; i < rows.length; i++) {
+        var row = document.createElement("tr");
+
+        row.innerHTML =
+          "<td>" + rows[i][0] + "</td>" +
+          "<td>" + rows[i][1] + "</td>" +
+          "<td>" + rows[i][2] + "</td>";
+
+        table.appendChild(row);
+      }
+    }
+
+    function sendTakeoffToEstimator() {
+      if (lastTakeoffHeads <= 0) {
+        alert("Run the PDF takeoff first.");
+        return;
+      }
+
+      document.getElementById("heads").value = lastTakeoffHeads;
+      calculateEstimate();
+      alert("Takeoff quantity sent to calculator.");
     }
 
     function calculateEstimate() {
