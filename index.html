@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fire Protection Estimator V6</title>
+  <title>Fire Protection Estimator</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -18,7 +18,7 @@
     }
 
     header {
-      padding: 36px 20px;
+      padding: 35px 20px;
       text-align: center;
       background: #111827;
       border-bottom: 1px solid #334155;
@@ -84,8 +84,18 @@
 
     button:hover { background: #1d4ed8; }
 
-    .print-btn { background: #16a34a; }
-    .print-btn:hover { background: #15803d; }
+    button:disabled {
+      background: #64748b;
+      cursor: not-allowed;
+    }
+
+    .print-btn {
+      background: #16a34a;
+    }
+
+    .print-btn:hover {
+      background: #15803d;
+    }
 
     .grid {
       display: grid;
@@ -139,29 +149,43 @@
       background: #2563eb;
     }
 
-    .good-tag { background: #166534; }
     .warning-tag { background: #92400e; }
-    .ai-tag { background: #6d28d9; }
+    .good-tag { background: #166534; }
+    .ai-tag { background: #7c3aed; }
 
     .notice {
-      background: #1e3a8a;
-      color: #dbeafe;
+      margin-top: 14px;
       padding: 14px;
       border-radius: 8px;
-      margin-top: 14px;
+      background: #1e3a8a;
+      color: #dbeafe;
       line-height: 1.4;
     }
 
-    #pdfPreview, #aiJsonPreview {
+    #pdfPreview {
       background: #020617;
       border: 1px solid #334155;
       border-radius: 10px;
       padding: 12px;
-      max-height: 260px;
+      max-height: 240px;
       overflow: auto;
       white-space: pre-wrap;
       font-size: 13px;
       color: #cbd5e1;
+    }
+
+    details {
+      margin-top: 15px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+      color: #93c5fd;
     }
 
     .proposal {
@@ -172,7 +196,9 @@
       margin-top: 20px;
     }
 
-    .proposal h1, .proposal h2, .proposal h3 {
+    .proposal h1,
+    .proposal h2,
+    .proposal h3 {
       color: black;
     }
 
@@ -183,7 +209,8 @@
       background: white;
     }
 
-    .proposal-table th, .proposal-table td {
+    .proposal-table th,
+    .proposal-table td {
       border: 1px solid #ccc;
       padding: 10px;
       color: black;
@@ -191,22 +218,37 @@
 
     @media (max-width: 700px) {
       .grid { grid-template-columns: 1fr; }
+      header h1 { font-size: 25px; }
       main { padding: 14px; }
-      header h1 { font-size: 26px; }
     }
 
     @media print {
-      body { background: white; }
-      header, .card:not(.print-area) { display: none; }
-      .print-area {
+      body {
+        background: white;
+      }
+
+      header,
+      .card:not(.printable-card),
+      button {
+        display: none;
+      }
+
+      main {
+        padding: 0;
+        max-width: none;
+      }
+
+      .printable-card {
         display: block;
         box-shadow: none;
         background: white;
-        color: black;
+        padding: 0;
+        margin: 0;
       }
+
       .proposal {
         box-shadow: none;
-        padding: 0;
+        border-radius: 0;
       }
     }
   </style>
@@ -216,7 +258,7 @@
 
 <header>
   <h1>Fire Protection Estimator</h1>
-  <p>Reference Drawing Library • PDF Text Reading • AI-Ready Takeoff Engine</p>
+  <p>PDF Upload • Reference Drawing Logic • Material Assemblies • Proposal Generator</p>
 </header>
 
 <main>
@@ -232,6 +274,31 @@
 
   <label>Location</label>
   <input id="location" type="text">
+</section>
+
+<section class="card">
+  <h2>PDF Drawing Analysis</h2>
+
+  <label>Upload PDF Drawings</label>
+  <input id="drawingFiles" type="file" multiple accept=".pdf">
+
+  <label>Reference Drawing Type</label>
+  <select id="referenceType">
+    <option value="none">No Reference / Manual Only</option>
+    <option value="office">Office / Tenant Fit-Out</option>
+    <option value="warehouse">Warehouse / ESFR</option>
+    <option value="riser">Riser Room / Header Work</option>
+    <option value="dry">Dry System</option>
+    <option value="underground">Underground / Site Service</option>
+    <option value="service">Service / Relocate Work</option>
+  </select>
+
+  <label>Drawing Notes / Manual Overrides</label>
+  <textarea id="drawingNotes" placeholder="Example: 42 new pendant heads, 12 relocates, 4 inch main, 2 inch branchlines, FDC, riser, dry system, flex drops, sch 10 grooved mains, sch 40 threaded drops."></textarea>
+
+  <div class="notice">
+    This version reads searchable PDF text and combines it with reference drawing logic. It still does not visually count sprinkler symbols from scanned drawings yet.
+  </div>
 </section>
 
 <section class="card">
@@ -266,6 +333,728 @@
     <option value="esfr">ESFR / Warehouse System</option>
   </select>
 
-  <label>Reference Drawing Type</label>
-  <select id="referenceType">
-    <option value="auto">Auto Detect From PDF / Notes</option>
+  <div class="grid">
+    <div>
+      <label>Manual Head Count</label>
+      <input id="manualHeads" type="number" placeholder="Leave blank if unknown">
+    </div>
+
+    <div>
+      <label>Manual New Drops</label>
+      <input id="manualNewDrops" type="number" placeholder="Leave blank if unknown">
+    </div>
+
+    <div>
+      <label>Manual Relocates</label>
+      <input id="manualRelocates" type="number" placeholder="Leave blank if unknown">
+    </div>
+
+    <div>
+      <label>Main Pipe Footage</label>
+      <input id="manualMainFeet" type="number" placeholder="Leave blank if unknown">
+    </div>
+
+    <div>
+      <label>Branchline Pipe Footage</label>
+      <input id="manualBranchFeet" type="number" placeholder="Leave blank if unknown">
+    </div>
+
+    <div>
+      <label>Sprinkler Drop Type</label>
+      <select id="dropType">
+        <option value="hardpipe">Hard Pipe Drops</option>
+        <option value="flex">Flex Drops</option>
+        <option value="mixed">Mixed Hard Pipe + Flex</option>
+      </select>
+    </div>
+  </div>
+
+  <button id="analyzeButton" onclick="analyzeEstimate()">Analyze PDFs & Generate Estimate</button>
+</section>
+
+<section class="card">
+  <h2>PDF Analysis Results</h2>
+
+  <div class="grid">
+    <div class="summary-box"><strong>PDF Files Uploaded</strong><span id="summaryFiles">0</span></div>
+    <div class="summary-box"><strong>PDF Text Status</strong><span id="pdfStatus">Not analyzed</span></div>
+    <div class="summary-box"><strong>Reference Type</strong><span id="summaryReference">None</span></div>
+    <div class="summary-box"><strong>Confidence</strong><span id="confidence">0%</span></div>
+  </div>
+
+  <h3>Detected From PDF / Notes</h3>
+  <div id="detectedScopes"></div>
+
+  <h3>Warnings / Manual Review</h3>
+  <div id="warnings"></div>
+
+  <details>
+    <summary>Show PDF Text Preview</summary>
+    <div id="pdfPreview">No PDF text loaded yet.</div>
+  </details>
+</section>
+
+<section class="card">
+  <h2>Estimate Summary</h2>
+
+  <div class="grid">
+    <div class="summary-box"><strong>Estimated Heads</strong><span id="summaryHeads">0</span></div>
+    <div class="summary-box"><strong>New Drops</strong><span id="summaryNewDrops">0</span></div>
+    <div class="summary-box"><strong>Relocates</strong><span id="summaryRelocates">0</span></div>
+    <div class="summary-box"><strong>Labour Hours</strong><span id="summaryLabour">0 hrs</span></div>
+    <div class="summary-box"><strong>Material Cost</strong><span id="materialCost">$0.00</span></div>
+    <div class="summary-box"><strong>Labour Cost</strong><span id="labourCost">$0.00</span></div>
+    <div class="summary-box"><strong>Subtotal</strong><span id="subtotal">$0.00</span></div>
+    <div class="summary-box"><strong>Sell Price</strong><span id="sellPrice" class="total">$0.00</span></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Detailed Material List</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Qty</th>
+        <th>Description</th>
+        <th>Size</th>
+        <th>Spec</th>
+        <th>Connection</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+
+    <tbody id="materialTable">
+      <tr><td colspan="6">No material generated yet.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card printable-card">
+  <h2>Proposal Preview</h2>
+
+  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+
+  <div class="proposal" id="proposalPreview">
+    <h1>Fire Protection Estimate</h1>
+
+    <p><strong>Project:</strong> <span id="proposalProject"></span></p>
+    <p><strong>Customer:</strong> <span id="proposalCustomer"></span></p>
+    <p><strong>Location:</strong> <span id="proposalLocation"></span></p>
+
+    <h2>Scope of Work</h2>
+    <p id="proposalScope">
+      Provide labour and material for fire sprinkler work as per supplied drawings, specifications, and estimator-generated takeoff.
+    </p>
+
+    <h2>Estimate Summary</h2>
+
+    <table class="proposal-table">
+      <tr>
+        <th>Description</th>
+        <th>Amount</th>
+      </tr>
+
+      <tr>
+        <td>Material Cost</td>
+        <td id="proposalMaterial">$0.00</td>
+      </tr>
+
+      <tr>
+        <td>Labour Cost</td>
+        <td id="proposalLabour">$0.00</td>
+      </tr>
+
+      <tr>
+        <td>Subtotal</td>
+        <td id="proposalSubtotal">$0.00</td>
+      </tr>
+
+      <tr>
+        <td><strong>Total Sell Price</strong></td>
+        <td id="proposalSell">$0.00</td>
+      </tr>
+    </table>
+
+    <h2>Notes</h2>
+    <p>
+      This estimate is generated from available PDF text, manual inputs, reference drawing logic, and fire sprinkler material assemblies.
+      Final quantities should be reviewed against issued-for-construction sprinkler drawings.
+    </p>
+
+    <h2>Exclusions</h2>
+    <ul>
+      <li>Electrical work by others</li>
+      <li>Cutting and patching by others</li>
+      <li>Permit fees excluded unless noted</li>
+      <li>After-hours work excluded unless noted</li>
+      <li>Ceiling removal/replacement by others unless noted</li>
+      <li>Fire watch excluded unless noted</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  const prices = {
+    head: 18,
+    flexDrop: 85,
+    mechTee2x1: 32,
+    elbow1: 3.75,
+    reducer1x12: 4.25,
+    nipple1x2: 3.50,
+    hanger: 6.50,
+    rod: 5.50,
+    pipe1: 4.25,
+    pipe2: 9.50,
+    pipe3: 18,
+    pipe4: 28,
+    pipe6: 48,
+    coupling2: 12,
+    coupling3: 18,
+    coupling4: 26,
+    coupling6: 48,
+    fdc: 850,
+    riser: 2500,
+    drain: 75,
+    valve: 250,
+    airVent: 275,
+    testHeader: 1200,
+    dryValve: 3500,
+    backflow: 1800,
+    undergroundPipe: 42
+  };
+
+  const materialTable = document.getElementById("materialTable");
+
+  function money(value) {
+    return "$" + value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  async function extractTextFromPDF(file) {
+    const buffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+
+    let text = "";
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+      const page = await pdf.getPage(pageNumber);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(" ");
+      text += `\n\n--- ${file.name} Page ${pageNumber} ---\n${pageText}`;
+    }
+
+    return text;
+  }
+
+  async function readAllPDFs(files) {
+    let combined = "";
+
+    for (const file of files) {
+      try {
+        const text = await extractTextFromPDF(file);
+        combined += "\n\n" + text;
+      } catch (error) {
+        combined += `\n\nCould not read text from ${file.name}.`;
+      }
+    }
+
+    return combined;
+  }
+
+  function cleanText(text) {
+    return text
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'");
+  }
+
+  function numberNear(text, words) {
+    for (const word of words) {
+      const patterns = [
+        new RegExp("(\\d+)\\s*(?:x|ea|each|total)?\\s*" + word, "i"),
+        new RegExp(word + "\\s*(?:qty|quantity|count|total)?\\s*[:\\-]?\\s*(\\d+)", "i"),
+        new RegExp("(?:qty|quantity|count|total)\\s*[:\\-]?\\s*(\\d+)\\s*" + word, "i")
+      ];
+
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) return Number(match[1]);
+      }
+    }
+
+    return 0;
+  }
+
+  function addMaterial(materials, qty, desc, size, spec, connection, source, cost) {
+    if (!qty || qty <= 0) return;
+
+    const key = `${desc}|${size}|${spec}|${connection}|${source}`;
+
+    if (!materials[key]) {
+      materials[key] = {
+        qty: 0,
+        desc,
+        size,
+        spec,
+        connection,
+        source,
+        cost: cost || 0
+      };
+    }
+
+    materials[key].qty += qty;
+  }
+
+  function addTag(containerId, text, className) {
+    const container = document.getElementById(containerId);
+    const tag = document.createElement("span");
+    tag.className = "tag " + className;
+    tag.innerText = text;
+    container.appendChild(tag);
+  }
+
+  function getReferenceDefaults(referenceType) {
+    const defaults = {
+      heads: 0,
+      newDrops: 0,
+      relocates: 0,
+      mainFeet: 0,
+      branchFeet: 0,
+      mainSize: '4"',
+      branchSize: '2"',
+      dropSize: '1"',
+      notes: []
+    };
+
+    if (referenceType === "office") {
+      defaults.heads = 35;
+      defaults.newDrops = 25;
+      defaults.relocates = 10;
+      defaults.mainFeet = 120;
+      defaults.branchFeet = 350;
+      defaults.mainSize = '2"';
+      defaults.branchSize = '2"';
+      defaults.notes.push("Office / tenant fit-out reference applied");
+    }
+
+    if (referenceType === "warehouse") {
+      defaults.heads = 120;
+      defaults.newDrops = 120;
+      defaults.mainFeet = 700;
+      defaults.branchFeet = 1500;
+      defaults.mainSize = '6"';
+      defaults.branchSize = '2"';
+      defaults.notes.push("Warehouse / ESFR reference applied");
+    }
+
+    if (referenceType === "riser") {
+      defaults.mainFeet = 80;
+      defaults.mainSize = '4"';
+      defaults.notes.push("Riser room / header reference applied");
+    }
+
+    if (referenceType === "dry") {
+      defaults.heads = 50;
+      defaults.newDrops = 50;
+      defaults.mainFeet = 300;
+      defaults.branchFeet = 600;
+      defaults.mainSize = '4"';
+      defaults.branchSize = '2"';
+      defaults.notes.push("Dry system reference applied");
+    }
+
+    if (referenceType === "underground") {
+      defaults.mainFeet = 150;
+      defaults.mainSize = '6"';
+      defaults.notes.push("Underground service reference applied");
+    }
+
+    if (referenceType === "service") {
+      defaults.heads = 10;
+      defaults.relocates = 10;
+      defaults.branchFeet = 80;
+      defaults.mainSize = '2"';
+      defaults.branchSize = '2"';
+      defaults.notes.push("Service / relocate reference applied");
+    }
+
+    return defaults;
+  }
+
+  function detectSizes(text, defaults) {
+    let mainSize = defaults.mainSize;
+    let branchSize = defaults.branchSize;
+    let dropSize = defaults.dropSize;
+
+    if (text.includes('6"') || text.includes("6 inch")) mainSize = '6"';
+    else if (text.includes('4"') || text.includes("4 inch")) mainSize = '4"';
+    else if (text.includes('3"') || text.includes("3 inch")) mainSize = '3"';
+    else if (text.includes('2"') || text.includes("2 inch")) mainSize = '2"';
+
+    if (text.includes("branch") && (text.includes('2"') || text.includes("2 inch"))) branchSize = '2"';
+    if (text.includes("branch") && (text.includes('1-1/2"') || text.includes("1 1/2 inch"))) branchSize = '1-1/2"';
+
+    if (text.includes('1"') || text.includes("1 inch")) dropSize = '1"';
+    if (text.includes('3/4"') || text.includes("3/4 inch")) dropSize = '3/4"';
+
+    return { mainSize, branchSize, dropSize };
+  }
+
+  function pipePrice(size) {
+    if (size === '6"') return prices.pipe6;
+    if (size === '4"') return prices.pipe4;
+    if (size === '3"') return prices.pipe3;
+    if (size === '2"') return prices.pipe2;
+    return prices.pipe1;
+  }
+
+  function couplingPrice(size) {
+    if (size === '6"') return prices.coupling6;
+    if (size === '4"') return prices.coupling4;
+    if (size === '3"') return prices.coupling3;
+    return prices.coupling2;
+  }
+
+  function referenceLabel(value) {
+    const labels = {
+      none: "No Reference",
+      office: "Office / Tenant Fit-Out",
+      warehouse: "Warehouse / ESFR",
+      riser: "Riser Room / Header Work",
+      dry: "Dry System",
+      underground: "Underground / Site Service",
+      service: "Service / Relocate Work"
+    };
+
+    return labels[value] || value;
+  }
+
+  async function analyzeEstimate() {
+    const button = document.getElementById("analyzeButton");
+    button.innerText = "Reading PDFs...";
+    button.disabled = true;
+
+    const files = document.getElementById("drawingFiles").files;
+    const notes = document.getElementById("drawingNotes").value || "";
+    const referenceType = document.getElementById("referenceType").value;
+    const estimateType = document.getElementById("estimateType").value;
+    const systemType = document.getElementById("systemType").value;
+    const dropType = document.getElementById("dropType").value;
+
+    document.getElementById("detectedScopes").innerHTML = "";
+    document.getElementById("warnings").innerHTML = "";
+
+    let pdfText = "";
+
+    if (files.length > 0) {
+      pdfText = await readAllPDFs(files);
+    }
+
+    const combinedRaw = notes + "\n\n" + pdfText;
+    const text = cleanText(combinedRaw);
+
+    document.getElementById("pdfPreview").innerText =
+      pdfText.trim()
+        ? pdfText.substring(0, 9000)
+        : "No readable PDF text found. This PDF may be scanned/image-based.";
+
+    document.getElementById("summaryFiles").innerText = files.length;
+    document.getElementById("summaryReference").innerText = referenceLabel(referenceType);
+    document.getElementById("pdfStatus").innerText = pdfText.trim() ? "Text read" : "No searchable text";
+
+    const defaults = getReferenceDefaults(referenceType);
+    defaults.notes.forEach(note => addTag("detectedScopes", note, "ai-tag"));
+
+    let heads = Number(document.getElementById("manualHeads").value) || 0;
+    let newDrops = Number(document.getElementById("manualNewDrops").value) || 0;
+    let relocates = Number(document.getElementById("manualRelocates").value) || 0;
+    let mainFeet = Number(document.getElementById("manualMainFeet").value) || 0;
+    let branchFeet = Number(document.getElementById("manualBranchFeet").value) || 0;
+
+    const detectedHeads = numberNear(text, [
+      "heads?",
+      "sprinklers?",
+      "pendants?",
+      "pendents?",
+      "uprights?",
+      "sidewalls?"
+    ]);
+
+    const detectedNewDrops = numberNear(text, [
+      "new drops?",
+      "new heads?",
+      "new sprinklers?",
+      "mechanical tee drops?"
+    ]);
+
+    const detectedRelocates = numberNear(text, [
+      "relocates?",
+      "relocated heads?",
+      "relocated sprinklers?"
+    ]);
+
+    if (!heads && detectedHeads) {
+      heads = detectedHeads;
+      addTag("detectedScopes", "Head count detected from PDF/notes", "good-tag");
+    }
+
+    if (!newDrops && detectedNewDrops) {
+      newDrops = detectedNewDrops;
+      addTag("detectedScopes", "New drops detected from PDF/notes", "good-tag");
+    }
+
+    if (!relocates && detectedRelocates) {
+      relocates = detectedRelocates;
+      addTag("detectedScopes", "Relocates detected from PDF/notes", "good-tag");
+    }
+
+    if (!heads && defaults.heads) {
+      heads = defaults.heads;
+      addTag("warnings", "Head count estimated from reference type", "warning-tag");
+    }
+
+    if (!newDrops && defaults.newDrops) {
+      newDrops = defaults.newDrops;
+      addTag("warnings", "New drops estimated from reference type", "warning-tag");
+    }
+
+    if (!relocates && defaults.relocates) {
+      relocates = defaults.relocates;
+      addTag("warnings", "Relocates estimated from reference type", "warning-tag");
+    }
+
+    if (!mainFeet && defaults.mainFeet) {
+      mainFeet = defaults.mainFeet;
+      addTag("warnings", "Main pipe footage estimated from reference type", "warning-tag");
+    }
+
+    if (!branchFeet && defaults.branchFeet) {
+      branchFeet = defaults.branchFeet;
+      addTag("warnings", "Branchline pipe footage estimated from reference type", "warning-tag");
+    }
+
+    if (text.includes("fdc") || text.includes("fire department connection")) {
+      addTag("detectedScopes", "FDC detected", "good-tag");
+    }
+
+    if (text.includes("riser")) {
+      addTag("detectedScopes", "Riser detected", "good-tag");
+    }
+
+    if (text.includes("dry")) {
+      addTag("detectedScopes", "Dry system detected", "good-tag");
+    }
+
+    if (text.includes("esfr")) {
+      addTag("detectedScopes", "ESFR / warehouse system detected", "good-tag");
+    }
+
+    if (text.includes("flex")) {
+      addTag("detectedScopes", "Flex drops detected", "good-tag");
+    }
+
+    if (text.includes("air vent") || text.includes("automatic air vent")) {
+      addTag("detectedScopes", "Air vent detected", "good-tag");
+    }
+
+    if (text.includes("drain")) {
+      addTag("detectedScopes", "Drain detected", "good-tag");
+    }
+
+    if (text.includes("valve")) {
+      addTag("detectedScopes", "Valves detected", "good-tag");
+    }
+
+    const sizes = detectSizes(text, defaults);
+    const mainSpec = text.includes("sch 40 main") || text.includes("schedule 40 main") ? "Sch 40" : "Sch 10";
+    const branchSpec = text.includes("sch 40 branch") || text.includes("schedule 40 branch") ? "Sch 40" : "Sch 10";
+    const dropSpec = "Sch 40";
+
+    const materials = {};
+
+    if (heads > 0) {
+      addMaterial(materials, heads, "Sprinkler Heads", '1/2"', "QR/SR", "Threaded", "Takeoff", prices.head);
+    }
+
+    if (newDrops > 0) {
+      addMaterial(materials, newDrops, "Mechanical Tee", `${sizes.branchSize} x ${sizes.dropSize}`, branchSpec, "Grooved/Threaded Outlet", "Assembly Rule", prices.mechTee2x1);
+    }
+
+    let hardPipeDrops = heads;
+    let flexDrops = 0;
+
+    if (dropType === "flex" || text.includes("flex")) {
+      hardPipeDrops = 0;
+      flexDrops = heads;
+    }
+
+    if (dropType === "mixed") {
+      flexDrops = Math.ceil(heads * 0.5);
+      hardPipeDrops = heads - flexDrops;
+    }
+
+    if (hardPipeDrops > 0) {
+      addMaterial(materials, Math.ceil((hardPipeDrops * 4) / 21), "Drop Pipe - 21 ft lengths", sizes.dropSize, dropSpec, "Threaded", "Assembly Rule", prices.pipe1);
+      addMaterial(materials, hardPipeDrops * 3, "90 Degree Elbow", sizes.dropSize, dropSpec, "Threaded", "Assembly Rule", prices.elbow1);
+      addMaterial(materials, hardPipeDrops, "Reducer", `${sizes.dropSize} x 1/2"`, dropSpec, "Threaded", "Assembly Rule", prices.reducer1x12);
+      addMaterial(materials, hardPipeDrops, "Nipple", `${sizes.dropSize} x 2"`, dropSpec, "Threaded", "Assembly Rule", prices.nipple1x2);
+      addMaterial(materials, hardPipeDrops, "Drop Hanger", sizes.dropSize, "Standard", "Rod Assembly", "Assembly Rule", prices.hanger);
+      addMaterial(materials, hardPipeDrops, "Rod Assembly", '3/8"', "Standard", "Threaded Rod", "Assembly Rule", prices.rod);
+    }
+
+    if (flexDrops > 0) {
+      addMaterial(materials, flexDrops, "Flexible Sprinkler Drop Assembly", '1/2"', "UL/FM", "Threaded", "Detected/Selected", prices.flexDrop);
+    }
+
+    if (mainFeet > 0) {
+      const lengths = Math.ceil(mainFeet / 21);
+      addMaterial(materials, lengths, "Main Pipe - 21 ft lengths", sizes.mainSize, mainSpec, "Grooved", "Manual/Reference", pipePrice(sizes.mainSize));
+      addMaterial(materials, Math.ceil(lengths * 1.1), "Grooved Coupling", sizes.mainSize, mainSpec, "Grooved", "Assembly Rule", couplingPrice(sizes.mainSize));
+      addMaterial(materials, Math.ceil(mainFeet / 10), "Clevis Hanger", sizes.mainSize, "Standard", "Rod Assembly", "Assembly Rule", prices.hanger);
+      addMaterial(materials, Math.ceil(mainFeet / 10), "Rod Assembly", '3/8"', "Standard", "Threaded Rod", "Assembly Rule", prices.rod);
+    }
+
+    if (branchFeet > 0) {
+      const lengths = Math.ceil(branchFeet / 21);
+      addMaterial(materials, lengths, "Branchline Pipe - 21 ft lengths", sizes.branchSize, branchSpec, "Grooved", "Manual/Reference", pipePrice(sizes.branchSize));
+      addMaterial(materials, Math.ceil(lengths * 1.1), "Grooved Coupling", sizes.branchSize, branchSpec, "Grooved", "Assembly Rule", couplingPrice(sizes.branchSize));
+      addMaterial(materials, Math.ceil(branchFeet / 10), "Clevis Hanger", sizes.branchSize, "Standard", "Rod Assembly", "Assembly Rule", prices.hanger);
+      addMaterial(materials, Math.ceil(branchFeet / 10), "Rod Assembly", '3/8"', "Standard", "Threaded Rod", "Assembly Rule", prices.rod);
+    }
+
+    if (text.includes("fdc") || referenceType === "riser") {
+      addMaterial(materials, 1, "Fire Department Connection Assembly", '4"', "Standard", "Grooved/Threaded", "Detected/Reference", prices.fdc);
+    }
+
+    if (text.includes("riser") || referenceType === "riser") {
+      addMaterial(materials, 1, "Riser Assembly with Trim", sizes.mainSize, "Sch 10 / Sch 40", "Grooved/Threaded", "Detected/Reference", prices.riser);
+    }
+
+    if (text.includes("drain") || referenceType === "riser") {
+      addMaterial(materials, 1, "Main Drain Assembly", '2"', "Sch 40", "Threaded", "Detected/Reference", prices.drain);
+    }
+
+    if (text.includes("valve") || referenceType === "riser") {
+      addMaterial(materials, 2, "Control Valve", sizes.mainSize, "UL/FM", "Grooved", "Detected/Reference", prices.valve);
+    }
+
+    if (text.includes("air vent") || text.includes("automatic air vent") || systemType === "dry" || referenceType === "dry") {
+      addMaterial(materials, 1, "Automatic Air Vent Assembly", '1/2"', "Standard", "Threaded", "Detected/Reference", prices.airVent);
+    }
+
+    if (systemType === "dry" || referenceType === "dry" || text.includes("dry valve")) {
+      addMaterial(materials, 1, "Dry Valve Assembly", sizes.mainSize, "UL/FM", "Grooved", "System Rule", prices.dryValve);
+    }
+
+    if (referenceType === "underground") {
+      addMaterial(materials, Math.ceil(mainFeet / 20), "Underground Fire Service Pipe", sizes.mainSize, "C900 / Ductile Iron", "Gasketed", "Reference", prices.undergroundPipe);
+      addMaterial(materials, 1, "Backflow Preventer", sizes.mainSize, "UL/FM", "Flanged/Grooved", "Reference", prices.backflow);
+    }
+
+    materialTable.innerHTML = "";
+
+    let materialCost = 0;
+
+    Object.values(materials).forEach(item => {
+      materialCost += item.qty * item.cost;
+
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${Math.ceil(item.qty)}</td>
+        <td>${item.desc}</td>
+        <td>${item.size}</td>
+        <td>${item.spec}</td>
+        <td>${item.connection}</td>
+        <td>${item.source}</td>
+      `;
+
+      materialTable.appendChild(row);
+    });
+
+    if (Object.keys(materials).length === 0) {
+      materialTable.innerHTML = `<tr><td colspan="6">No material generated yet.</td></tr>`;
+    }
+
+    let labourHours = 0;
+
+    labourHours += newDrops * 1.0;
+    labourHours += relocates * 1.0;
+    labourHours += mainFeet * 0.08;
+    labourHours += branchFeet * 0.06;
+
+    if (systemType === "dry" || referenceType === "dry") labourHours *= 1.25;
+    if (systemType === "preaction") labourHours *= 1.35;
+    if (systemType === "esfr" || referenceType === "warehouse") labourHours *= 1.2;
+
+    labourHours = Math.ceil(labourHours);
+
+    const labourRate = Number(document.getElementById("labourRate").value) || 95;
+    const markup = Number(document.getElementById("markup").value) || 35;
+
+    const labourCost = labourHours * labourRate;
+    const subtotal = materialCost + labourCost;
+    const sellPrice = subtotal * (1 + markup / 100);
+
+    let confidence = 20;
+
+    if (files.length > 0) confidence += 10;
+    if (pdfText.trim()) confidence += 25;
+    if (notes.trim()) confidence += 15;
+    if (heads > 0) confidence += 15;
+    if (referenceType !== "none") confidence += 10;
+
+    if (!pdfText.trim() && files.length > 0) {
+      addTag("warnings", "PDF may be scanned/image-based. Real OCR/AI vision is needed.", "warning-tag");
+      confidence -= 15;
+    }
+
+    if (!heads) {
+      addTag("warnings", "No reliable head count found. Add manual count or better PDF data.", "warning-tag");
+      confidence -= 20;
+    }
+
+    if (!mainFeet && !branchFeet && heads > 0) {
+      addTag("warnings", "Pipe footage is estimated or missing. Add main/branch footage for better accuracy.", "warning-tag");
+      confidence -= 10;
+    }
+
+    confidence = Math.max(5, Math.min(90, confidence));
+
+    document.getElementById("confidence").innerText = confidence + "%";
+    document.getElementById("summaryHeads").innerText = heads;
+    document.getElementById("summaryNewDrops").innerText = newDrops;
+    document.getElementById("summaryRelocates").innerText = relocates;
+    document.getElementById("summaryLabour").innerText = labourHours + " hrs";
+    document.getElementById("materialCost").innerText = money(materialCost);
+    document.getElementById("labourCost").innerText = money(labourCost);
+    document.getElementById("subtotal").innerText = money(subtotal);
+    document.getElementById("sellPrice").innerText = money(sellPrice);
+
+    document.getElementById("proposalProject").innerText = document.getElementById("projectName").value;
+    document.getElementById("proposalCustomer").innerText = document.getElementById("customerName").value;
+    document.getElementById("proposalLocation").innerText = document.getElementById("location").value;
+    document.getElementById("proposalMaterial").innerText = money(materialCost);
+    document.getElementById("proposalLabour").innerText = money(labourCost);
+    document.getElementById("proposalSubtotal").innerText = money(subtotal);
+    document.getElementById("proposalSell").innerText = money(sellPrice);
+
+    document.getElementById("proposalScope").innerText =
+      `Provide labour and material for ${referenceLabel(referenceType).toLowerCase()} fire sprinkler scope including sprinkler heads, piping, fittings, hangers, and related devices as generated from the takeoff.`;
+
+    button.innerText = "Analyze PDFs & Generate Estimate";
+    button.disabled = false;
+  }
+</script>
+
+</body>
+</html>
