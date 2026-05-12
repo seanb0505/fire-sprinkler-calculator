@@ -24,10 +24,7 @@
       border-bottom: 1px solid #334155;
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 30px;
-    }
+    header h1 { margin: 0; font-size: 30px; }
 
     header p {
       margin-top: 10px;
@@ -36,7 +33,7 @@
     }
 
     main {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: auto;
       padding: 20px;
     }
@@ -85,6 +82,11 @@
 
     button:hover { background: #1d4ed8; }
 
+    button:disabled {
+      background: #64748b;
+      cursor: not-allowed;
+    }
+
     .warning {
       margin-top: 14px;
       background: #7c2d12;
@@ -98,6 +100,15 @@
       margin-top: 14px;
       background: #14532d;
       color: #bbf7d0;
+      padding: 14px;
+      border-radius: 6px;
+      line-height: 1.4;
+    }
+
+    .info {
+      margin-top: 14px;
+      background: #1e3a8a;
+      color: #dbeafe;
       padding: 14px;
       border-radius: 6px;
       line-height: 1.4;
@@ -163,8 +174,16 @@
       font-size: 13px;
     }
 
+    .tag.warning-tag {
+      background: #92400e;
+    }
+
+    .tag.good-tag {
+      background: #166534;
+    }
+
     #pdfTextPreview {
-      max-height: 180px;
+      max-height: 210px;
       overflow: auto;
       background: #020617;
       padding: 12px;
@@ -187,7 +206,7 @@
 
 <header>
   <h1>Fire Protection Estimator</h1>
-  <p>PDF Text Reading • Smart Assemblies • Detailed Material Lists</p>
+  <p>PDF Text Reading • Confidence Scoring • Smart Material Assemblies</p>
 </header>
 
 <main>
@@ -233,7 +252,7 @@
     </select>
 
     <label>Sprinkler Heads</label>
-    <input id="headCount" type="number" min="0" placeholder="Example: 25">
+    <input id="headCount" type="number" min="0" placeholder="Leave blank if you want PDF/notes to estimate">
 
     <label>New Mechanical Tee Drops</label>
     <input id="newDropCount" type="number" min="0" placeholder="Example: 10">
@@ -250,13 +269,13 @@
     <label>Upload Drawing PDFs</label>
     <input id="drawingFiles" type="file" multiple accept=".pdf">
 
-    <label>Drawing Notes</label>
-    <textarea id="drawingNotes" placeholder="Example: new build with 4 inch mains, 2 inch branchlines, riser room, FDC, FHCs, dry system, flex drops, demo caps, valves, drains, test header, prefab, sch 10 grooved mains, sch 40 threaded drops."></textarea>
+    <label>Drawing Notes / Manual Overrides</label>
+    <textarea id="drawingNotes" placeholder="Example: 42 new pendant heads, 12 relocates, 4 inch main, 2 inch branchlines, 1 inch threaded drops, FDC, riser, dry system, flex drops, sch 10 grooved mains, sch 40 threaded drops."></textarea>
 
     <button onclick="analyzeEstimate()">Analyze PDFs & Estimate</button>
 
-    <div id="pdfStatus" class="warning">
-      Upload searchable PDFs. This version reads PDF text, notes, legends, schedules, and labels. It does not visually count sprinkler symbols yet.
+    <div id="pdfStatus" class="info">
+      This version reads searchable PDF text and gives confidence warnings. It still cannot visually count sprinkler symbols from scanned drawings.
     </div>
   </section>
 
@@ -271,15 +290,22 @@
     <div class="grid">
       <div class="summary-box"><strong>Files Uploaded</strong><span id="filesUploaded">0</span></div>
       <div class="summary-box"><strong>Estimated Heads</strong><span id="summaryHeads">0</span></div>
+      <div class="summary-box"><strong>Head Count Source</strong><span id="headSource">None</span></div>
+      <div class="summary-box"><strong>AI Confidence</strong><span id="confidenceScore">0%</span></div>
       <div class="summary-box"><strong>Estimated Labour</strong><span id="summaryLabour">0 hrs</span></div>
-      <div class="summary-box"><strong>Base Estimate Type</strong><span id="summaryEstimateType">None</span></div>
+      <div class="summary-box"><strong>Estimate Type</strong><span id="summaryEstimateType">None</span></div>
       <div class="summary-box"><strong>System Type</strong><span id="summarySystemType">None</span></div>
       <div class="summary-box"><strong>Fabrication</strong><span id="summaryFabrication">None</span></div>
     </div>
 
-    <h3>Detected Added Scopes</h3>
+    <h3>Detected From PDF / Notes</h3>
     <div id="detectedScopes">
       <span class="small">None detected yet.</span>
+    </div>
+
+    <h3>Warnings / Manual Review</h3>
+    <div id="warningScopes">
+      <span class="small">No warnings yet.</span>
     </div>
   </section>
 
@@ -289,7 +315,7 @@
     <h3>Pipe</h3>
     <table>
       <thead>
-        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th></tr>
+        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th><th>Source</th></tr>
       </thead>
       <tbody id="pipeTable"></tbody>
     </table>
@@ -297,7 +323,7 @@
     <h3>Fittings</h3>
     <table>
       <thead>
-        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th></tr>
+        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th><th>Source</th></tr>
       </thead>
       <tbody id="fittingTable"></tbody>
     </table>
@@ -305,7 +331,7 @@
     <h3>Devices / Valves / Trim</h3>
     <table>
       <thead>
-        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th></tr>
+        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th><th>Source</th></tr>
       </thead>
       <tbody id="deviceTable"></tbody>
     </table>
@@ -313,7 +339,7 @@
     <h3>Hangers / Supports</h3>
     <table>
       <thead>
-        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th></tr>
+        <tr><th>Qty</th><th>Size</th><th>Description</th><th>Spec</th><th>Connection</th><th>Source</th></tr>
       </thead>
       <tbody id="hangerTable"></tbody>
     </table>
@@ -338,10 +364,14 @@
 
   const prices = {
     "1 pipe": 4.25,
+    "1.25 pipe": 5.75,
+    "1.5 pipe": 7.25,
     "2 pipe": 9.50,
+    "2.5 pipe": 13.50,
     "3 pipe": 18.00,
     "4 pipe": 28.00,
     "6 pipe": 48.00,
+
     "1 elbow": 3.75,
     "1 reducer": 4.25,
     "1 nipple": 3.50,
@@ -349,13 +379,17 @@
     "rod assembly": 5.50,
     "head": 18.00,
     "flex drop": 85.00,
+
     "2 coupling": 12.00,
+    "2.5 coupling": 15.00,
     "3 coupling": 18.00,
     "4 coupling": 26.00,
     "6 coupling": 48.00,
+
     "2 mech tee": 32.00,
     "3 mech tee": 44.00,
     "4 mech tee": 58.00,
+
     "valve": 250.00,
     "drain": 75.00,
     "fdc": 850.00,
@@ -364,13 +398,13 @@
     "riser": 2500.00
   };
 
-  function addItem(list, qty, size, description, spec, connection, unitCost) {
+  function addItem(list, qty, size, description, spec, connection, unitCost, source) {
     if (!qty || qty <= 0) return;
 
-    const key = `${size}|${description}|${spec}|${connection}`;
+    const key = `${size}|${description}|${spec}|${connection}|${source}`;
 
     if (!list[key]) {
-      list[key] = { qty: 0, size, description, spec, connection, unitCost };
+      list[key] = { qty: 0, size, description, spec, connection, unitCost: unitCost || 0, source };
     }
 
     list[key].qty += qty;
@@ -383,7 +417,7 @@
     const values = Object.values(items);
 
     if (values.length === 0) {
-      table.innerHTML = `<tr><td colspan="5">No material generated yet.</td></tr>`;
+      table.innerHTML = `<tr><td colspan="6">No material generated yet.</td></tr>`;
       return;
     }
 
@@ -395,6 +429,7 @@
         <td>${item.description}</td>
         <td>${item.spec}</td>
         <td>${item.connection}</td>
+        <td>${item.source}</td>
       `;
       table.appendChild(row);
     });
@@ -438,30 +473,98 @@
     return combinedText;
   }
 
-  function countMatches(text, patterns) {
-    let total = 0;
-
-    patterns.forEach(pattern => {
-      const matches = text.match(pattern);
-      if (matches) total += matches.length;
-    });
-
-    return total;
+  function normalizeText(text) {
+    return text
+      .toLowerCase()
+      .replace(/[\u201c\u201d]/g, '"')
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/\s+/g, " ");
   }
 
-  function detectNumberNearText(text, words) {
+  function countRegex(text, regex) {
+    const matches = text.match(regex);
+    return matches ? matches.length : 0;
+  }
+
+  function findQtyNearWords(text, words) {
     for (const word of words) {
-      const regex1 = new RegExp("(\\d+)\\s*(?:x|ea|each|total)?\\s*" + word, "i");
-      const regex2 = new RegExp(word + "\\s*(?:qty|quantity|count|total)?\\s*[:\\-]?\\s*(\\d+)", "i");
+      const patterns = [
+        new RegExp("(\\d+)\\s*(?:x|ea|each|total)?\\s*" + word, "i"),
+        new RegExp(word + "\\s*(?:qty|quantity|count|total)?\\s*[:\\-]?\\s*(\\d+)", "i"),
+        new RegExp("(?:qty|quantity|count|total)\\s*[:\\-]?\\s*(\\d+)\\s*" + word, "i")
+      ];
 
-      const match1 = text.match(regex1);
-      const match2 = text.match(regex2);
-
-      if (match1) return Number(match1[1]);
-      if (match2) return Number(match2[1]);
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) return Number(match[1]);
+      }
     }
 
     return 0;
+  }
+
+  function detectPipeSize(text, preferredSizes) {
+    for (const size of preferredSizes) {
+      const escaped = size.replace('"', '\\"');
+      const inchWord = size.replace('"', "").replace("-", "\\-");
+
+      const patterns = [
+        new RegExp(escaped, "i"),
+        new RegExp(inchWord + "\\s*inch", "i"),
+        new RegExp(inchWord + "\\s*in\\b", "i")
+      ];
+
+      if (patterns.some(pattern => pattern.test(text))) return size;
+    }
+
+    return "";
+  }
+
+  function sizeKey(size) {
+    return size.replace('"', "").replace("1-1/4", "1.25").replace("1-1/2", "1.5").replace("2-1/2", "2.5");
+  }
+
+  function addTags(containerId, tags, className) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+
+    if (tags.length === 0) {
+      container.innerHTML = `<span class="small">None.</span>`;
+      return;
+    }
+
+    [...new Set(tags)].forEach(text => {
+      const tag = document.createElement("span");
+      tag.className = "tag " + (className || "");
+      tag.innerText = text;
+      container.appendChild(tag);
+    });
+  }
+
+  function detectSprinklerTypes(text, detected) {
+    const types = [];
+
+    if (text.includes("pendant") || text.includes("pendent")) {
+      types.push("Pendant Heads");
+      detected.push("Pendant sprinkler heads detected");
+    }
+
+    if (text.includes("upright")) {
+      types.push("Upright Heads");
+      detected.push("Upright sprinkler heads detected");
+    }
+
+    if (text.includes("sidewall")) {
+      types.push("Sidewall Heads");
+      detected.push("Sidewall sprinkler heads detected");
+    }
+
+    if (text.includes("concealed")) {
+      types.push("Concealed Heads");
+      detected.push("Concealed sprinkler heads detected");
+    }
+
+    return types;
   }
 
   async function analyzeEstimate() {
@@ -481,16 +584,23 @@
       pdfText = await readAllPDFs(files);
     }
 
-    const combinedTextRaw = `${typedNotes}\n\n${pdfText}`;
-    const combinedText = combinedTextRaw.toLowerCase();
+    const combinedRaw = `${typedNotes}\n\n${pdfText}`;
+    const text = normalizeText(combinedRaw);
 
     document.getElementById("pdfTextPreview").innerText =
-      pdfText.trim() ? pdfText.substring(0, 5000) : "No readable PDF text found. This PDF may be scanned/image-based.";
+      pdfText.trim()
+        ? pdfText.substring(0, 7000)
+        : "No readable PDF text found. This PDF may be scanned/image-based.";
 
-    document.getElementById("pdfStatus").className = pdfText.trim() ? "success" : "warning";
-    document.getElementById("pdfStatus").innerText = pdfText.trim()
-      ? "PDF text was read successfully. Estimate generated from PDF text plus drawing notes."
-      : "No searchable PDF text was found. This may be a scanned drawing. Use the Drawing Notes box for now.";
+    const pdfStatus = document.getElementById("pdfStatus");
+
+    if (pdfText.trim()) {
+      pdfStatus.className = "success";
+      pdfStatus.innerText = "PDF text was read. This estimate uses PDF text, typed notes, and sprinkler estimating rules.";
+    } else {
+      pdfStatus.className = "warning";
+      pdfStatus.innerText = "No searchable PDF text was found. This may be a scanned/image drawing. Manual notes are needed until OCR/AI vision is added.";
+    }
 
     let headCount = Number(document.getElementById("headCount").value) || 0;
     let newDropCount = Number(document.getElementById("newDropCount").value) || 0;
@@ -499,192 +609,271 @@
     let branchPipeFeet = Number(document.getElementById("branchPipeFeet").value) || 0;
 
     const detected = [];
+    const warnings = [];
     const pipe = {};
     const fittings = {};
     const devices = {};
     const hangers = {};
 
-    const sprinklerMentions = countMatches(combinedText, [
-      /\bsprinkler\b/g,
-      /\bhead\b/g,
-      /\bpendant\b/g,
-      /\bupright\b/g,
-      /\bsidewall\b/g
-    ]);
+    let confidence = 15;
+    let headSource = "Not detected";
 
-    const detectedHeadQty = detectNumberNearText(combinedText, [
+    if (pdfText.trim()) confidence += 20;
+    if (typedNotes.trim()) confidence += 15;
+
+    const sprinklerTypes = detectSprinklerTypes(text, detected);
+
+    const scheduleHeadQty = findQtyNearWords(text, [
+      "sprinkler heads?",
       "sprinklers?",
       "heads?",
       "pendants?",
+      "pendents?",
       "uprights?",
       "sidewalls?"
     ]);
 
-    if (headCount === 0 && detectedHeadQty > 0) {
-      headCount = detectedHeadQty;
-      detected.push("Head count detected from PDF text");
+    if (headCount > 0) {
+      headSource = "Manual input";
+      confidence += 25;
+    } else if (scheduleHeadQty > 0) {
+      headCount = scheduleHeadQty;
+      headSource = "Detected from PDF text/notes";
+      detected.push("Head count detected from text");
+      confidence += 25;
+    } else {
+      const sprinklerMentions =
+        countRegex(text, /\bsprinkler\b/g) +
+        countRegex(text, /\bpendent\b/g) +
+        countRegex(text, /\bpendant\b/g) +
+        countRegex(text, /\bupright\b/g) +
+        countRegex(text, /\bsidewall\b/g);
+
+      if (sprinklerMentions >= 12) {
+        headCount = Math.min(Math.max(sprinklerMentions, 10), 150);
+        headSource = "Estimated from repeated sprinkler mentions";
+        detected.push("Head count estimated from sprinkler mentions");
+        warnings.push("Head count is estimated, not visually counted.");
+        confidence += 10;
+      }
     }
 
-    if (headCount === 0 && sprinklerMentions >= 10) {
-      headCount = Math.min(Math.max(sprinklerMentions, 10), 150);
-      detected.push("Estimated head count from sprinkler text mentions");
-    }
-
-    if (combinedText.includes("office") || combinedText.includes("tenant")) {
+    if (text.includes("office") || text.includes("tenant") || text.includes("fit-out") || text.includes("fitout")) {
       detected.push("Office / Tenant Fit-Out");
       if (headCount === 0) headCount = 25;
       if (branchPipeFeet === 0) branchPipeFeet = 250;
+      confidence += 10;
     }
 
-    if (combinedText.includes("warehouse") || combinedText.includes("industrial") || combinedText.includes("esfr")) {
+    if (text.includes("warehouse") || text.includes("industrial") || text.includes("esfr")) {
       detected.push("Warehouse / Industrial");
       if (headCount === 0) headCount = 80;
       if (mainPipeFeet === 0) mainPipeFeet = 600;
       if (branchPipeFeet === 0) branchPipeFeet = 1200;
+      confidence += 10;
     }
 
     let systemType = systemTypeInput;
     let fabricationType = fabricationTypeInput;
 
-    if (combinedText.includes("dry system") || combinedText.includes("dry pipe")) {
+    if (text.includes("dry system") || text.includes("dry pipe")) {
       systemType = "dry";
       detected.push("Dry System");
+      confidence += 8;
     }
 
-    if (combinedText.includes("preaction") || combinedText.includes("pre-action")) {
+    if (text.includes("preaction") || text.includes("pre-action")) {
       systemType = "preaction";
       detected.push("Pre-Action System");
+      confidence += 8;
     }
 
-    if (combinedText.includes("esfr")) {
+    if (text.includes("esfr")) {
       systemType = "esfr";
       detected.push("ESFR System");
+      confidence += 8;
     }
 
-    if (combinedText.includes("prefab") || combinedText.includes("shop fabricated")) {
+    if (text.includes("prefab") || text.includes("shop fabricated") || text.includes("fabricated piping")) {
       fabricationType = "prefab";
       detected.push("Prefab Piping");
+      confidence += 8;
     }
 
-    if (combinedText.includes("fdc") || combinedText.includes("fire department connection")) {
+    const mainSize = detectPipeSize(text, ['6"', '4"', '3"', '2-1/2"', '2"']) || '4"';
+    const branchSize = detectPipeSize(text, ['2"', '1-1/2"', '1-1/4"']) || '2"';
+    const dropSize = detectPipeSize(text, ['1"', '1-1/4"', '3/4"']) || '1"';
+
+    if (text.includes("sch 40") || text.includes("schedule 40")) detected.push("Schedule 40 pipe detected");
+    if (text.includes("sch 10") || text.includes("schedule 10")) detected.push("Schedule 10 pipe detected");
+    if (text.includes("grooved")) detected.push("Grooved pipe/fittings detected");
+    if (text.includes("threaded")) detected.push("Threaded pipe/fittings detected");
+
+    const mainSpec = text.includes("sch 40 main") || text.includes("schedule 40 main") ? "Sch 40" : "Sch 10";
+    const branchSpec = text.includes("sch 40 branch") || text.includes("schedule 40 branch") ? "Sch 40" : "Sch 10";
+    const dropSpec = "Sch 40";
+
+    if (text.includes("fdc") || text.includes("fire department connection")) {
       detected.push("FDC");
-      addItem(devices, 1, "4\"", "Fire Department Connection Assembly", "Standard", "Grooved/Threaded", prices.fdc);
+      addItem(devices, 1, "4\"", "Fire Department Connection Assembly", "Standard", "Grooved/Threaded", prices.fdc, "Detected");
+      confidence += 5;
     }
 
-    if (combinedText.includes("fhc") || combinedText.includes("hose cabinet")) {
+    if (text.includes("fhc") || text.includes("hose cabinet")) {
       detected.push("Fire Hose Cabinets");
-      addItem(devices, 2, "1-1/2\"", "Fire Hose Cabinet Connection", "Standard", "Threaded", 450);
+      addItem(devices, 2, "1-1/2\"", "Fire Hose Cabinet Connection", "Standard", "Threaded", 450, "Detected");
+      confidence += 5;
     }
 
-    if (combinedText.includes("riser")) {
+    if (text.includes("riser")) {
       detected.push("Riser Assembly");
-      addItem(devices, 1, "4\"", "Riser Assembly with Trim", "Sch 10 / Sch 40", "Grooved/Threaded", prices.riser);
+      addItem(devices, 1, mainSize, "Riser Assembly with Trim", "Sch 10 / Sch 40", "Grooved/Threaded", prices.riser, "Detected");
+      confidence += 5;
     }
 
-    if (combinedText.includes("test header")) {
+    if (text.includes("test header")) {
       detected.push("Test Header");
-      addItem(devices, 1, "2-1/2\"", "Fire Pump Test Header", "Standard", "Threaded", prices["test header"]);
+      addItem(devices, 1, "2-1/2\"", "Fire Pump Test Header", "Standard", "Threaded", prices["test header"], "Detected");
+      confidence += 5;
     }
 
-    if (combinedText.includes("air vent") || combinedText.includes("auto air vent")) {
+    if (text.includes("air vent") || text.includes("auto air vent") || text.includes("automatic air vent")) {
       detected.push("Automatic Air Vent");
-      addItem(devices, 1, "1/2\"", "Automatic Air Vent Assembly", "Standard", "Threaded", prices["air vent"]);
+      addItem(devices, 1, "1/2\"", "Automatic Air Vent Assembly", "Standard", "Threaded", prices["air vent"], "Detected");
+      confidence += 5;
     }
 
-    if (combinedText.includes("drain")) {
+    if (text.includes("drain")) {
       detected.push("Drain Assembly");
-      addItem(devices, 1, "2\"", "Main Drain Assembly", "Sch 40", "Threaded", prices.drain);
+      addItem(devices, 1, "2\"", "Main Drain Assembly", "Sch 40", "Threaded", prices.drain, "Detected");
+      confidence += 5;
     }
 
-    if (combinedText.includes("valve")) {
+    if (text.includes("valve")) {
       detected.push("Control Valves");
-      addItem(devices, 2, "4\"", "Control Valve", "UL/FM", "Grooved", prices.valve);
+      addItem(devices, 2, mainSize, "Control Valve", "UL/FM", "Grooved", prices.valve, "Estimated");
+      warnings.push("Valves detected, but exact quantity may need review.");
     }
 
-    if (combinedText.includes("flex")) {
+    if (text.includes("flex")) {
       detected.push("Flex Drops");
     }
 
-    if (combinedText.includes("demo") || combinedText.includes("cap existing") || combinedText.includes("cap pipe")) {
+    if (text.includes("demo") || text.includes("cap existing") || text.includes("cap pipe")) {
       detected.push("Demo / Cap Existing Piping");
-      addItem(fittings, 5, "1\"", "Threaded Cap", "Sch 40", "Threaded", 3);
+      addItem(fittings, 5, dropSize, "Threaded Cap", "Sch 40", "Threaded", 3, "Estimated");
+      warnings.push("Demo/cap quantities are estimated.");
+    }
+
+    if (newDropCount === 0) {
+      const detectedNewDrops = findQtyNearWords(text, [
+        "new drops?",
+        "mechanical tee drops?",
+        "new heads?",
+        "new sprinklers?"
+      ]);
+
+      if (detectedNewDrops > 0) {
+        newDropCount = detectedNewDrops;
+        detected.push("New drop quantity detected");
+      }
+    }
+
+    if (relocateCount === 0) {
+      const detectedRelocates = findQtyNearWords(text, [
+        "relocates?",
+        "relocated heads?",
+        "relocate heads?",
+        "relocated sprinklers?"
+      ]);
+
+      if (detectedRelocates > 0) {
+        relocateCount = detectedRelocates;
+        detected.push("Relocate quantity detected");
+      }
     }
 
     if (headCount === 0) {
       headCount = newDropCount + relocateCount;
     }
 
-    if (newDropCount === 0 && estimateType !== "service") {
+    if (newDropCount === 0 && headCount > 0 && estimateType !== "service") {
       newDropCount = Math.ceil(headCount * 0.5);
+      warnings.push("New mechanical tee drops were estimated as 50% of heads.");
     }
 
-    if (relocateCount === 0 && estimateType === "service") {
+    if (relocateCount === 0 && estimateType === "service" && headCount > 0) {
       relocateCount = headCount;
+      warnings.push("Service estimate assumes all heads are relocates unless manually changed.");
     }
 
-    if (mainPipeFeet === 0 && combinedText.includes("main")) {
+    if (mainPipeFeet === 0 && (text.includes("main") || text.includes("feed main"))) {
       mainPipeFeet = headCount > 50 ? 400 : 150;
-      detected.push("Main piping estimated from PDF text");
+      detected.push("Main piping estimated from text");
+      warnings.push("Main pipe footage is estimated, not measured from drawing scale.");
     }
 
-    if (branchPipeFeet === 0 && combinedText.includes("branch")) {
-      branchPipeFeet = headCount * 10;
-      detected.push("Branchline piping estimated from PDF text");
+    if (branchPipeFeet === 0 && (text.includes("branch") || text.includes("branchline"))) {
+      branchPipeFeet = headCount > 0 ? headCount * 10 : 250;
+      detected.push("Branchline piping estimated from text");
+      warnings.push("Branchline footage is estimated, not measured from drawing scale.");
     }
 
-    const flexDrops = combinedText.includes("flex") ? headCount : 0;
+    const flexDrops = text.includes("flex") ? headCount : 0;
     const hardPipeDrops = Math.max(headCount - flexDrops, 0);
-
-    const mainSpec = combinedText.includes("sch 40") ? "Sch 40" : "Sch 10";
-    const branchSpec = "Sch 10";
-    const dropSpec = "Sch 40";
-
-    const mainSize =
-      combinedText.includes("6 inch") || combinedText.includes("6\"") ? "6\"" :
-      combinedText.includes("4 inch") || combinedText.includes("4\"") ? "4\"" :
-      combinedText.includes("3 inch") || combinedText.includes("3\"") ? "3\"" : "4\"";
-
-    const branchSize =
-      combinedText.includes("2 inch") || combinedText.includes("2\"") ? "2\"" : "2\"";
 
     if (mainPipeFeet > 0) {
       const mainLengths = Math.ceil(mainPipeFeet / 21);
-      const sizeKey = mainSize.replace('"','');
+      const key = sizeKey(mainSize);
 
-      addItem(pipe, mainLengths, mainSize, "Main Pipe - 21 ft lengths", mainSpec, "Grooved", prices[sizeKey + " pipe"]);
-      addItem(fittings, Math.ceil(mainLengths * 1.1), mainSize, "Grooved Coupling", mainSpec, "Grooved", prices[sizeKey + " coupling"]);
-      addItem(hangers, Math.ceil(mainPipeFeet / 10), mainSize, "Clevis Hanger", "Standard", "Rod Assembly", prices["1 hanger"]);
-      addItem(hangers, Math.ceil(mainPipeFeet / 10), "3/8\"", "Rod Assembly", "Standard", "Threaded Rod", prices["rod assembly"]);
+      addItem(pipe, mainLengths, mainSize, "Main Pipe - 21 ft lengths", mainSpec, "Grooved", prices[key + " pipe"], "Manual/Estimated");
+      addItem(fittings, Math.ceil(mainLengths * 1.1), mainSize, "Grooved Coupling", mainSpec, "Grooved", prices[key + " coupling"], "Estimated");
+      addItem(hangers, Math.ceil(mainPipeFeet / 10), mainSize, "Clevis Hanger", "Standard", "Rod Assembly", prices["1 hanger"], "Estimated");
+      addItem(hangers, Math.ceil(mainPipeFeet / 10), "3/8\"", "Rod Assembly", "Standard", "Threaded Rod", prices["rod assembly"], "Estimated");
     }
 
     if (branchPipeFeet > 0) {
       const branchLengths = Math.ceil(branchPipeFeet / 21);
+      const key = sizeKey(branchSize);
 
-      addItem(pipe, branchLengths, branchSize, "Branchline Pipe - 21 ft lengths", branchSpec, "Grooved", prices["2 pipe"]);
-      addItem(fittings, Math.ceil(branchLengths * 1.1), branchSize, "Grooved Coupling", branchSpec, "Grooved", prices["2 coupling"]);
-      addItem(hangers, Math.ceil(branchPipeFeet / 10), branchSize, "Clevis Hanger", "Standard", "Rod Assembly", prices["1 hanger"]);
-      addItem(hangers, Math.ceil(branchPipeFeet / 10), "3/8\"", "Rod Assembly", "Standard", "Threaded Rod", prices["rod assembly"]);
+      addItem(pipe, branchLengths, branchSize, "Branchline Pipe - 21 ft lengths", branchSpec, "Grooved", prices[key + " pipe"] || prices["2 pipe"], "Manual/Estimated");
+      addItem(fittings, Math.ceil(branchLengths * 1.1), branchSize, "Grooved Coupling", branchSpec, "Grooved", prices[key + " coupling"] || prices["2 coupling"], "Estimated");
+      addItem(hangers, Math.ceil(branchPipeFeet / 10), branchSize, "Clevis Hanger", "Standard", "Rod Assembly", prices["1 hanger"], "Estimated");
+      addItem(hangers, Math.ceil(branchPipeFeet / 10), "3/8\"", "Rod Assembly", "Standard", "Threaded Rod", prices["rod assembly"], "Estimated");
     }
 
     if (hardPipeDrops > 0) {
-      addItem(pipe, Math.ceil(hardPipeDrops * 4 / 21), "1\"", "Drop Pipe - 21 ft lengths", dropSpec, "Threaded", prices["1 pipe"]);
-      addItem(fittings, hardPipeDrops * 3, "1\"", "90 Degree Elbow", dropSpec, "Threaded", prices["1 elbow"]);
-      addItem(fittings, hardPipeDrops, "1\" x 1/2\"", "Reducer", dropSpec, "Threaded", prices["1 reducer"]);
-      addItem(fittings, hardPipeDrops, "1\" x 2\"", "Nipple", dropSpec, "Threaded", prices["1 nipple"]);
-      addItem(hangers, hardPipeDrops, "1\"", "Drop Hanger", "Standard", "Rod Assembly", prices["1 hanger"]);
-      addItem(hangers, hardPipeDrops, "3/8\"", "Rod Assembly", "Standard", "Threaded Rod", prices["rod assembly"]);
+      addItem(pipe, Math.ceil(hardPipeDrops * 4 / 21), dropSize, "Drop Pipe - 21 ft lengths", dropSpec, "Threaded", prices["1 pipe"], "Assembly Rule");
+      addItem(fittings, hardPipeDrops * 3, dropSize, "90 Degree Elbow", dropSpec, "Threaded", prices["1 elbow"], "Assembly Rule");
+      addItem(fittings, hardPipeDrops, `${dropSize} x 1/2"`, "Reducer", dropSpec, "Threaded", prices["1 reducer"], "Assembly Rule");
+      addItem(fittings, hardPipeDrops, `${dropSize} x 2"`, "Nipple", dropSpec, "Threaded", prices["1 nipple"], "Assembly Rule");
+      addItem(hangers, hardPipeDrops, dropSize, "Drop Hanger", "Standard", "Rod Assembly", prices["1 hanger"], "Assembly Rule");
+      addItem(hangers, hardPipeDrops, "3/8\"", "Rod Assembly", "Standard", "Threaded Rod", prices["rod assembly"], "Assembly Rule");
     }
 
     if (newDropCount > 0) {
-      addItem(fittings, newDropCount, "2\" x 1\"", "Mechanical Tee", "Sch 10", "Grooved/Threaded Outlet", prices["2 mech tee"]);
+      addItem(fittings, newDropCount, `${branchSize} x ${dropSize}`, "Mechanical Tee", branchSpec, "Grooved/Threaded Outlet", prices["2 mech tee"], "Assembly Rule");
     }
 
     if (flexDrops > 0) {
-      addItem(devices, flexDrops, "1/2\"", "Flexible Sprinkler Drop Assembly", "UL/FM", "Threaded", prices["flex drop"]);
+      addItem(devices, flexDrops, "1/2\"", "Flexible Sprinkler Drop Assembly", "UL/FM", "Threaded", prices["flex drop"], "Detected/Assembly");
     }
 
     if (headCount > 0) {
-      addItem(devices, headCount, "1/2\"", "Sprinkler Head", "Standard Response / Quick Response", "Threaded", prices.head);
+      const headDescription = sprinklerTypes.length ? sprinklerTypes.join(" / ") : "Sprinkler Head";
+      addItem(devices, headCount, "1/2\"", headDescription, "Standard / Quick Response", "Threaded", prices.head, headSource);
+    }
+
+    if (headCount === 0) {
+      warnings.push("No reliable head count found. Add manual head count for better estimate.");
+    }
+
+    if (!pdfText.trim() && files.length > 0) {
+      warnings.push("PDF may be scanned/image-based. Real OCR or AI vision is needed for better takeoff.");
+    }
+
+    if (mainPipeFeet === 0 && branchPipeFeet === 0 && headCount > 0) {
+      warnings.push("Pipe footage was not found. Add main/branch footage or drawing scale takeoff later.");
     }
 
     let labourHours = 0;
@@ -712,26 +901,23 @@
     const subtotal = materialCost + labourCost;
     const sellPrice = subtotal * 1.35;
 
+    confidence = Math.min(confidence, 90);
+
+    if (warnings.length > 0) confidence = Math.min(confidence, 70);
+    if (headSource.includes("Estimated")) confidence = Math.min(confidence, 65);
+    if (headCount === 0) confidence = Math.min(confidence, 35);
+
     document.getElementById("filesUploaded").innerText = files.length;
     document.getElementById("summaryHeads").innerText = headCount;
+    document.getElementById("headSource").innerText = headSource;
+    document.getElementById("confidenceScore").innerText = confidence + "%";
     document.getElementById("summaryLabour").innerText = labourHours + " hrs";
     document.getElementById("summaryEstimateType").innerText = estimateType;
     document.getElementById("summarySystemType").innerText = systemType;
     document.getElementById("summaryFabrication").innerText = fabricationType;
 
-    const detectedScopes = document.getElementById("detectedScopes");
-    detectedScopes.innerHTML = "";
-
-    if (detected.length === 0) {
-      detectedScopes.innerHTML = `<span class="small">None detected from PDF text or notes yet.</span>`;
-    } else {
-      [...new Set(detected)].forEach(scope => {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.innerText = scope;
-        detectedScopes.appendChild(tag);
-      });
-    }
+    addTags("detectedScopes", detected, "good-tag");
+    addTags("warningScopes", warnings, "warning-tag");
 
     renderTable("pipeTable", pipe);
     renderTable("fittingTable", fittings);
