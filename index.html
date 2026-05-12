@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fire Protection Estimator V5</title>
+  <title>Fire Protection Estimator V6</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -18,7 +18,7 @@
     }
 
     header {
-      padding: 35px 20px;
+      padding: 36px 20px;
       text-align: center;
       background: #111827;
       border-bottom: 1px solid #334155;
@@ -48,10 +48,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
-    h2 {
-      margin-top: 0;
-      font-size: 24px;
-    }
+    h2 { margin-top: 0; }
 
     label {
       display: block;
@@ -60,9 +57,7 @@
       font-weight: bold;
     }
 
-    input,
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
       padding: 12px;
       border-radius: 8px;
@@ -87,9 +82,10 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background: #1d4ed8;
-    }
+    button:hover { background: #1d4ed8; }
+
+    .print-btn { background: #16a34a; }
+    .print-btn:hover { background: #15803d; }
 
     .grid {
       display: grid;
@@ -119,17 +115,14 @@
       border-radius: 10px;
     }
 
-    th,
-    td {
+    th, td {
       padding: 12px;
       border-bottom: 1px solid #334155;
       text-align: left;
       font-size: 14px;
     }
 
-    th {
-      background: #334155;
-    }
+    th { background: #334155; }
 
     .total {
       font-size: 24px;
@@ -146,20 +139,25 @@
       background: #2563eb;
     }
 
-    .warning-tag {
-      background: #92400e;
+    .good-tag { background: #166534; }
+    .warning-tag { background: #92400e; }
+    .ai-tag { background: #6d28d9; }
+
+    .notice {
+      background: #1e3a8a;
+      color: #dbeafe;
+      padding: 14px;
+      border-radius: 8px;
+      margin-top: 14px;
+      line-height: 1.4;
     }
 
-    .good-tag {
-      background: #166534;
-    }
-
-    #pdfPreview {
+    #pdfPreview, #aiJsonPreview {
       background: #020617;
       border: 1px solid #334155;
       border-radius: 10px;
       padding: 12px;
-      max-height: 240px;
+      max-height: 260px;
       overflow: auto;
       white-space: pre-wrap;
       font-size: 13px;
@@ -174,9 +172,7 @@
       margin-top: 20px;
     }
 
-    .proposal h1,
-    .proposal h2,
-    .proposal h3 {
+    .proposal h1, .proposal h2, .proposal h3 {
       color: black;
     }
 
@@ -184,26 +180,33 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      background: white;
     }
 
-    .proposal-table th,
-    .proposal-table td {
+    .proposal-table th, .proposal-table td {
       border: 1px solid #ccc;
       padding: 10px;
       color: black;
     }
 
-    .print-btn {
-      background: #16a34a;
-    }
-
-    .print-btn:hover {
-      background: #15803d;
-    }
-
     @media (max-width: 700px) {
-      .grid {
-        grid-template-columns: 1fr;
+      .grid { grid-template-columns: 1fr; }
+      main { padding: 14px; }
+      header h1 { font-size: 26px; }
+    }
+
+    @media print {
+      body { background: white; }
+      header, .card:not(.print-area) { display: none; }
+      .print-area {
+        display: block;
+        box-shadow: none;
+        background: white;
+        color: black;
+      }
+      .proposal {
+        box-shadow: none;
+        padding: 0;
       }
     }
   </style>
@@ -213,7 +216,7 @@
 
 <header>
   <h1>Fire Protection Estimator</h1>
-  <p>PDF Analysis • Material Assemblies • Labour • Proposal Generator</p>
+  <p>Reference Drawing Library • PDF Text Reading • AI-Ready Takeoff Engine</p>
 </header>
 
 <main>
@@ -263,248 +266,6 @@
     <option value="esfr">ESFR / Warehouse System</option>
   </select>
 
-  <label>Upload PDFs</label>
-  <input id="drawingFiles" type="file" multiple accept=".pdf">
-
-  <label>Drawing Notes / Overrides</label>
-  <textarea id="drawingNotes"></textarea>
-
-  <button onclick="analyzeEstimate()">Analyze PDFs & Generate Estimate</button>
-</section>
-
-<section class="card">
-  <h2>PDF Text Preview</h2>
-  <div id="pdfPreview">No PDF text loaded yet.</div>
-</section>
-
-<section class="card">
-  <h2>Summary</h2>
-
-  <div class="grid">
-    <div class="summary-box"><strong>Estimated Heads</strong><span id="summaryHeads">0</span></div>
-    <div class="summary-box"><strong>Labour Hours</strong><span id="summaryLabour">0 hrs</span></div>
-    <div class="summary-box"><strong>Material Cost</strong><span id="materialCost">$0.00</span></div>
-    <div class="summary-box"><strong>Labour Cost</strong><span id="labourCost">$0.00</span></div>
-    <div class="summary-box"><strong>Subtotal</strong><span id="subtotal">$0.00</span></div>
-    <div class="summary-box"><strong>Sell Price</strong><span id="sellPrice" class="total">$0.00</span></div>
-  </div>
-
-  <h3>Detected Scope</h3>
-  <div id="detectedScopes"></div>
-
-  <h3>Warnings</h3>
-  <div id="warnings"></div>
-</section>
-
-<section class="card">
-  <h2>Detailed Material List</h2>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Qty</th>
-        <th>Description</th>
-        <th>Size</th>
-        <th>Source</th>
-      </tr>
-    </thead>
-
-    <tbody id="materialTable"></tbody>
-  </table>
-</section>
-
-<section class="card">
-  <h2>Proposal Preview</h2>
-
-  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
-
-  <div class="proposal" id="proposalPreview">
-    <h1>Fire Protection Estimate</h1>
-
-    <p><strong>Project:</strong> <span id="proposalProject"></span></p>
-    <p><strong>Customer:</strong> <span id="proposalCustomer"></span></p>
-    <p><strong>Location:</strong> <span id="proposalLocation"></span></p>
-
-    <h2>Scope of Work</h2>
-    <p>
-      Provide labour and material for fire sprinkler modifications as per supplied drawings and specifications.
-    </p>
-
-    <h2>Estimate Summary</h2>
-
-    <table class="proposal-table">
-      <tr>
-        <th>Description</th>
-        <th>Amount</th>
-      </tr>
-
-      <tr>
-        <td>Material Cost</td>
-        <td id="proposalMaterial"></td>
-      </tr>
-
-      <tr>
-        <td>Labour Cost</td>
-        <td id="proposalLabour"></td>
-      </tr>
-
-      <tr>
-        <td>Subtotal</td>
-        <td id="proposalSubtotal"></td>
-      </tr>
-
-      <tr>
-        <td><strong>Total Sell Price</strong></td>
-        <td id="proposalSell"></td>
-      </tr>
-    </table>
-
-    <h2>Exclusions</h2>
-
-    <ul>
-      <li>Electrical work by others</li>
-      <li>Cutting and patching by others</li>
-      <li>Permit fees excluded unless noted</li>
-      <li>After-hours work excluded unless noted</li>
-    </ul>
-  </div>
-</section>
-
-</main>
-
-<script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-  const materialTable = document.getElementById('materialTable');
-
-  function money(value) {
-    return '$' + value.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }
-
-  async function extractText(file) {
-    const buffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-
-    let text = '';
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      text += content.items.map(item => item.str).join(' ') + ' ';
-    }
-
-    return text;
-  }
-
-  async function analyzeEstimate() {
-    const files = document.getElementById('drawingFiles').files;
-    const notes = document.getElementById('drawingNotes').value.toLowerCase();
-
-    let combinedText = notes;
-
-    for (const file of files) {
-      try {
-        const text = await extractText(file);
-        combinedText += ' ' + text.toLowerCase();
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    document.getElementById('pdfPreview').innerText = combinedText.substring(0, 7000);
-
-    const detected = [];
-    const warnings = [];
-    const materials = [];
-
-    let headCount = 0;
-
-    const headMatch = combinedText.match(/(\d+)\s*(heads|sprinklers)/i);
-
-    if (headMatch) {
-      headCount = Number(headMatch[1]);
-      detected.push('Head count detected from text');
-    } else {
-      headCount = 25;
-      warnings.push('Head count estimated because no reliable quantity was detected.');
-    }
-
-    if (combinedText.includes('dry')) detected.push('Dry system detected');
-    if (combinedText.includes('esfr')) detected.push('ESFR system detected');
-    if (combinedText.includes('riser')) detected.push('Riser detected');
-    if (combinedText.includes('fdc')) detected.push('FDC detected');
-    if (combinedText.includes('flex')) detected.push('Flex drops detected');
-    if (combinedText.includes('warehouse')) detected.push('Warehouse project detected');
-
-    materials.push({ qty: headCount, desc: 'Sprinkler Heads', size: '1/2"', source: 'Detected/Estimated', cost: 18 });
-    materials.push({ qty: Math.ceil(headCount / 2), desc: 'Mechanical Tees', size: '2" x 1"', source: 'Assembly Rule', cost: 32 });
-    materials.push({ qty: headCount * 3, desc: '90 Degree Elbows', size: '1"', source: 'Assembly Rule', cost: 3.75 });
-    materials.push({ qty: headCount, desc: 'Reducers', size: '1" x 1/2"', source: 'Assembly Rule', cost: 4.25 });
-    materials.push({ qty: headCount, desc: 'Drop Hangers', size: '1"', source: 'Assembly Rule', cost: 6.5 });
-
-    if (combinedText.includes('fdc')) {
-      materials.push({ qty: 1, desc: 'Fire Department Connection', size: '4"', source: 'Detected', cost: 850 });
-    }
-
-    if (combinedText.includes('riser')) {
-      materials.push({ qty: 1, desc: 'Riser Assembly', size: '4"', source: 'Detected', cost: 2500 });
-    }
-
-    materialTable.innerHTML = '';
-
-    let materialCost = 0;
-
-    materials.forEach(item => {
-      materialCost += item.qty * item.cost;
-
-      const row = document.createElement('tr');
-
-      row.innerHTML = `
-        <td>${Math.ceil(item.qty)}</td>
-        <td>${item.desc}</td>
-        <td>${item.size}</td>
-        <td>${item.source}</td>
-      `;
-
-      materialTable.appendChild(row);
-    });
-
-    const labourHours = Math.ceil(headCount * 1.1);
-
-    const labourRate = Number(document.getElementById('labourRate').value) || 95;
-    const markup = Number(document.getElementById('markup').value) || 35;
-
-    const labourCost = labourHours * labourRate;
-    const subtotal = materialCost + labourCost;
-    const sellPrice = subtotal * (1 + markup / 100);
-
-    document.getElementById('summaryHeads').innerText = headCount;
-    document.getElementById('summaryLabour').innerText = labourHours + ' hrs';
-    document.getElementById('materialCost').innerText = money(materialCost);
-    document.getElementById('labourCost').innerText = money(labourCost);
-    document.getElementById('subtotal').innerText = money(subtotal);
-    document.getElementById('sellPrice').innerText = money(sellPrice);
-
-    document.getElementById('detectedScopes').innerHTML = detected.map(x => `<span class="tag good-tag">${x}</span>`).join(' ');
-
-    document.getElementById('warnings').innerHTML = warnings.length
-      ? warnings.map(x => `<span class="tag warning-tag">${x}</span>`).join(' ')
-      : '<span class="tag good-tag">No major warnings</span>';
-
-    document.getElementById('proposalProject').innerText = document.getElementById('projectName').value;
-    document.getElementById('proposalCustomer').innerText = document.getElementById('customerName').value;
-    document.getElementById('proposalLocation').innerText = document.getElementById('location').value;
-
-    document.getElementById('proposalMaterial').innerText = money(materialCost);
-    document.getElementById('proposalLabour').innerText = money(labourCost);
-    document.getElementById('proposalSubtotal').innerText = money(subtotal);
-    document.getElementById('proposalSell').innerText = money(sellPrice);
-  }
-</script>
-
-</body>
-</html>
+  <label>Reference Drawing Type</label>
+  <select id="referenceType">
+    <option value="auto">Auto Detect From PDF / Notes</option>
