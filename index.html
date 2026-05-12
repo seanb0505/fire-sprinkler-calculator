@@ -74,6 +74,21 @@
       background: #374151;
     }
 
+    .secondary:hover {
+      background: #4b5563;
+    }
+
+    .danger {
+      background: #991b1b;
+      padding: 8px;
+      font-size: 14px;
+      margin-top: 0;
+    }
+
+    .danger:hover {
+      background: #7f1d1d;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -85,10 +100,16 @@
       border-bottom: 1px solid #374151;
       padding: 10px;
       text-align: left;
+      vertical-align: top;
     }
 
     th {
       color: #93c5fd;
+    }
+
+    td input {
+      margin: 0;
+      padding: 8px;
     }
 
     .notice {
@@ -126,7 +147,7 @@
 
 <header>
   <h1>Fire Protection Estimator</h1>
-  <p>AI Drawing Takeoff • Material Lists • Labour Estimating</p>
+  <p>AI Drawing Takeoff • Editable Material Lists • Labour Estimating</p>
 </header>
 
 <main>
@@ -161,17 +182,17 @@
     <input type="file" id="pdfUpload" multiple accept="application/pdf">
 
     <label>Drawing Notes</label>
-    <textarea id="drawingNotes" placeholder="Describe project scope, heads, mains, risers, demo, valves, branchlines, FHCs, etc."></textarea>
+    <textarea id="drawingNotes" placeholder="Describe project scope, heads, mains, risers, demo, valves, branchlines, FHCs, FDC, dry heads, flex drops, etc."></textarea>
 
     <button onclick="runTakeoff()">Analyze Drawings</button>
 
     <div class="success" id="successBox">
-      Drawing analysis completed.
+      Drawing analysis completed. Review and edit quantities below.
     </div>
 
     <div class="notice">
       Real AI PDF reading will be connected later through an AI backend/API.
-      This version builds the estimating workflow and takeoff structure first.
+      This version builds the estimating workflow and editable takeoff structure first.
     </div>
   </div>
 
@@ -187,23 +208,27 @@
   </div>
 
   <div class="box">
-    <h2>Material Breakdown</h2>
+    <h2>Editable Material Breakdown</h2>
 
     <table>
       <thead>
         <tr>
           <th>Material</th>
-          <th>Quantity</th>
+          <th>Qty</th>
+          <th>Unit Cost</th>
           <th>Notes</th>
+          <th>Delete</th>
         </tr>
       </thead>
 
       <tbody id="materialTable">
         <tr>
-          <td colspan="3">Upload drawings and analyze project.</td>
+          <td colspan="5">Upload drawings and analyze project.</td>
         </tr>
       </tbody>
     </table>
+
+    <button class="secondary" onclick="addBlankMaterial()">Add Custom Material Line</button>
   </div>
 
   <div class="box">
@@ -215,9 +240,11 @@
     <label>Material Markup %</label>
     <input type="number" id="markup" value="20">
 
-    <button class="secondary" onclick="calculatePricing()">Calculate Pricing</button>
+    <button onclick="calculatePricing()">Calculate Pricing</button>
 
     <div style="margin-top:20px;">
+      <p><strong>Material Subtotal:</strong> <span id="materialSubtotal">$0.00</span></p>
+      <p><strong>Material Markup:</strong> <span id="materialMarkup">$0.00</span></p>
       <p><strong>Material Total:</strong> <span id="materialTotal">$0.00</span></p>
       <p><strong>Labour Total:</strong> <span id="labourTotal">$0.00</span></p>
       <p><strong>Total Estimate:</strong> <span id="estimateTotal">$0.00</span></p>
@@ -229,152 +256,176 @@
 <script>
   var detectedHeads = 0;
   var detectedLabour = 0;
-  var detectedMaterialCost = 0;
 
   function money(amount) {
     return "$" + amount.toFixed(2);
   }
 
-  function runTakeoff() {
+  function clearTable() {
+    var table = document.getElementById("materialTable");
+    table.innerHTML = "";
+  }
 
+  function addMaterialRow(material, qty, unitCost, notes) {
+    var table = document.getElementById("materialTable");
+    var row = document.createElement("tr");
+
+    row.innerHTML =
+      "<td><input type='text' class='mat-name' value='" + material + "'></td>" +
+      "<td><input type='number' class='mat-qty' value='" + qty + "'></td>" +
+      "<td><input type='number' class='mat-cost' value='" + unitCost + "' step='0.01'></td>" +
+      "<td><input type='text' class='mat-notes' value='" + notes + "'></td>" +
+      "<td><button class='danger' onclick='deleteRow(this)'>Delete</button></td>";
+
+    table.appendChild(row);
+  }
+
+  function deleteRow(button) {
+    var row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    calculatePricing();
+  }
+
+  function addBlankMaterial() {
+    addMaterialRow("Custom Material", 1, 0, "Manual entry");
+  }
+
+  function runTakeoff() {
     var files = document.getElementById("pdfUpload").files;
     var notes = document.getElementById("drawingNotes").value.toLowerCase();
     var estimateType = document.getElementById("estimateType").value;
 
-    var table = document.getElementById("materialTable");
-    table.innerHTML = "";
-
-    var materials = [];
+    clearTable();
 
     detectedHeads = 0;
     detectedLabour = 0;
-    detectedMaterialCost = 0;
 
     if (estimateType === "service") {
-
       detectedHeads = 6;
       detectedLabour = 8;
 
-      materials = [
-        ["Sprinkler Heads", 6, "Service replacements / repairs"],
-        ["1 inch Pipe", "60 ft", "Estimated branch piping"],
-        ["1 inch Fittings", 18, "Estimated threaded fittings"],
-        ["Service Van / T&M", 1, "Truck and tooling"]
-      ];
+      addMaterialRow("Sprinkler Heads", 6, 18.00, "Service replacements / repairs");
+      addMaterialRow("1 inch Pipe", 60, 4.50, "Estimated branch piping in feet");
+      addMaterialRow("1 inch Fittings", 18, 3.25, "Estimated threaded fittings");
+      addMaterialRow("Service Van / Truck Charge", 1, 95.00, "T&M truck and tooling");
     }
 
     if (estimateType === "retrofit") {
-
       detectedHeads = 18;
       detectedLabour = 24;
 
-      materials = [
-        ["Sprinkler Heads", 18, "Retrofit / tenant improvement"],
-        ["1 inch Pipe", "180 ft", "Branch line modifications"],
-        ["Mechanical Tees", 18, "New connections"],
-        ["1 inch 90s", 54, "Hard pipe drops"],
-        ["Hangers", 18, "Support hardware"]
-      ];
+      addMaterialRow("Sprinkler Heads", 18, 18.00, "Retrofit / tenant improvement");
+      addMaterialRow("1 inch Pipe", 180, 4.50, "Branchline modifications in feet");
+      addMaterialRow("Mechanical Tees", 18, 18.00, "New connections");
+      addMaterialRow("1 inch 90 Elbows", 54, 3.25, "3 elbows per hard pipe drop");
+      addMaterialRow("Hangers", 18, 4.25, "Support hardware");
+      addMaterialRow("Rod Assemblies", 18, 3.50, "Hanger rod assemblies");
     }
 
     if (estimateType === "newbuild") {
-
       detectedHeads = 60;
       detectedLabour = 140;
 
-      materials = [
-        ["Sprinkler Heads", 60, "New building install"],
-        ["4 inch Main Pipe", "400 ft", "Main distribution"],
-        ["2 inch Branchlines", "800 ft", "Branch piping"],
-        ["Grooved Couplings", 120, "Main piping"],
-        ["Hangers", 90, "Pipe supports"],
-        ["Control Valves", 2, "System valves"]
-      ];
+      addMaterialRow("Sprinkler Heads", 60, 18.00, "New building install");
+      addMaterialRow("4 inch Main Pipe", 400, 18.00, "Main distribution piping in feet");
+      addMaterialRow("2 inch Branchline Pipe", 800, 9.00, "Branch piping in feet");
+      addMaterialRow("Grooved Couplings", 120, 9.50, "Main piping couplings");
+      addMaterialRow("Grooved 90 Elbows", 24, 28.00, "Main piping direction changes");
+      addMaterialRow("Hangers", 90, 4.25, "Pipe supports");
+      addMaterialRow("Control Valves", 2, 350.00, "System valves");
+      addMaterialRow("Fire Department Connection", 1, 650.00, "FDC assembly");
     }
 
     if (estimateType === "mains") {
-
       detectedHeads = 0;
       detectedLabour = 80;
 
-      materials = [
-        ["6 inch Main Pipe", "300 ft", "Underground / overhead main"],
-        ["6 inch Couplings", 40, "Grooved couplings"],
-        ["6 inch 90s", 8, "Main direction changes"],
-        ["Hangers", 35, "Pipe supports"]
-      ];
+      addMaterialRow("6 inch Main Pipe", 300, 28.00, "Main piping in feet");
+      addMaterialRow("6 inch Couplings", 40, 22.00, "Grooved couplings");
+      addMaterialRow("6 inch 90 Elbows", 8, 95.00, "Main direction changes");
+      addMaterialRow("Hangers", 35, 4.25, "Pipe supports");
+      addMaterialRow("Rod Assemblies", 35, 3.50, "Hanger rod assemblies");
     }
 
     if (estimateType === "riser") {
-
       detectedHeads = 0;
       detectedLabour = 40;
 
-      materials = [
-        ["6 inch Riser", 1, "Complete riser assembly"],
-        ["Butterfly Valve", 2, "Control valves"],
-        ["Check Valve", 1, "Alarm valve assembly"],
-        ["Test & Drain", 1, "Inspector test"],
-        ["Pressure Gauges", 2, "Monitoring"]
-      ];
+      addMaterialRow("6 inch Riser Pipe", 20, 28.00, "Riser piping in feet");
+      addMaterialRow("Butterfly Valves", 2, 450.00, "Control valves");
+      addMaterialRow("Check Valve", 1, 750.00, "Alarm/check valve assembly");
+      addMaterialRow("Test and Drain", 1, 250.00, "Inspector test connection");
+      addMaterialRow("Pressure Gauges", 2, 35.00, "System gauges");
+      addMaterialRow("Flow Switch", 1, 175.00, "Waterflow device");
+      addMaterialRow("Tamper Switches", 2, 85.00, "Valve supervision");
     }
 
     if (estimateType === "fhc") {
-
       detectedHeads = 0;
       detectedLabour = 20;
 
-      materials = [
-        ["Fire Hose Cabinets", 4, "FHC assemblies"],
-        ["2 inch Hose Valves", 4, "Landing valves"],
-        ["2 inch Pipe", "120 ft", "Cabinet feeds"],
-        ["Cabinet Trim", 4, "Install hardware"]
-      ];
+      addMaterialRow("Fire Hose Cabinets", 4, 850.00, "FHC assemblies");
+      addMaterialRow("2 inch Hose Valves", 4, 180.00, "Landing valves");
+      addMaterialRow("2 inch Pipe", 120, 9.00, "Cabinet feeds in feet");
+      addMaterialRow("2 inch Couplings/Fittings", 20, 12.00, "FHC feed fittings");
+      addMaterialRow("Cabinet Trim", 4, 75.00, "Install hardware");
     }
 
-    if (notes.includes("flex")) {
-      materials.push(["Flex Drops", detectedHeads, "Detected from notes"]);
+    if (notes.indexOf("flex") !== -1) {
+      addMaterialRow("Flex Drop Assemblies", detectedHeads, 42.00, "Detected from notes");
     }
 
-    if (notes.includes("dry")) {
-      materials.push(["Dry Heads", 4, "Detected from notes"]);
+    if (notes.indexOf("dry") !== -1) {
+      addMaterialRow("Dry Sprinkler Heads", 4, 95.00, "Detected from notes");
     }
 
-    if (notes.includes("fdc")) {
-      materials.push(["Fire Department Connection", 1, "Detected from notes"]);
+    if (notes.indexOf("fdc") !== -1) {
+      addMaterialRow("Fire Department Connection", 1, 650.00, "Detected from notes");
+    }
+
+    if (notes.indexOf("demo") !== -1 || notes.indexOf("cap") !== -1) {
+      addMaterialRow("Demo / Cap Allowance", 1, 250.00, "Detected from notes");
+      detectedLabour = detectedLabour + 6;
     }
 
     document.getElementById("fileCount").innerText = files.length;
     document.getElementById("headCount").innerText = detectedHeads;
     document.getElementById("labourHours").innerText = detectedLabour + " hrs";
     document.getElementById("scopeType").innerText = estimateType;
-
-    for (var i = 0; i < materials.length; i++) {
-
-      var row = document.createElement("tr");
-
-      row.innerHTML =
-        "<td>" + materials[i][0] + "</td>" +
-        "<td>" + materials[i][1] + "</td>" +
-        "<td>" + materials[i][2] + "</td>";
-
-      table.appendChild(row);
-
-      detectedMaterialCost += 250;
-    }
-
     document.getElementById("successBox").style.display = "block";
+
+    calculatePricing();
   }
 
   function calculatePricing() {
+    var qtyInputs = document.getElementsByClassName("mat-qty");
+    var costInputs = document.getElementsByClassName("mat-cost");
+
+    var subtotal = 0;
+
+    for (var i = 0; i < qtyInputs.length; i++) {
+      var qty = Number(qtyInputs[i].value);
+      var cost = Number(costInputs[i].value);
+
+      if (isNaN(qty)) qty = 0;
+      if (isNaN(cost)) cost = 0;
+
+      subtotal = subtotal + (qty * cost);
+    }
 
     var labourRate = Number(document.getElementById("labourRate").value);
     var markup = Number(document.getElementById("markup").value);
 
-    var materialTotal = detectedMaterialCost + (detectedMaterialCost * (markup / 100));
+    if (isNaN(labourRate)) labourRate = 0;
+    if (isNaN(markup)) markup = 0;
+
+    var markupAmount = subtotal * (markup / 100);
+    var materialTotal = subtotal + markupAmount;
     var labourTotal = detectedLabour * labourRate;
     var estimateTotal = materialTotal + labourTotal;
 
+    document.getElementById("materialSubtotal").innerText = money(subtotal);
+    document.getElementById("materialMarkup").innerText = money(markupAmount);
     document.getElementById("materialTotal").innerText = money(materialTotal);
     document.getElementById("labourTotal").innerText = money(labourTotal);
     document.getElementById("estimateTotal").innerText = money(estimateTotal);
