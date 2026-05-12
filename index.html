@@ -1,67 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fire Sprinkler Estimator</title>
-
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #111827;
       color: white;
+      margin: 0;
+      padding: 0;
     }
 
     header {
       background: #0f172a;
-      padding: 40px 20px;
       text-align: center;
-      border-bottom: 1px solid #374151;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 34px;
-    }
-
-    header p {
-      color: #cbd5e1;
-      margin-top: 10px;
+      padding: 30px 15px;
     }
 
     main {
-      max-width: 1100px;
+      max-width: 900px;
       margin: auto;
-      padding: 25px;
+      padding: 20px;
     }
 
-    .card {
+    .box {
       background: #1f2937;
-      padding: 25px;
-      border-radius: 14px;
-      margin-bottom: 25px;
-      border: 1px solid #374151;
-    }
-
-    h2 {
-      margin-top: 0;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
     }
 
     label {
       display: block;
-      margin-top: 15px;
-      margin-bottom: 6px;
-      color: #d1d5db;
+      margin-top: 12px;
       font-weight: bold;
     }
 
-    input, select {
+    input, select, button {
       width: 100%;
       padding: 12px;
-      border-radius: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
       border: none;
-      margin-bottom: 10px;
       font-size: 16px;
       box-sizing: border-box;
     }
@@ -69,70 +49,23 @@
     button {
       background: #2563eb;
       color: white;
-      border: none;
-      padding: 14px 22px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 15px;
-      width: 100%;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-    }
-
-    .summary-box {
-      background: #111827;
-      padding: 18px;
-      border-radius: 10px;
-      border: 1px solid #374151;
-    }
-
-    .summary-box strong {
-      display: block;
-      color: #9ca3af;
-      margin-bottom: 6px;
-    }
-
-    .summary-box span {
-      font-size: 22px;
-      font-weight: bold;
+      margin-top: 20px;
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
       margin-top: 15px;
+      border-collapse: collapse;
     }
 
     th, td {
+      padding: 10px;
       border-bottom: 1px solid #374151;
-      padding: 12px;
       text-align: left;
     }
 
     th {
       color: #93c5fd;
-    }
-
-    .note {
-      color: #cbd5e1;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-
-    footer {
-      text-align: center;
-      color: #9ca3af;
-      padding: 25px;
-      font-size: 14px;
     }
   </style>
 </head>
@@ -140,24 +73,24 @@
 <body>
   <header>
     <h1>Fire Sprinkler Estimator</h1>
-    <p>Estimate sprinkler drops, relocates, material, labour, and basic project pricing.</p>
+    <p>Basic material and labour calculator</p>
   </header>
 
   <main>
-    <section class="card">
+    <div class="box">
       <h2>Project Information</h2>
 
       <label>Project Name</label>
-      <input type="text" id="projectName" placeholder="Example: Unit 102 Office Alteration" />
+      <input id="projectName" type="text" placeholder="Project name">
 
       <label>Customer Name</label>
-      <input type="text" id="customerName" placeholder="Example: ABC Contracting" />
+      <input id="customerName" type="text" placeholder="Customer name">
 
       <label>Location</label>
-      <input type="text" id="projectLocation" placeholder="Example: Richmond Hill, ON" />
-    </section>
+      <input id="location" type="text" placeholder="Location">
+    </div>
 
-    <section class="card">
+    <div class="box">
       <h2>Sprinkler Work</h2>
 
       <label>Work Type</label>
@@ -173,232 +106,165 @@
       </select>
 
       <label>Number of Heads</label>
-      <input type="number" id="heads" value="1" min="0" />
+      <input id="heads" type="number" value="1">
 
-      <label>Pipe Size for New Mechanical Tee</label>
-      <select id="mainPipeSize">
+      <label>Mechanical Tee</label>
+      <select id="teeType">
         <option value="none">No Mechanical Tee</option>
-        <option value="2x1">2&quot; x 1&quot; Mechanical Tee</option>
-        <option value="2x34">2&quot; x 3/4&quot; Mechanical Tee</option>
-        <option value="2x12">2&quot; x 1/2&quot; Mechanical Tee</option>
+        <option value="2 x 1 Mechanical Tee">2 inch x 1 inch Mechanical Tee</option>
+        <option value="2 x 3/4 Mechanical Tee">2 inch x 3/4 inch Mechanical Tee</option>
+        <option value="2 x 1/2 Mechanical Tee">2 inch x 1/2 inch Mechanical Tee</option>
       </select>
 
-      <label>Average 1&quot; Pipe Per Head / Relocate</label>
-      <input type="number" id="pipePerHead" value="10" min="0" />
+      <label>Average 1 inch Pipe Per Head</label>
+      <input id="pipePerHead" type="number" value="10">
 
       <label>Labour Hours Per Head</label>
-      <input type="number" id="hoursPerHead" value="1" min="0" step="0.25" />
+      <input id="hoursPerHead" type="number" value="1" step="0.25">
 
       <label>Labour Rate Per Hour</label>
-      <input type="number" id="labourRate" value="95" min="0" />
+      <input id="labourRate" type="number" value="95">
 
-      <label>Material Markup %</label>
-      <input type="number" id="markup" value="20" min="0" />
+      <label>Material Markup Percent</label>
+      <input id="markup" type="number" value="20">
 
       <button onclick="calculateEstimate()">Calculate Estimate</button>
-    </section>
+    </div>
 
-    <section class="card">
+    <div class="box">
       <h2>Estimate Summary</h2>
+      <p><strong>Total Heads:</strong> <span id="summaryHeads">0</span></p>
+      <p><strong>Total Pipe:</strong> <span id="summaryPipe">0 ft</span></p>
+      <p><strong>Labour Hours:</strong> <span id="summaryHours">0 hrs</span></p>
+      <p><strong>Material Total:</strong> <span id="summaryMaterial">$0.00</span></p>
+      <p><strong>Labour Total:</strong> <span id="summaryLabour">$0.00</span></p>
+      <p><strong>Total Estimate:</strong> <span id="summaryTotal">$0.00</span></p>
+    </div>
 
-      <div class="summary-grid">
-        <div class="summary-box">
-          <strong>Total Heads</strong>
-          <span id="summaryHeads">0</span>
-        </div>
-
-        <div class="summary-box">
-          <strong>Total 1&quot; Pipe</strong>
-          <span id="summaryPipe">0 ft</span>
-        </div>
-
-        <div class="summary-box">
-          <strong>Labour Hours</strong>
-          <span id="summaryHours">0 hrs</span>
-        </div>
-
-        <div class="summary-box">
-          <strong>Material Total</strong>
-          <span id="summaryMaterial">$0.00</span>
-        </div>
-
-        <div class="summary-box">
-          <strong>Labour Total</strong>
-          <span id="summaryLabour">$0.00</span>
-        </div>
-
-        <div class="summary-box">
-          <strong>Total Estimate</strong>
-          <span id="summaryTotal">$0.00</span>
-        </div>
-      </div>
-
-      <p class="note">Pricing is a working estimate only. Supplier pricing and PDF export will be added later.</p>
-    </section>
-
-    <section class="card">
+    <div class="box">
       <h2>Material List</h2>
-
       <table>
         <thead>
           <tr>
             <th>Material</th>
-            <th>Quantity</th>
-            <th>Unit Cost</th>
+            <th>Qty</th>
+            <th>Unit</th>
             <th>Total</th>
           </tr>
         </thead>
-        <tbody id="materialTable">
-          <tr>
-            <td colspan="4">Enter project details and click calculate.</td>
-          </tr>
-        </tbody>
+        <tbody id="materialTable"></tbody>
       </table>
-    </section>
+    </div>
   </main>
 
-  <footer>
-    Fire Sprinkler Estimator
-  </footer>
-
   <script>
-    function money(value) {
-      return "$" + value.toFixed(2);
+    function money(amount) {
+      return "$" + amount.toFixed(2);
+    }
+
+    function addMaterial(list, name, qty, unitCost) {
+      list.push({
+        name: name,
+        qty: qty,
+        unitCost: unitCost,
+        total: qty * unitCost
+      });
     }
 
     function calculateEstimate() {
-      const workType = document.getElementById("workType").value;
-      const dropType = document.getElementById("dropType").value;
-      const heads = Number(document.getElementById("heads").value) || 0;
-      const mainPipeSize = document.getElementById("mainPipeSize").value;
-      const pipePerHead = Number(document.getElementById("pipePerHead").value) || 0;
-      const hoursPerHead = Number(document.getElementById("hoursPerHead").value) || 0;
-      const labourRate = Number(document.getElementById("labourRate").value) || 0;
-      const markupPercent = Number(document.getElementById("markup").value) || 0;
+      var workType = document.getElementById("workType").value;
+      var dropType = document.getElementById("dropType").value;
+      var heads = Number(document.getElementById("heads").value);
+      var teeType = document.getElementById("teeType").value;
+      var pipePerHead = Number(document.getElementById("pipePerHead").value);
+      var hoursPerHead = Number(document.getElementById("hoursPerHead").value);
+      var labourRate = Number(document.getElementById("labourRate").value);
+      var markup = Number(document.getElementById("markup").value);
 
-      const totalPipeFeet = heads * pipePerHead;
-      const labourHours = heads * hoursPerHead;
-      const labourTotal = labourHours * labourRate;
+      if (isNaN(heads)) heads = 0;
+      if (isNaN(pipePerHead)) pipePerHead = 0;
+      if (isNaN(hoursPerHead)) hoursPerHead = 0;
+      if (isNaN(labourRate)) labourRate = 0;
+      if (isNaN(markup)) markup = 0;
 
-      let materials = [];
+      var materials = [];
+      var totalPipe = heads * pipePerHead;
 
       if (dropType === "hardpipe") {
-        materials.push({
-          name: "1&quot; Schedule 40 Black Pipe",
-          qty: totalPipeFeet + " ft",
-          unitCost: 4.50,
-          total: totalPipeFeet * 4.50
-        });
-
-        materials.push({
-          name: "1&quot; 90° Elbows",
-          qty: heads * 3,
-          unitCost: 3.25,
-          total: heads * 3 * 3.25
-        });
-
-        materials.push({
-          name: "1&quot; x 2&quot; Nipple",
-          qty: heads,
-          unitCost: 2.75,
-          total: heads * 2.75
-        });
+        addMaterial(materials, "1 inch Schedule 40 Black Pipe", totalPipe, 4.50);
+        addMaterial(materials, "1 inch 90 Elbows", heads * 3, 3.25);
+        addMaterial(materials, "1 inch x 2 inch Nipple", heads, 2.75);
       }
 
       if (dropType === "flex") {
-        materials.push({
-          name: "Flex Drop Assembly",
-          qty: heads,
-          unitCost: 42.00,
-          total: heads * 42.00
-        });
+        addMaterial(materials, "Flex Drop Assembly", heads, 42.00);
       }
 
-      materials.push({
-        name: "1&quot; Hanger",
-        qty: heads,
-        unitCost: 4.25,
-        total: heads * 4.25
-      });
+      addMaterial(materials, "1 inch Hanger", heads, 4.25);
+      addMaterial(materials, "Rod Assembly", heads, 3.50);
+      addMaterial(materials, "Sprinkler Head", heads, 18.00);
 
-      materials.push({
-        name: "Rod Assembly",
-        qty: heads,
-        unitCost: 3.50,
-        total: heads * 3.50
-      });
-
-      materials.push({
-        name: "Sprinkler Head",
-        qty: heads,
-        unitCost: 18.00,
-        total: heads * 18.00
-      });
-
-      if (workType === "new" && mainPipeSize !== "none") {
-        let teeName = "";
-
-        if (mainPipeSize === "2x1") {
-          teeName = "2&quot; x 1&quot; Mechanical Tee";
-        } else if (mainPipeSize === "2x34") {
-          teeName = "2&quot; x 3/4&quot; Mechanical Tee";
-        } else if (mainPipeSize === "2x12") {
-          teeName = "2&quot; x 1/2&quot; Mechanical Tee";
-        }
-
-        materials.push({
-          name: teeName,
-          qty: heads,
-          unitCost: 18.00,
-          total: heads * 18.00
-        });
+      if (workType === "new" && teeType !== "none") {
+        addMaterial(materials, teeType, heads, 18.00);
       }
 
-      let materialSubtotal = materials.reduce((sum, item) => sum + item.total, 0);
-      let materialMarkup = materialSubtotal * (markupPercent / 100);
-      let materialTotal = materialSubtotal + materialMarkup;
-      let totalEstimate = materialTotal + labourTotal;
+      var materialSubtotal = 0;
+
+      for (var i = 0; i < materials.length; i++) {
+        materialSubtotal = materialSubtotal + materials[i].total;
+      }
+
+      var materialMarkup = materialSubtotal * (markup / 100);
+      var materialTotal = materialSubtotal + materialMarkup;
+      var labourHours = heads * hoursPerHead;
+      var labourTotal = labourHours * labourRate;
+      var totalEstimate = materialTotal + labourTotal;
 
       document.getElementById("summaryHeads").innerText = heads;
-      document.getElementById("summaryPipe").innerText = dropType === "hardpipe" ? totalPipeFeet + " ft" : "N/A";
+
+      if (dropType === "hardpipe") {
+        document.getElementById("summaryPipe").innerText = totalPipe + " ft";
+      } else {
+        document.getElementById("summaryPipe").innerText = "N/A";
+      }
+
       document.getElementById("summaryHours").innerText = labourHours + " hrs";
       document.getElementById("summaryMaterial").innerText = money(materialTotal);
       document.getElementById("summaryLabour").innerText = money(labourTotal);
       document.getElementById("summaryTotal").innerText = money(totalEstimate);
 
-      const materialTable = document.getElementById("materialTable");
-      materialTable.innerHTML = "";
+      var table = document.getElementById("materialTable");
+      table.innerHTML = "";
 
-      materials.forEach(item => {
-        const row = document.createElement("tr");
+      for (var j = 0; j < materials.length; j++) {
+        var row = document.createElement("tr");
 
-        row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.qty}</td>
-          <td>${money(item.unitCost)}</td>
-          <td>${money(item.total)}</td>
-        `;
+        row.innerHTML =
+          "<td>" + materials[j].name + "</td>" +
+          "<td>" + materials[j].qty + "</td>" +
+          "<td>" + money(materials[j].unitCost) + "</td>" +
+          "<td>" + money(materials[j].total) + "</td>";
 
-        materialTable.appendChild(row);
-      });
+        table.appendChild(row);
+      }
 
-      const markupRow = document.createElement("tr");
-      markupRow.innerHTML = `
-        <td><strong>Material Markup</strong></td>
-        <td>${markupPercent}%</td>
-        <td>-</td>
-        <td><strong>${money(materialMarkup)}</strong></td>
-      `;
-      materialTable.appendChild(markupRow);
+      var markupRow = document.createElement("tr");
+      markupRow.innerHTML =
+        "<td><strong>Material Markup</strong></td>" +
+        "<td>" + markup + "%</td>" +
+        "<td>-</td>" +
+        "<td><strong>" + money(materialMarkup) + "</strong></td>";
 
-      const totalRow = document.createElement("tr");
-      totalRow.innerHTML = `
-        <td><strong>Material Total</strong></td>
-        <td>-</td>
-        <td>-</td>
-        <td><strong>${money(materialTotal)}</strong></td>
-      `;
-      materialTable.appendChild(totalRow);
+      table.appendChild(markupRow);
+
+      var totalRow = document.createElement("tr");
+      totalRow.innerHTML =
+        "<td><strong>Material Total</strong></td>" +
+        "<td>-</td>" +
+        "<td>-</td>" +
+        "<td><strong>" + money(materialTotal) + "</strong></td>";
+
+      table.appendChild(totalRow);
     }
 
     calculateEstimate();
