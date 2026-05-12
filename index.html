@@ -135,6 +135,20 @@
       gap: 12px;
     }
 
+    .scope-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      background: #2563eb;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
     @media (min-width: 700px) {
       .grid {
         grid-template-columns: 1fr 1fr;
@@ -182,7 +196,7 @@
     <input type="file" id="pdfUpload" multiple accept="application/pdf">
 
     <label>Drawing Notes</label>
-    <textarea id="drawingNotes" placeholder="Describe project scope, heads, mains, risers, demo, valves, branchlines, FHCs, FDC, dry heads, flex drops, etc."></textarea>
+    <textarea id="drawingNotes" placeholder="Example: new build with 4 inch mains, branchlines, riser room, FDC, FHCs, dry heads, flex drops, demo/caps, valves, drains, test header, service work, etc."></textarea>
 
     <button onclick="runTakeoff()">Analyze Drawings</button>
 
@@ -192,7 +206,7 @@
 
     <div class="notice">
       Real AI PDF reading will be connected later through an AI backend/API.
-      This version builds the estimating workflow and editable takeoff structure first.
+      This version detects project scope from your notes and creates editable material/labour takeoffs.
     </div>
   </div>
 
@@ -203,7 +217,12 @@
       <p><strong>Files Uploaded:</strong> <span id="fileCount">0</span></p>
       <p><strong>Estimated Heads:</strong> <span id="headCount">0</span></p>
       <p><strong>Estimated Labour:</strong> <span id="labourHours">0 hrs</span></p>
-      <p><strong>Detected Scope:</strong> <span id="scopeType">None</span></p>
+      <p><strong>Base Estimate Type:</strong> <span id="scopeType">None</span></p>
+    </div>
+
+    <p><strong>Detected Added Scopes:</strong></p>
+    <div class="scope-tags" id="scopeTags">
+      <span class="tag">None yet</span>
     </div>
   </div>
 
@@ -262,8 +281,19 @@
   }
 
   function clearTable() {
-    var table = document.getElementById("materialTable");
-    table.innerHTML = "";
+    document.getElementById("materialTable").innerHTML = "";
+  }
+
+  function clearScopeTags() {
+    document.getElementById("scopeTags").innerHTML = "";
+  }
+
+  function addScopeTag(name) {
+    var tagBox = document.getElementById("scopeTags");
+    var tag = document.createElement("span");
+    tag.className = "tag";
+    tag.innerText = name;
+    tagBox.appendChild(tag);
   }
 
   function addMaterialRow(material, qty, unitCost, notes) {
@@ -272,8 +302,8 @@
 
     row.innerHTML =
       "<td><input type='text' class='mat-name' value='" + material + "'></td>" +
-      "<td><input type='number' class='mat-qty' value='" + qty + "'></td>" +
-      "<td><input type='number' class='mat-cost' value='" + unitCost + "' step='0.01'></td>" +
+      "<td><input type='number' class='mat-qty' value='" + qty + "' oninput='calculatePricing()'></td>" +
+      "<td><input type='number' class='mat-cost' value='" + unitCost + "' step='0.01' oninput='calculatePricing()'></td>" +
       "<td><input type='text' class='mat-notes' value='" + notes + "'></td>" +
       "<td><button class='danger' onclick='deleteRow(this)'>Delete</button></td>";
 
@@ -288,21 +318,13 @@
 
   function addBlankMaterial() {
     addMaterialRow("Custom Material", 1, 0, "Manual entry");
+    calculatePricing();
   }
 
-  function runTakeoff() {
-    var files = document.getElementById("pdfUpload").files;
-    var notes = document.getElementById("drawingNotes").value.toLowerCase();
-    var estimateType = document.getElementById("estimateType").value;
-
-    clearTable();
-
-    detectedHeads = 0;
-    detectedLabour = 0;
-
+  function addBaseScope(estimateType) {
     if (estimateType === "service") {
-      detectedHeads = 6;
-      detectedLabour = 8;
+      detectedHeads += 6;
+      detectedLabour += 8;
 
       addMaterialRow("Sprinkler Heads", 6, 18.00, "Service replacements / repairs");
       addMaterialRow("1 inch Pipe", 60, 4.50, "Estimated branch piping in feet");
@@ -311,8 +333,8 @@
     }
 
     if (estimateType === "retrofit") {
-      detectedHeads = 18;
-      detectedLabour = 24;
+      detectedHeads += 18;
+      detectedLabour += 24;
 
       addMaterialRow("Sprinkler Heads", 18, 18.00, "Retrofit / tenant improvement");
       addMaterialRow("1 inch Pipe", 180, 4.50, "Branchline modifications in feet");
@@ -323,8 +345,8 @@
     }
 
     if (estimateType === "newbuild") {
-      detectedHeads = 60;
-      detectedLabour = 140;
+      detectedHeads += 60;
+      detectedLabour += 140;
 
       addMaterialRow("Sprinkler Heads", 60, 18.00, "New building install");
       addMaterialRow("4 inch Main Pipe", 400, 18.00, "Main distribution piping in feet");
@@ -337,8 +359,7 @@
     }
 
     if (estimateType === "mains") {
-      detectedHeads = 0;
-      detectedLabour = 80;
+      detectedLabour += 80;
 
       addMaterialRow("6 inch Main Pipe", 300, 28.00, "Main piping in feet");
       addMaterialRow("6 inch Couplings", 40, 22.00, "Grooved couplings");
@@ -348,8 +369,7 @@
     }
 
     if (estimateType === "riser") {
-      detectedHeads = 0;
-      detectedLabour = 40;
+      detectedLabour += 40;
 
       addMaterialRow("6 inch Riser Pipe", 20, 28.00, "Riser piping in feet");
       addMaterialRow("Butterfly Valves", 2, 450.00, "Control valves");
@@ -361,8 +381,7 @@
     }
 
     if (estimateType === "fhc") {
-      detectedHeads = 0;
-      detectedLabour = 20;
+      detectedLabour += 20;
 
       addMaterialRow("Fire Hose Cabinets", 4, 850.00, "FHC assemblies");
       addMaterialRow("2 inch Hose Valves", 4, 180.00, "Landing valves");
@@ -370,23 +389,130 @@
       addMaterialRow("2 inch Couplings/Fittings", 20, 12.00, "FHC feed fittings");
       addMaterialRow("Cabinet Trim", 4, 75.00, "Install hardware");
     }
+  }
 
-    if (notes.indexOf("flex") !== -1) {
-      addMaterialRow("Flex Drop Assemblies", detectedHeads, 42.00, "Detected from notes");
+  function detectExtraScopes(notes) {
+    var foundAny = false;
+
+    if (notes.indexOf("riser") !== -1) {
+      addScopeTag("Riser Room");
+      detectedLabour += 40;
+      foundAny = true;
+
+      addMaterialRow("6 inch Riser Pipe", 20, 28.00, "Detected riser scope");
+      addMaterialRow("Butterfly Valves", 2, 450.00, "Detected riser scope");
+      addMaterialRow("Check Valve", 1, 750.00, "Detected riser scope");
+      addMaterialRow("Test and Drain", 1, 250.00, "Detected riser scope");
+      addMaterialRow("Pressure Gauges", 2, 35.00, "Detected riser scope");
     }
 
-    if (notes.indexOf("dry") !== -1) {
-      addMaterialRow("Dry Sprinkler Heads", 4, 95.00, "Detected from notes");
+    if (notes.indexOf("fhc") !== -1 || notes.indexOf("hose cabinet") !== -1 || notes.indexOf("hose cabinets") !== -1) {
+      addScopeTag("FHC / Hose Cabinets");
+      detectedLabour += 20;
+      foundAny = true;
+
+      addMaterialRow("Fire Hose Cabinets", 4, 850.00, "Detected FHC scope");
+      addMaterialRow("2 inch Hose Valves", 4, 180.00, "Detected FHC scope");
+      addMaterialRow("2 inch Pipe", 120, 9.00, "Detected FHC scope");
     }
 
-    if (notes.indexOf("fdc") !== -1) {
-      addMaterialRow("Fire Department Connection", 1, 650.00, "Detected from notes");
+    if (notes.indexOf("fdc") !== -1 || notes.indexOf("fire department connection") !== -1) {
+      addScopeTag("FDC");
+      detectedLabour += 8;
+      foundAny = true;
+
+      addMaterialRow("Fire Department Connection", 1, 650.00, "Detected FDC scope");
+      addMaterialRow("4 inch FDC Pipe", 40, 18.00, "Detected FDC piping allowance in feet");
+      addMaterialRow("4 inch Check Valve", 1, 450.00, "Detected FDC scope");
     }
 
-    if (notes.indexOf("demo") !== -1 || notes.indexOf("cap") !== -1) {
-      addMaterialRow("Demo / Cap Allowance", 1, 250.00, "Detected from notes");
-      detectedLabour = detectedLabour + 6;
+    if (notes.indexOf("dry") !== -1 || notes.indexOf("dry system") !== -1) {
+      addScopeTag("Dry System");
+      detectedLabour += 16;
+      foundAny = true;
+
+      addMaterialRow("Dry Sprinkler Heads", 6, 95.00, "Detected dry system scope");
+      addMaterialRow("Dry Valve / Trim Allowance", 1, 1500.00, "Detected dry system scope");
+      addMaterialRow("Air Compressor Allowance", 1, 850.00, "Detected dry system scope");
     }
+
+    if (notes.indexOf("flex") !== -1 || notes.indexOf("flex drops") !== -1) {
+      addScopeTag("Flex Drops");
+      detectedLabour += 4;
+      foundAny = true;
+
+      var flexQty = detectedHeads;
+      if (flexQty <= 0) flexQty = 10;
+
+      addMaterialRow("Flex Drop Assemblies", flexQty, 42.00, "Detected flex drop scope");
+    }
+
+    if (notes.indexOf("demo") !== -1 || notes.indexOf("cap") !== -1 || notes.indexOf("caps") !== -1) {
+      addScopeTag("Demo / Caps");
+      detectedLabour += 6;
+      foundAny = true;
+
+      addMaterialRow("Demo / Cap Allowance", 1, 250.00, "Detected demo/cap scope");
+      addMaterialRow("Caps / Plugs", 10, 4.00, "Detected demo/cap scope");
+    }
+
+    if (notes.indexOf("main") !== -1 || notes.indexOf("mains") !== -1) {
+      addScopeTag("Mains");
+      detectedLabour += 40;
+      foundAny = true;
+
+      addMaterialRow("4 inch Main Pipe", 200, 18.00, "Detected main piping scope in feet");
+      addMaterialRow("4 inch Couplings", 30, 14.00, "Detected main piping scope");
+      addMaterialRow("4 inch Grooved 90s", 6, 65.00, "Detected main piping scope");
+      addMaterialRow("Main Hangers", 25, 4.25, "Detected main piping scope");
+    }
+
+    if (notes.indexOf("branch") !== -1 || notes.indexOf("branchline") !== -1 || notes.indexOf("branchlines") !== -1) {
+      addScopeTag("Branchlines");
+      detectedLabour += 30;
+      foundAny = true;
+
+      addMaterialRow("2 inch Branchline Pipe", 300, 9.00, "Detected branchline scope in feet");
+      addMaterialRow("2 inch Couplings", 50, 9.50, "Detected branchline scope");
+      addMaterialRow("2 inch Hangers", 35, 4.25, "Detected branchline scope");
+    }
+
+    if (notes.indexOf("valve") !== -1 || notes.indexOf("valves") !== -1) {
+      addScopeTag("Valves");
+      detectedLabour += 8;
+      foundAny = true;
+
+      addMaterialRow("Control Valves", 2, 350.00, "Detected valve scope");
+      addMaterialRow("Tamper Switches", 2, 85.00, "Detected valve scope");
+    }
+
+    if (notes.indexOf("drain") !== -1 || notes.indexOf("test") !== -1) {
+      addScopeTag("Drains / Tests");
+      detectedLabour += 6;
+      foundAny = true;
+
+      addMaterialRow("Test and Drain", 1, 250.00, "Detected drain/test scope");
+      addMaterialRow("Drain Piping Allowance", 30, 5.00, "Detected drain/test scope in feet");
+    }
+
+    if (!foundAny) {
+      addScopeTag("None detected from notes");
+    }
+  }
+
+  function runTakeoff() {
+    var files = document.getElementById("pdfUpload").files;
+    var notes = document.getElementById("drawingNotes").value.toLowerCase();
+    var estimateType = document.getElementById("estimateType").value;
+
+    clearTable();
+    clearScopeTags();
+
+    detectedHeads = 0;
+    detectedLabour = 0;
+
+    addBaseScope(estimateType);
+    detectExtraScopes(notes);
 
     document.getElementById("fileCount").innerText = files.length;
     document.getElementById("headCount").innerText = detectedHeads;
