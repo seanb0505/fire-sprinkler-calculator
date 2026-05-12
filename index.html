@@ -2,179 +2,49 @@
 <html>
 <head>
   <title>Fire Protection Estimator</title>
-
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: white;
-      margin: 0;
-      padding: 0;
+    body { font-family: Arial, sans-serif; background:#111827; color:white; margin:0; }
+    header { background:#0f172a; padding:30px; text-align:center; }
+    main { max-width:1100px; margin:auto; padding:20px; }
+    .box { background:#1f2937; padding:20px; margin-bottom:20px; border-radius:10px; }
+    h1, h2 { margin-top:0; }
+    label { display:block; margin-top:15px; margin-bottom:5px; font-weight:bold; }
+    input, select, textarea, button {
+      width:100%; padding:12px; border-radius:6px; border:none;
+      font-size:16px; box-sizing:border-box;
     }
-
-    header {
-      background: #0f172a;
-      padding: 30px;
-      text-align: center;
-    }
-
-    main {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .box {
-      background: #1f2937;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-    }
-
-    h1, h2 {
-      margin-top: 0;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-
-    input,
-    select,
-    textarea,
-    button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 6px;
-      border: none;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    button {
-      background: #2563eb;
-      color: white;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    .secondary {
-      background: #374151;
-    }
-
-    .secondary:hover {
-      background: #4b5563;
-    }
-
-    .danger {
-      background: #991b1b;
-      padding: 8px;
-      font-size: 14px;
-      margin-top: 0;
-    }
-
-    .danger:hover {
-      background: #7f1d1d;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    th,
-    td {
-      border-bottom: 1px solid #374151;
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      color: #93c5fd;
-    }
-
-    td input {
-      margin: 0;
-      padding: 8px;
-    }
-
-    .notice {
-      background: #78350f;
-      color: #fde68a;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 15px;
-    }
-
-    .success {
-      background: #064e3b;
-      color: #a7f3d0;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 15px;
-      display: none;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    .scope-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .tag {
-      background: #2563eb;
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-size: 13px;
-    }
-
-    @media (min-width: 700px) {
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
+    textarea { min-height:100px; resize:vertical; }
+    button { background:#2563eb; color:white; margin-top:20px; cursor:pointer; }
+    button:hover { background:#1d4ed8; }
+    .secondary { background:#374151; }
+    .danger { background:#991b1b; padding:8px; font-size:14px; margin-top:0; }
+    table { width:100%; border-collapse:collapse; margin-top:15px; }
+    th, td { border-bottom:1px solid #374151; padding:10px; text-align:left; vertical-align:top; }
+    th { color:#93c5fd; }
+    td input { margin:0; padding:8px; }
+    .notice { background:#78350f; color:#fde68a; padding:12px; border-radius:8px; margin-top:15px; }
+    .success { background:#064e3b; color:#a7f3d0; padding:12px; border-radius:8px; margin-top:15px; display:none; }
+    .grid { display:grid; grid-template-columns:1fr; gap:12px; }
+    .scope-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .tag { background:#2563eb; padding:6px 10px; border-radius:20px; font-size:13px; }
+    @media (min-width:700px) { .grid { grid-template-columns:1fr 1fr; } }
   </style>
 </head>
 
 <body>
-
 <header>
   <h1>Fire Protection Estimator</h1>
-  <p>AI Drawing Takeoff • Editable Material Lists • Labour Estimating</p>
+  <p>AI Drawing Takeoff • Detailed Materials • Labour Estimating</p>
 </header>
 
 <main>
 
   <div class="box">
     <h2>Project Information</h2>
-
     <label>Project Name</label>
     <input type="text" id="projectName">
-
     <label>Customer Name</label>
     <input type="text" id="customerName">
-
     <label>Location</label>
     <input type="text" id="location">
   </div>
@@ -196,23 +66,21 @@
     <input type="file" id="pdfUpload" multiple accept="application/pdf">
 
     <label>Drawing Notes</label>
-    <textarea id="drawingNotes" placeholder="Example: new build with 4 inch mains, branchlines, riser room, FDC, FHCs, dry heads, flex drops, demo/caps, valves, drains, test header, service work, etc."></textarea>
+    <textarea id="drawingNotes" placeholder="Example: new build with 4 inch mains, 2 inch branchlines, riser room, FDC, FHCs, dry heads, flex drops, demo/caps, valves, drains, test header, sch 10 grooved mains, sch 40 threaded drops, etc."></textarea>
 
     <button onclick="runTakeoff()">Analyze Drawings</button>
 
     <div class="success" id="successBox">
-      Drawing analysis completed. Review and edit quantities below.
+      Drawing analysis completed. Review and edit the detailed material list below.
     </div>
 
     <div class="notice">
-      Real AI PDF reading will be connected later through an AI backend/API.
-      This version detects project scope from your notes and creates editable material/labour takeoffs.
+      This is still a simulated takeoff workflow. Real PDF reading will be connected later through an AI backend/API.
     </div>
   </div>
 
   <div class="box">
     <h2>Takeoff Summary</h2>
-
     <div class="grid">
       <p><strong>Files Uploaded:</strong> <span id="fileCount">0</span></p>
       <p><strong>Estimated Heads:</strong> <span id="headCount">0</span></p>
@@ -227,22 +95,24 @@
   </div>
 
   <div class="box">
-    <h2>Editable Material Breakdown</h2>
+    <h2>Detailed Editable Material Breakdown</h2>
 
     <table>
       <thead>
         <tr>
+          <th>Category</th>
           <th>Material</th>
+          <th>Size / Spec</th>
+          <th>Connection</th>
           <th>Qty</th>
           <th>Unit Cost</th>
           <th>Notes</th>
           <th>Delete</th>
         </tr>
       </thead>
-
       <tbody id="materialTable">
         <tr>
-          <td colspan="5">Upload drawings and analyze project.</td>
+          <td colspan="8">Upload drawings and analyze project.</td>
         </tr>
       </tbody>
     </table>
@@ -296,15 +166,18 @@
     tagBox.appendChild(tag);
   }
 
-  function addMaterialRow(material, qty, unitCost, notes) {
+  function addMaterialRow(category, material, spec, connection, qty, unitCost, notes) {
     var table = document.getElementById("materialTable");
     var row = document.createElement("tr");
 
     row.innerHTML =
-      "<td><input type='text' class='mat-name' value='" + material + "'></td>" +
+      "<td><input type='text' value='" + category + "'></td>" +
+      "<td><input type='text' value='" + material + "'></td>" +
+      "<td><input type='text' value='" + spec + "'></td>" +
+      "<td><input type='text' value='" + connection + "'></td>" +
       "<td><input type='number' class='mat-qty' value='" + qty + "' oninput='calculatePricing()'></td>" +
       "<td><input type='number' class='mat-cost' value='" + unitCost + "' step='0.01' oninput='calculatePricing()'></td>" +
-      "<td><input type='text' class='mat-notes' value='" + notes + "'></td>" +
+      "<td><input type='text' value='" + notes + "'></td>" +
       "<td><button class='danger' onclick='deleteRow(this)'>Delete</button></td>";
 
     table.appendChild(row);
@@ -317,182 +190,173 @@
   }
 
   function addBlankMaterial() {
-    addMaterialRow("Custom Material", 1, 0, "Manual entry");
+    addMaterialRow("Custom", "Custom Material", "", "", 1, 0, "Manual entry");
     calculatePricing();
   }
 
-  function addBaseScope(estimateType) {
-    if (estimateType === "service") {
+  function addBaseScope(type) {
+    if (type === "service") {
       detectedHeads += 6;
       detectedLabour += 8;
 
-      addMaterialRow("Sprinkler Heads", 6, 18.00, "Service replacements / repairs");
-      addMaterialRow("1 inch Pipe", 60, 4.50, "Estimated branch piping in feet");
-      addMaterialRow("1 inch Fittings", 18, 3.25, "Estimated threaded fittings");
-      addMaterialRow("Service Van / Truck Charge", 1, 95.00, "T&M truck and tooling");
+      addMaterialRow("Heads", "Pendant Sprinkler Heads", "1/2 inch", "Threaded", 6, 18, "Service replacements");
+      addMaterialRow("Pipe", "Black Steel Pipe", "1 inch Sch 40", "Threaded", 60, 4.50, "Service branch piping in feet");
+      addMaterialRow("Fittings", "90 Elbows", "1 inch Sch 40", "Threaded", 18, 3.25, "Threaded service fittings");
+      addMaterialRow("Fittings", "Couplings", "1 inch Sch 40", "Threaded", 6, 2.50, "Threaded couplings");
+      addMaterialRow("Labour/Other", "Service Van / Truck Charge", "T&M", "N/A", 1, 95, "Truck and tooling");
     }
 
-    if (estimateType === "retrofit") {
+    if (type === "retrofit") {
       detectedHeads += 18;
       detectedLabour += 24;
 
-      addMaterialRow("Sprinkler Heads", 18, 18.00, "Retrofit / tenant improvement");
-      addMaterialRow("1 inch Pipe", 180, 4.50, "Branchline modifications in feet");
-      addMaterialRow("Mechanical Tees", 18, 18.00, "New connections");
-      addMaterialRow("1 inch 90 Elbows", 54, 3.25, "3 elbows per hard pipe drop");
-      addMaterialRow("Hangers", 18, 4.25, "Support hardware");
-      addMaterialRow("Rod Assemblies", 18, 3.50, "Hanger rod assemblies");
+      addMaterialRow("Heads", "Pendant Sprinkler Heads", "1/2 inch", "Threaded", 18, 18, "Tenant improvement heads");
+      addMaterialRow("Pipe", "Black Steel Pipe", "1 inch Sch 40", "Threaded", 180, 4.50, "Drop piping in feet");
+      addMaterialRow("Fittings", "90 Elbows", "1 inch Sch 40", "Threaded", 54, 3.25, "3 elbows per hard pipe drop");
+      addMaterialRow("Fittings", "Close Nipples", "1 inch x 2 inch", "Threaded", 18, 2.75, "1 per drop");
+      addMaterialRow("Fittings", "Mechanical Tees", "2 inch x 1 inch", "Grooved outlet / threaded outlet", 18, 18, "New drops from existing mains");
+      addMaterialRow("Supports", "Hangers", "1 inch", "Rod assembly", 18, 4.25, "1 per drop");
+      addMaterialRow("Supports", "Rod Assemblies", "3/8 inch", "Threaded rod", 18, 3.50, "Hanger rod assemblies");
     }
 
-    if (estimateType === "newbuild") {
+    if (type === "newbuild") {
       detectedHeads += 60;
       detectedLabour += 140;
 
-      addMaterialRow("Sprinkler Heads", 60, 18.00, "New building install");
-      addMaterialRow("4 inch Main Pipe", 400, 18.00, "Main distribution piping in feet");
-      addMaterialRow("2 inch Branchline Pipe", 800, 9.00, "Branch piping in feet");
-      addMaterialRow("Grooved Couplings", 120, 9.50, "Main piping couplings");
-      addMaterialRow("Grooved 90 Elbows", 24, 28.00, "Main piping direction changes");
-      addMaterialRow("Hangers", 90, 4.25, "Pipe supports");
-      addMaterialRow("Control Valves", 2, 350.00, "System valves");
-      addMaterialRow("Fire Department Connection", 1, 650.00, "FDC assembly");
+      addMaterialRow("Heads", "Pendant Sprinkler Heads", "1/2 inch", "Threaded", 45, 18, "New building pendants");
+      addMaterialRow("Heads", "Upright Sprinkler Heads", "1/2 inch", "Threaded", 15, 18, "New building uprights");
+
+      addMaterialRow("Pipe", "Black Steel Pipe", "4 inch Sch 10", "Grooved", 400, 18, "Main distribution piping in feet");
+      addMaterialRow("Pipe", "Black Steel Pipe", "2 inch Sch 10", "Grooved", 800, 9, "Branchline piping in feet");
+      addMaterialRow("Pipe", "Black Steel Pipe", "1 inch Sch 40", "Threaded", 600, 4.50, "Drops in feet");
+
+      addMaterialRow("Fittings", "Grooved Couplings", "4 inch", "Grooved", 60, 14, "4 inch main couplings");
+      addMaterialRow("Fittings", "Grooved Couplings", "2 inch", "Grooved", 100, 9.50, "2 inch branchline couplings");
+      addMaterialRow("Fittings", "Grooved 90 Elbows", "4 inch", "Grooved", 12, 65, "Main direction changes");
+      addMaterialRow("Fittings", "Grooved 90 Elbows", "2 inch", "Grooved", 24, 28, "Branchline direction changes");
+      addMaterialRow("Fittings", "Mechanical Tees", "2 inch x 1 inch", "Grooved outlet / threaded outlet", 60, 18, "Drops from branchlines");
+      addMaterialRow("Fittings", "Threaded 90 Elbows", "1 inch Sch 40", "Threaded", 180, 3.25, "3 per hard pipe drop");
+      addMaterialRow("Fittings", "Close Nipples", "1 inch x 2 inch", "Threaded", 60, 2.75, "1 per drop");
+
+      addMaterialRow("Supports", "Hangers", "4 inch", "Clevis / rod", 25, 8, "Main hangers");
+      addMaterialRow("Supports", "Hangers", "2 inch", "Clevis / rod", 65, 6, "Branchline hangers");
+      addMaterialRow("Supports", "Hangers", "1 inch", "Rod assembly", 60, 4.25, "Drop hangers");
+
+      addMaterialRow("Valves/Devices", "Control Valves", "4 inch", "Grooved", 2, 350, "System valves");
+      addMaterialRow("Valves/Devices", "Tamper Switches", "Valve supervision", "Electrical device", 2, 85, "Supervisory switches");
+      addMaterialRow("Specialty", "Fire Department Connection", "4 inch", "Grooved/threaded", 1, 650, "FDC assembly");
     }
 
-    if (estimateType === "mains") {
+    if (type === "mains") {
       detectedLabour += 80;
 
-      addMaterialRow("6 inch Main Pipe", 300, 28.00, "Main piping in feet");
-      addMaterialRow("6 inch Couplings", 40, 22.00, "Grooved couplings");
-      addMaterialRow("6 inch 90 Elbows", 8, 95.00, "Main direction changes");
-      addMaterialRow("Hangers", 35, 4.25, "Pipe supports");
-      addMaterialRow("Rod Assemblies", 35, 3.50, "Hanger rod assemblies");
+      addMaterialRow("Pipe", "Black Steel Pipe", "6 inch Sch 10", "Grooved", 300, 28, "Main piping in feet");
+      addMaterialRow("Fittings", "Grooved Couplings", "6 inch", "Grooved", 40, 22, "6 inch main couplings");
+      addMaterialRow("Fittings", "Grooved 90 Elbows", "6 inch", "Grooved", 8, 95, "6 inch main direction changes");
+      addMaterialRow("Fittings", "Grooved Tees", "6 inch", "Grooved", 4, 125, "Main tees");
+      addMaterialRow("Supports", "Hangers", "6 inch", "Clevis / rod", 35, 12, "Main supports");
+      addMaterialRow("Supports", "Rod Assemblies", "1/2 inch", "Threaded rod", 35, 4.50, "Hanger rod assemblies");
     }
 
-    if (estimateType === "riser") {
+    if (type === "riser") {
       detectedLabour += 40;
 
-      addMaterialRow("6 inch Riser Pipe", 20, 28.00, "Riser piping in feet");
-      addMaterialRow("Butterfly Valves", 2, 450.00, "Control valves");
-      addMaterialRow("Check Valve", 1, 750.00, "Alarm/check valve assembly");
-      addMaterialRow("Test and Drain", 1, 250.00, "Inspector test connection");
-      addMaterialRow("Pressure Gauges", 2, 35.00, "System gauges");
-      addMaterialRow("Flow Switch", 1, 175.00, "Waterflow device");
-      addMaterialRow("Tamper Switches", 2, 85.00, "Valve supervision");
+      addMaterialRow("Pipe", "Black Steel Pipe", "6 inch Sch 10", "Grooved", 20, 28, "Riser piping in feet");
+      addMaterialRow("Valves/Devices", "Butterfly Valves", "6 inch", "Grooved", 2, 450, "Control valves");
+      addMaterialRow("Valves/Devices", "Check Valve", "6 inch", "Grooved", 1, 750, "Alarm/check valve assembly");
+      addMaterialRow("Valves/Devices", "Test and Drain", "2 inch", "Threaded", 1, 250, "Inspector test connection");
+      addMaterialRow("Valves/Devices", "Pressure Gauges", "0-300 PSI", "Threaded", 2, 35, "System gauges");
+      addMaterialRow("Valves/Devices", "Flow Switch", "6 inch", "Electrical device", 1, 175, "Waterflow device");
+      addMaterialRow("Valves/Devices", "Tamper Switches", "Valve supervision", "Electrical device", 2, 85, "Valve supervision");
     }
 
-    if (estimateType === "fhc") {
+    if (type === "fhc") {
       detectedLabour += 20;
 
-      addMaterialRow("Fire Hose Cabinets", 4, 850.00, "FHC assemblies");
-      addMaterialRow("2 inch Hose Valves", 4, 180.00, "Landing valves");
-      addMaterialRow("2 inch Pipe", 120, 9.00, "Cabinet feeds in feet");
-      addMaterialRow("2 inch Couplings/Fittings", 20, 12.00, "FHC feed fittings");
-      addMaterialRow("Cabinet Trim", 4, 75.00, "Install hardware");
+      addMaterialRow("Specialty", "Fire Hose Cabinets", "Wall mounted", "Cabinet", 4, 850, "FHC assemblies");
+      addMaterialRow("Valves/Devices", "Hose Valves", "2 inch", "Threaded", 4, 180, "Landing valves");
+      addMaterialRow("Pipe", "Black Steel Pipe", "2 inch Sch 40", "Threaded/Grooved", 120, 9, "Cabinet feeds in feet");
+      addMaterialRow("Fittings", "Couplings/Fittings", "2 inch", "Threaded/Grooved", 20, 12, "FHC feed fittings");
+      addMaterialRow("Specialty", "Cabinet Trim", "FHC", "Hardware", 4, 75, "Install hardware");
     }
   }
 
   function detectExtraScopes(notes) {
     var foundAny = false;
 
-    if (notes.indexOf("riser") !== -1) {
+    if (notes.includes("riser")) {
       addScopeTag("Riser Room");
       detectedLabour += 40;
       foundAny = true;
-
-      addMaterialRow("6 inch Riser Pipe", 20, 28.00, "Detected riser scope");
-      addMaterialRow("Butterfly Valves", 2, 450.00, "Detected riser scope");
-      addMaterialRow("Check Valve", 1, 750.00, "Detected riser scope");
-      addMaterialRow("Test and Drain", 1, 250.00, "Detected riser scope");
-      addMaterialRow("Pressure Gauges", 2, 35.00, "Detected riser scope");
+      addMaterialRow("Pipe", "Black Steel Pipe", "6 inch Sch 10", "Grooved", 20, 28, "Detected riser pipe");
+      addMaterialRow("Valves/Devices", "Butterfly Valves", "6 inch", "Grooved", 2, 450, "Detected riser valves");
+      addMaterialRow("Valves/Devices", "Check Valve", "6 inch", "Grooved", 1, 750, "Detected check valve");
+      addMaterialRow("Valves/Devices", "Test and Drain", "2 inch", "Threaded", 1, 250, "Detected test and drain");
     }
 
-    if (notes.indexOf("fhc") !== -1 || notes.indexOf("hose cabinet") !== -1 || notes.indexOf("hose cabinets") !== -1) {
+    if (notes.includes("fhc") || notes.includes("hose cabinet")) {
       addScopeTag("FHC / Hose Cabinets");
       detectedLabour += 20;
       foundAny = true;
-
-      addMaterialRow("Fire Hose Cabinets", 4, 850.00, "Detected FHC scope");
-      addMaterialRow("2 inch Hose Valves", 4, 180.00, "Detected FHC scope");
-      addMaterialRow("2 inch Pipe", 120, 9.00, "Detected FHC scope");
+      addMaterialRow("Specialty", "Fire Hose Cabinets", "Wall mounted", "Cabinet", 4, 850, "Detected FHCs");
+      addMaterialRow("Valves/Devices", "Hose Valves", "2 inch", "Threaded", 4, 180, "Detected hose valves");
+      addMaterialRow("Pipe", "Black Steel Pipe", "2 inch Sch 40", "Threaded/Grooved", 120, 9, "Detected FHC feeds");
     }
 
-    if (notes.indexOf("fdc") !== -1 || notes.indexOf("fire department connection") !== -1) {
+    if (notes.includes("fdc") || notes.includes("fire department connection")) {
       addScopeTag("FDC");
       detectedLabour += 8;
       foundAny = true;
-
-      addMaterialRow("Fire Department Connection", 1, 650.00, "Detected FDC scope");
-      addMaterialRow("4 inch FDC Pipe", 40, 18.00, "Detected FDC piping allowance in feet");
-      addMaterialRow("4 inch Check Valve", 1, 450.00, "Detected FDC scope");
+      addMaterialRow("Specialty", "Fire Department Connection", "4 inch", "Threaded/Grooved", 1, 650, "Detected FDC");
+      addMaterialRow("Pipe", "Black Steel Pipe", "4 inch Sch 10", "Grooved", 40, 18, "Detected FDC piping");
+      addMaterialRow("Valves/Devices", "Check Valve", "4 inch", "Grooved", 1, 450, "Detected FDC check valve");
     }
 
-    if (notes.indexOf("dry") !== -1 || notes.indexOf("dry system") !== -1) {
+    if (notes.includes("dry")) {
       addScopeTag("Dry System");
       detectedLabour += 16;
       foundAny = true;
-
-      addMaterialRow("Dry Sprinkler Heads", 6, 95.00, "Detected dry system scope");
-      addMaterialRow("Dry Valve / Trim Allowance", 1, 1500.00, "Detected dry system scope");
-      addMaterialRow("Air Compressor Allowance", 1, 850.00, "Detected dry system scope");
+      addMaterialRow("Heads", "Dry Sprinkler Heads", "1 inch", "Threaded", 6, 95, "Detected dry heads");
+      addMaterialRow("Valves/Devices", "Dry Valve / Trim", "System trim", "Grooved/threaded", 1, 1500, "Detected dry valve");
+      addMaterialRow("Valves/Devices", "Air Compressor", "Dry system", "Electrical/mechanical", 1, 850, "Detected compressor");
     }
 
-    if (notes.indexOf("flex") !== -1 || notes.indexOf("flex drops") !== -1) {
+    if (notes.includes("flex")) {
       addScopeTag("Flex Drops");
       detectedLabour += 4;
       foundAny = true;
-
       var flexQty = detectedHeads;
       if (flexQty <= 0) flexQty = 10;
-
-      addMaterialRow("Flex Drop Assemblies", flexQty, 42.00, "Detected flex drop scope");
+      addMaterialRow("Drops", "Flex Drop Assemblies", "1 inch x 48 inch", "Flexible hose", flexQty, 42, "Detected flex drops");
     }
 
-    if (notes.indexOf("demo") !== -1 || notes.indexOf("cap") !== -1 || notes.indexOf("caps") !== -1) {
+    if (notes.includes("demo") || notes.includes("cap")) {
       addScopeTag("Demo / Caps");
       detectedLabour += 6;
       foundAny = true;
-
-      addMaterialRow("Demo / Cap Allowance", 1, 250.00, "Detected demo/cap scope");
-      addMaterialRow("Caps / Plugs", 10, 4.00, "Detected demo/cap scope");
+      addMaterialRow("Demo", "Caps / Plugs", "1 inch", "Threaded", 10, 4, "Detected demo/caps");
+      addMaterialRow("Demo", "Caps / Plugs", "2 inch", "Threaded/Grooved", 4, 8, "Detected demo/caps");
+      addMaterialRow("Labour/Other", "Demo Allowance", "T&M", "N/A", 1, 250, "Detected demo allowance");
     }
 
-    if (notes.indexOf("main") !== -1 || notes.indexOf("mains") !== -1) {
+    if (notes.includes("main")) {
       addScopeTag("Mains");
       detectedLabour += 40;
       foundAny = true;
-
-      addMaterialRow("4 inch Main Pipe", 200, 18.00, "Detected main piping scope in feet");
-      addMaterialRow("4 inch Couplings", 30, 14.00, "Detected main piping scope");
-      addMaterialRow("4 inch Grooved 90s", 6, 65.00, "Detected main piping scope");
-      addMaterialRow("Main Hangers", 25, 4.25, "Detected main piping scope");
+      addMaterialRow("Pipe", "Black Steel Pipe", "4 inch Sch 10", "Grooved", 200, 18, "Detected main piping");
+      addMaterialRow("Fittings", "Grooved Couplings", "4 inch", "Grooved", 30, 14, "Detected main couplings");
+      addMaterialRow("Fittings", "Grooved 90 Elbows", "4 inch", "Grooved", 6, 65, "Detected main elbows");
+      addMaterialRow("Supports", "Hangers", "4 inch", "Clevis / rod", 25, 8, "Detected main hangers");
     }
 
-    if (notes.indexOf("branch") !== -1 || notes.indexOf("branchline") !== -1 || notes.indexOf("branchlines") !== -1) {
+    if (notes.includes("branch")) {
       addScopeTag("Branchlines");
       detectedLabour += 30;
       foundAny = true;
-
-      addMaterialRow("2 inch Branchline Pipe", 300, 9.00, "Detected branchline scope in feet");
-      addMaterialRow("2 inch Couplings", 50, 9.50, "Detected branchline scope");
-      addMaterialRow("2 inch Hangers", 35, 4.25, "Detected branchline scope");
-    }
-
-    if (notes.indexOf("valve") !== -1 || notes.indexOf("valves") !== -1) {
-      addScopeTag("Valves");
-      detectedLabour += 8;
-      foundAny = true;
-
-      addMaterialRow("Control Valves", 2, 350.00, "Detected valve scope");
-      addMaterialRow("Tamper Switches", 2, 85.00, "Detected valve scope");
-    }
-
-    if (notes.indexOf("drain") !== -1 || notes.indexOf("test") !== -1) {
-      addScopeTag("Drains / Tests");
-      detectedLabour += 6;
-      foundAny = true;
-
-      addMaterialRow("Test and Drain", 1, 250.00, "Detected drain/test scope");
-      addMaterialRow("Drain Piping Allowance", 30, 5.00, "Detected drain/test scope in feet");
+      addMaterialRow("Pipe", "Black Steel Pipe", "2 inch Sch 10", "Grooved", 300, 9, "Detected branchline pipe");
+      addMaterialRow("Fittings", "Grooved Couplings", "2 inch", "Grooved", 50, 9.50, "Detected 2 inch couplings");
+      addMaterialRow("Fittings", "Mechanical Tees", "2 inch x 1 inch", "Grooved outlet / threaded outlet", 30, 18, "Detected mechanical tees");
+      addMaterialRow("Supports", "Hangers", "2 inch", "Clevis / rod", 35, 6, "Detected branchline hangers");
     }
 
     if (!foundAny) {
@@ -503,7 +367,7 @@
   function runTakeoff() {
     var files = document.getElementById("pdfUpload").files;
     var notes = document.getElementById("drawingNotes").value.toLowerCase();
-    var estimateType = document.getElementById("estimateType").value;
+    var type = document.getElementById("estimateType").value;
 
     clearTable();
     clearScopeTags();
@@ -511,13 +375,13 @@
     detectedHeads = 0;
     detectedLabour = 0;
 
-    addBaseScope(estimateType);
+    addBaseScope(type);
     detectExtraScopes(notes);
 
     document.getElementById("fileCount").innerText = files.length;
     document.getElementById("headCount").innerText = detectedHeads;
     document.getElementById("labourHours").innerText = detectedLabour + " hrs";
-    document.getElementById("scopeType").innerText = estimateType;
+    document.getElementById("scopeType").innerText = type;
     document.getElementById("successBox").style.display = "block";
 
     calculatePricing();
@@ -526,17 +390,14 @@
   function calculatePricing() {
     var qtyInputs = document.getElementsByClassName("mat-qty");
     var costInputs = document.getElementsByClassName("mat-cost");
-
     var subtotal = 0;
 
     for (var i = 0; i < qtyInputs.length; i++) {
       var qty = Number(qtyInputs[i].value);
       var cost = Number(costInputs[i].value);
-
       if (isNaN(qty)) qty = 0;
       if (isNaN(cost)) cost = 0;
-
-      subtotal = subtotal + (qty * cost);
+      subtotal += qty * cost;
     }
 
     var labourRate = Number(document.getElementById("labourRate").value);
