@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Fire Sprinkler Estimator</title>
+  <title>Fire Protection Estimator</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,12 +14,12 @@
 
     header {
       background: #0f172a;
+      padding: 30px;
       text-align: center;
-      padding: 30px 15px;
     }
 
     main {
-      max-width: 900px;
+      max-width: 1000px;
       margin: auto;
       padding: 20px;
     }
@@ -30,16 +31,23 @@
       border-radius: 10px;
     }
 
+    h1, h2 {
+      margin-top: 0;
+    }
+
     label {
       display: block;
-      margin-top: 12px;
+      margin-top: 15px;
+      margin-bottom: 5px;
       font-weight: bold;
     }
 
-    input, select, button, textarea {
+    input,
+    select,
+    textarea,
+    button {
       width: 100%;
       padding: 12px;
-      margin-top: 5px;
       border-radius: 6px;
       border: none;
       font-size: 16px;
@@ -47,7 +55,7 @@
     }
 
     textarea {
-      min-height: 90px;
+      min-height: 100px;
       resize: vertical;
     }
 
@@ -62,23 +70,20 @@
       background: #1d4ed8;
     }
 
-    .secondary-button {
+    .secondary {
       background: #374151;
-    }
-
-    .secondary-button:hover {
-      background: #4b5563;
     }
 
     table {
       width: 100%;
-      margin-top: 15px;
       border-collapse: collapse;
+      margin-top: 15px;
     }
 
-    th, td {
-      padding: 10px;
+    th,
+    td {
       border-bottom: 1px solid #374151;
+      padding: 10px;
       text-align: left;
     }
 
@@ -91,8 +96,7 @@
       color: #fde68a;
       padding: 12px;
       border-radius: 8px;
-      margin-top: 12px;
-      font-size: 14px;
+      margin-top: 15px;
     }
 
     .success {
@@ -100,8 +104,7 @@
       color: #a7f3d0;
       padding: 12px;
       border-radius: 8px;
-      margin-top: 12px;
-      font-size: 14px;
+      margin-top: 15px;
       display: none;
     }
 
@@ -120,342 +123,263 @@
 </head>
 
 <body>
-  <header>
-    <h1>Fire Sprinkler Estimator</h1>
-    <p>Material, labour, and drawing takeoff tool</p>
-  </header>
 
-  <main>
-    <div class="box">
-      <h2>Project Information</h2>
+<header>
+  <h1>Fire Protection Estimator</h1>
+  <p>AI Drawing Takeoff • Material Lists • Labour Estimating</p>
+</header>
 
-      <label>Project Name</label>
-      <input id="projectName" type="text" placeholder="Project name">
+<main>
 
-      <label>Customer Name</label>
-      <input id="customerName" type="text" placeholder="Customer name">
+  <div class="box">
+    <h2>Project Information</h2>
 
-      <label>Location</label>
-      <input id="location" type="text" placeholder="Location">
+    <label>Project Name</label>
+    <input type="text" id="projectName">
+
+    <label>Customer Name</label>
+    <input type="text" id="customerName">
+
+    <label>Location</label>
+    <input type="text" id="location">
+  </div>
+
+  <div class="box">
+    <h2>AI PDF Drawing Takeoff</h2>
+
+    <label>Estimate Type</label>
+    <select id="estimateType">
+      <option value="service">Service / T&M</option>
+      <option value="retrofit">Tenant Improvement / Retrofit</option>
+      <option value="newbuild">New Build</option>
+      <option value="mains">Mains & Branchlines</option>
+      <option value="riser">Riser Room</option>
+      <option value="fhc">FHC / Hose Cabinets</option>
+    </select>
+
+    <label>Upload Drawing PDFs</label>
+    <input type="file" id="pdfUpload" multiple accept="application/pdf">
+
+    <label>Drawing Notes</label>
+    <textarea id="drawingNotes" placeholder="Describe project scope, heads, mains, risers, demo, valves, branchlines, FHCs, etc."></textarea>
+
+    <button onclick="runTakeoff()">Analyze Drawings</button>
+
+    <div class="success" id="successBox">
+      Drawing analysis completed.
     </div>
 
-    <div class="box">
-      <h2>AI PDF Drawing Takeoff</h2>
-
-      <p>
-        Upload a sprinkler drawing PDF and run a takeoff preview.
-        This first version creates a sample material list so we can build the workflow before connecting real AI.
-      </p>
-
-      <label>Upload Sprinkler Drawing PDF</label>
-      <input id="pdfUpload" type="file" accept="application/pdf">
-
-      <label>Drawing Notes</label>
-      <textarea id="drawingNotes" placeholder="Example: Office renovation, pendant heads, 1 inch drops, existing 2 inch mains, relocates, new heads, demo areas, etc."></textarea>
-
-      <button onclick="runPdfTakeoff()">Analyze Drawing</button>
-
-      <div id="takeoffSuccess" class="success">
-        PDF takeoff preview created. Review the material list below.
-      </div>
-
-      <div class="notice">
-        Real AI PDF reading will require a backend/API later. This version builds the website workflow first.
-      </div>
+    <div class="notice">
+      Real AI PDF reading will be connected later through an AI backend/API.
+      This version builds the estimating workflow and takeoff structure first.
     </div>
+  </div>
 
-    <div class="box">
-      <h2>PDF Takeoff Result</h2>
+  <div class="box">
+    <h2>Takeoff Summary</h2>
 
-      <div class="grid">
-        <p><strong>Uploaded File:</strong> <span id="uploadedFileName">None</span></p>
-        <p><strong>Detected Work Type:</strong> <span id="detectedWorkType">Not analyzed</span></p>
-        <p><strong>Estimated Heads:</strong> <span id="detectedHeads">0</span></p>
-        <p><strong>Estimated Labour:</strong> <span id="detectedLabour">0 hrs</span></p>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th>Qty</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="takeoffTable">
-          <tr>
-            <td colspan="3">Upload a PDF and click Analyze Drawing.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <button class="secondary-button" onclick="sendTakeoffToEstimator()">Use This Takeoff In Calculator</button>
+    <div class="grid">
+      <p><strong>Files Uploaded:</strong> <span id="fileCount">0</span></p>
+      <p><strong>Estimated Heads:</strong> <span id="headCount">0</span></p>
+      <p><strong>Estimated Labour:</strong> <span id="labourHours">0 hrs</span></p>
+      <p><strong>Detected Scope:</strong> <span id="scopeType">None</span></p>
     </div>
+  </div>
 
-    <div class="box">
-      <h2>Manual Sprinkler Calculator</h2>
+  <div class="box">
+    <h2>Material Breakdown</h2>
 
-      <label>Work Type</label>
-      <select id="workType">
-        <option value="new">New Drops</option>
-        <option value="relocate">Relocates</option>
-      </select>
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Quantity</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
 
-      <label>Drop Type</label>
-      <select id="dropType">
-        <option value="hardpipe">Hard Pipe</option>
-        <option value="flex">Flex Drop</option>
-      </select>
+      <tbody id="materialTable">
+        <tr>
+          <td colspan="3">Upload drawings and analyze project.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-      <label>Number of Heads</label>
-      <input id="heads" type="number" value="1">
+  <div class="box">
+    <h2>Labour & Pricing</h2>
 
-      <label>Mechanical Tee</label>
-      <select id="teeType">
-        <option value="none">No Mechanical Tee</option>
-        <option value="2 x 1 Mechanical Tee">2 inch x 1 inch Mechanical Tee</option>
-        <option value="2 x 3/4 Mechanical Tee">2 inch x 3/4 inch Mechanical Tee</option>
-        <option value="2 x 1/2 Mechanical Tee">2 inch x 1/2 inch Mechanical Tee</option>
-      </select>
+    <label>Labour Rate Per Hour</label>
+    <input type="number" id="labourRate" value="95">
 
-      <label>Average 1 inch Pipe Per Head</label>
-      <input id="pipePerHead" type="number" value="10">
+    <label>Material Markup %</label>
+    <input type="number" id="markup" value="20">
 
-      <label>Labour Hours Per Head</label>
-      <input id="hoursPerHead" type="number" value="1" step="0.25">
+    <button class="secondary" onclick="calculatePricing()">Calculate Pricing</button>
 
-      <label>Labour Rate Per Hour</label>
-      <input id="labourRate" type="number" value="95">
-
-      <label>Material Markup Percent</label>
-      <input id="markup" type="number" value="20">
-
-      <button onclick="calculateEstimate()">Calculate Estimate</button>
+    <div style="margin-top:20px;">
+      <p><strong>Material Total:</strong> <span id="materialTotal">$0.00</span></p>
+      <p><strong>Labour Total:</strong> <span id="labourTotal">$0.00</span></p>
+      <p><strong>Total Estimate:</strong> <span id="estimateTotal">$0.00</span></p>
     </div>
+  </div>
 
-    <div class="box">
-      <h2>Estimate Summary</h2>
-      <p><strong>Total Heads:</strong> <span id="summaryHeads">0</span></p>
-      <p><strong>Total Pipe:</strong> <span id="summaryPipe">0 ft</span></p>
-      <p><strong>Labour Hours:</strong> <span id="summaryHours">0 hrs</span></p>
-      <p><strong>Material Total:</strong> <span id="summaryMaterial">$0.00</span></p>
-      <p><strong>Labour Total:</strong> <span id="summaryLabour">$0.00</span></p>
-      <p><strong>Total Estimate:</strong> <span id="summaryTotal">$0.00</span></p>
-    </div>
+</main>
 
-    <div class="box">
-      <h2>Estimator Material List</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th>Qty</th>
-            <th>Unit</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="materialTable"></tbody>
-      </table>
-    </div>
-  </main>
+<script>
+  var detectedHeads = 0;
+  var detectedLabour = 0;
+  var detectedMaterialCost = 0;
 
-  <script>
-    var lastTakeoffHeads = 0;
+  function money(amount) {
+    return "$" + amount.toFixed(2);
+  }
 
-    function money(amount) {
-      return "$" + amount.toFixed(2);
-    }
+  function runTakeoff() {
 
-    function addMaterial(list, name, qty, unitCost) {
-      list.push({
-        name: name,
-        qty: qty,
-        unitCost: unitCost,
-        total: qty * unitCost
-      });
-    }
+    var files = document.getElementById("pdfUpload").files;
+    var notes = document.getElementById("drawingNotes").value.toLowerCase();
+    var estimateType = document.getElementById("estimateType").value;
 
-    function runPdfTakeoff() {
-      var fileInput = document.getElementById("pdfUpload");
-      var notes = document.getElementById("drawingNotes").value.toLowerCase();
+    var table = document.getElementById("materialTable");
+    table.innerHTML = "";
 
-      var fileName = "No file selected";
+    var materials = [];
 
-      if (fileInput.files.length > 0) {
-        fileName = fileInput.files[0].name;
-      }
+    detectedHeads = 0;
+    detectedLabour = 0;
+    detectedMaterialCost = 0;
 
-      var estimatedHeads = 12;
-      var workType = "Office alteration / sprinkler modification";
-      var labourHours = estimatedHeads * 1;
+    if (estimateType === "service") {
 
-      if (notes.indexOf("relocate") !== -1 || notes.indexOf("relocates") !== -1) {
-        estimatedHeads = 8;
-        workType = "Relocates";
-        labourHours = estimatedHeads * 1;
-      }
+      detectedHeads = 6;
+      detectedLabour = 8;
 
-      if (notes.indexOf("new") !== -1 || notes.indexOf("new heads") !== -1) {
-        estimatedHeads = 12;
-        workType = "New Drops";
-        labourHours = estimatedHeads * 1;
-      }
-
-      if (notes.indexOf("flex") !== -1) {
-        workType = workType + " with flex drops";
-      }
-
-      lastTakeoffHeads = estimatedHeads;
-
-      document.getElementById("uploadedFileName").innerText = fileName;
-      document.getElementById("detectedWorkType").innerText = workType;
-      document.getElementById("detectedHeads").innerText = estimatedHeads;
-      document.getElementById("detectedLabour").innerText = labourHours + " hrs";
-      document.getElementById("takeoffSuccess").style.display = "block";
-
-      var table = document.getElementById("takeoffTable");
-      table.innerHTML = "";
-
-      var rows = [
-        ["Sprinkler Heads", estimatedHeads, "Estimated from drawing preview"],
-        ["1 inch Schedule 40 Pipe", estimatedHeads * 10 + " ft", "Allowance based on 10 ft per head"],
-        ["1 inch 90 Elbows", estimatedHeads * 3, "3 elbows per hard-piped drop"],
-        ["1 inch x 2 inch Nipples", estimatedHeads, "1 per drop"],
-        ["1 inch Hangers", estimatedHeads, "1 per drop"],
-        ["Rod Assemblies", estimatedHeads, "1 per drop"],
-        ["Mechanical Tees", estimatedHeads, "For new drops only"]
+      materials = [
+        ["Sprinkler Heads", 6, "Service replacements / repairs"],
+        ["1 inch Pipe", "60 ft", "Estimated branch piping"],
+        ["1 inch Fittings", 18, "Estimated threaded fittings"],
+        ["Service Van / T&M", 1, "Truck and tooling"]
       ];
-
-      if (notes.indexOf("flex") !== -1) {
-        rows = [
-          ["Sprinkler Heads", estimatedHeads, "Estimated from drawing preview"],
-          ["Flex Drop Assemblies", estimatedHeads, "1 per head"],
-          ["1 inch Hangers", estimatedHeads, "1 per head"],
-          ["Rod Assemblies", estimatedHeads, "1 per head"],
-          ["Mechanical Tees", estimatedHeads, "For new drops only"]
-        ];
-      }
-
-      for (var i = 0; i < rows.length; i++) {
-        var row = document.createElement("tr");
-
-        row.innerHTML =
-          "<td>" + rows[i][0] + "</td>" +
-          "<td>" + rows[i][1] + "</td>" +
-          "<td>" + rows[i][2] + "</td>";
-
-        table.appendChild(row);
-      }
     }
 
-    function sendTakeoffToEstimator() {
-      if (lastTakeoffHeads <= 0) {
-        alert("Run the PDF takeoff first.");
-        return;
-      }
+    if (estimateType === "retrofit") {
 
-      document.getElementById("heads").value = lastTakeoffHeads;
-      calculateEstimate();
-      alert("Takeoff quantity sent to calculator.");
+      detectedHeads = 18;
+      detectedLabour = 24;
+
+      materials = [
+        ["Sprinkler Heads", 18, "Retrofit / tenant improvement"],
+        ["1 inch Pipe", "180 ft", "Branch line modifications"],
+        ["Mechanical Tees", 18, "New connections"],
+        ["1 inch 90s", 54, "Hard pipe drops"],
+        ["Hangers", 18, "Support hardware"]
+      ];
     }
 
-    function calculateEstimate() {
-      var workType = document.getElementById("workType").value;
-      var dropType = document.getElementById("dropType").value;
-      var heads = Number(document.getElementById("heads").value);
-      var teeType = document.getElementById("teeType").value;
-      var pipePerHead = Number(document.getElementById("pipePerHead").value);
-      var hoursPerHead = Number(document.getElementById("hoursPerHead").value);
-      var labourRate = Number(document.getElementById("labourRate").value);
-      var markup = Number(document.getElementById("markup").value);
+    if (estimateType === "newbuild") {
 
-      if (isNaN(heads)) heads = 0;
-      if (isNaN(pipePerHead)) pipePerHead = 0;
-      if (isNaN(hoursPerHead)) hoursPerHead = 0;
-      if (isNaN(labourRate)) labourRate = 0;
-      if (isNaN(markup)) markup = 0;
+      detectedHeads = 60;
+      detectedLabour = 140;
 
-      var materials = [];
-      var totalPipe = heads * pipePerHead;
-
-      if (dropType === "hardpipe") {
-        addMaterial(materials, "1 inch Schedule 40 Black Pipe", totalPipe, 4.50);
-        addMaterial(materials, "1 inch 90 Elbows", heads * 3, 3.25);
-        addMaterial(materials, "1 inch x 2 inch Nipple", heads, 2.75);
-      }
-
-      if (dropType === "flex") {
-        addMaterial(materials, "Flex Drop Assembly", heads, 42.00);
-      }
-
-      addMaterial(materials, "1 inch Hanger", heads, 4.25);
-      addMaterial(materials, "Rod Assembly", heads, 3.50);
-      addMaterial(materials, "Sprinkler Head", heads, 18.00);
-
-      if (workType === "new" && teeType !== "none") {
-        addMaterial(materials, teeType, heads, 18.00);
-      }
-
-      var materialSubtotal = 0;
-
-      for (var i = 0; i < materials.length; i++) {
-        materialSubtotal = materialSubtotal + materials[i].total;
-      }
-
-      var materialMarkup = materialSubtotal * (markup / 100);
-      var materialTotal = materialSubtotal + materialMarkup;
-      var labourHours = heads * hoursPerHead;
-      var labourTotal = labourHours * labourRate;
-      var totalEstimate = materialTotal + labourTotal;
-
-      document.getElementById("summaryHeads").innerText = heads;
-
-      if (dropType === "hardpipe") {
-        document.getElementById("summaryPipe").innerText = totalPipe + " ft";
-      } else {
-        document.getElementById("summaryPipe").innerText = "N/A";
-      }
-
-      document.getElementById("summaryHours").innerText = labourHours + " hrs";
-      document.getElementById("summaryMaterial").innerText = money(materialTotal);
-      document.getElementById("summaryLabour").innerText = money(labourTotal);
-      document.getElementById("summaryTotal").innerText = money(totalEstimate);
-
-      var table = document.getElementById("materialTable");
-      table.innerHTML = "";
-
-      for (var j = 0; j < materials.length; j++) {
-        var row = document.createElement("tr");
-
-        row.innerHTML =
-          "<td>" + materials[j].name + "</td>" +
-          "<td>" + materials[j].qty + "</td>" +
-          "<td>" + money(materials[j].unitCost) + "</td>" +
-          "<td>" + money(materials[j].total) + "</td>";
-
-        table.appendChild(row);
-      }
-
-      var markupRow = document.createElement("tr");
-      markupRow.innerHTML =
-        "<td><strong>Material Markup</strong></td>" +
-        "<td>" + markup + "%</td>" +
-        "<td>-</td>" +
-        "<td><strong>" + money(materialMarkup) + "</strong></td>";
-
-      table.appendChild(markupRow);
-
-      var totalRow = document.createElement("tr");
-      totalRow.innerHTML =
-        "<td><strong>Material Total</strong></td>" +
-        "<td>-</td>" +
-        "<td>-</td>" +
-        "<td><strong>" + money(materialTotal) + "</strong></td>";
-
-      table.appendChild(totalRow);
+      materials = [
+        ["Sprinkler Heads", 60, "New building install"],
+        ["4 inch Main Pipe", "400 ft", "Main distribution"],
+        ["2 inch Branchlines", "800 ft", "Branch piping"],
+        ["Grooved Couplings", 120, "Main piping"],
+        ["Hangers", 90, "Pipe supports"],
+        ["Control Valves", 2, "System valves"]
+      ];
     }
 
-    calculateEstimate();
-  </script>
+    if (estimateType === "mains") {
+
+      detectedHeads = 0;
+      detectedLabour = 80;
+
+      materials = [
+        ["6 inch Main Pipe", "300 ft", "Underground / overhead main"],
+        ["6 inch Couplings", 40, "Grooved couplings"],
+        ["6 inch 90s", 8, "Main direction changes"],
+        ["Hangers", 35, "Pipe supports"]
+      ];
+    }
+
+    if (estimateType === "riser") {
+
+      detectedHeads = 0;
+      detectedLabour = 40;
+
+      materials = [
+        ["6 inch Riser", 1, "Complete riser assembly"],
+        ["Butterfly Valve", 2, "Control valves"],
+        ["Check Valve", 1, "Alarm valve assembly"],
+        ["Test & Drain", 1, "Inspector test"],
+        ["Pressure Gauges", 2, "Monitoring"]
+      ];
+    }
+
+    if (estimateType === "fhc") {
+
+      detectedHeads = 0;
+      detectedLabour = 20;
+
+      materials = [
+        ["Fire Hose Cabinets", 4, "FHC assemblies"],
+        ["2 inch Hose Valves", 4, "Landing valves"],
+        ["2 inch Pipe", "120 ft", "Cabinet feeds"],
+        ["Cabinet Trim", 4, "Install hardware"]
+      ];
+    }
+
+    if (notes.includes("flex")) {
+      materials.push(["Flex Drops", detectedHeads, "Detected from notes"]);
+    }
+
+    if (notes.includes("dry")) {
+      materials.push(["Dry Heads", 4, "Detected from notes"]);
+    }
+
+    if (notes.includes("fdc")) {
+      materials.push(["Fire Department Connection", 1, "Detected from notes"]);
+    }
+
+    document.getElementById("fileCount").innerText = files.length;
+    document.getElementById("headCount").innerText = detectedHeads;
+    document.getElementById("labourHours").innerText = detectedLabour + " hrs";
+    document.getElementById("scopeType").innerText = estimateType;
+
+    for (var i = 0; i < materials.length; i++) {
+
+      var row = document.createElement("tr");
+
+      row.innerHTML =
+        "<td>" + materials[i][0] + "</td>" +
+        "<td>" + materials[i][1] + "</td>" +
+        "<td>" + materials[i][2] + "</td>";
+
+      table.appendChild(row);
+
+      detectedMaterialCost += 250;
+    }
+
+    document.getElementById("successBox").style.display = "block";
+  }
+
+  function calculatePricing() {
+
+    var labourRate = Number(document.getElementById("labourRate").value);
+    var markup = Number(document.getElementById("markup").value);
+
+    var materialTotal = detectedMaterialCost + (detectedMaterialCost * (markup / 100));
+    var labourTotal = detectedLabour * labourRate;
+    var estimateTotal = materialTotal + labourTotal;
+
+    document.getElementById("materialTotal").innerText = money(materialTotal);
+    document.getElementById("labourTotal").innerText = money(labourTotal);
+    document.getElementById("estimateTotal").innerText = money(estimateTotal);
+  }
+</script>
+
 </body>
 </html>
