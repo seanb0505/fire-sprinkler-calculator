@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fire Protection Estimator</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+
   <style>
     body{
       font-family:Arial,sans-serif;
@@ -76,13 +78,9 @@
 
     <input id="heads" type="number" placeholder="Number of heads">
 
-    <button onclick="calculateEstimate()">
-      Calculate Estimate
-    </button>
+    <button onclick="calculateEstimate()">Calculate Estimate</button>
 
-    <pre id="estimateResult">
-Estimate result will appear here.
-    </pre>
+    <pre id="estimateResult">Estimate result will appear here.</pre>
   </div>
 
   <div class="card">
@@ -90,34 +88,45 @@ Estimate result will appear here.
 
     <textarea id="aiInput" placeholder="Paste drawing notes or project scope here"></textarea>
 
-    <button onclick="runAI()">
-      Run AI Estimate
-    </button>
+    <button onclick="runAI()">Run AI Estimate</button>
 
-    <pre id="aiResult">
-AI response will appear here.
-    </pre>
+    <pre id="aiResult">AI response will appear here.</pre>
+  </div>
+
+  <div class="card">
+    <h2>PDF Drawing Upload</h2>
+
+    <input id="pdfFile" type="file" accept="application/pdf">
+
+    <button onclick="extractPDFText()">Extract PDF Text</button>
+    <button onclick="analyzePDFWithAI()">Analyze PDF With AI</button>
+
+    <h3>Extracted PDF Text</h3>
+    <pre id="pdfTextResult">PDF text will appear here.</pre>
+
+    <h3>PDF AI Estimate</h3>
+    <pre id="pdfAIResult">PDF AI estimate will appear here.</pre>
   </div>
 
 </div>
 
 <script>
+const AI_WORKER_URL = "https://fire-estimator-ai.seanmbarbour.workers.dev";
 
-const AI_WORKER_URL =
-"https://fire-estimator-ai.seanmbarbour.workers.dev";
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+
+let extractedPDFText = "";
 
 function calculateEstimate(){
-
-  const heads =
-    Number(document.getElementById("heads").value || 0);
+  const heads = Number(document.getElementById("heads").value || 0);
 
   const labourHours = heads;
   const elbows = heads * 3;
   const hangers = heads;
 
   document.getElementById("estimateResult").textContent =
-`
-Heads: ${heads}
+`Heads: ${heads}
 
 Estimated Labour Hours:
 ${labourHours}
@@ -125,41 +134,30 @@ ${labourHours}
 Estimated Material:
 - ${elbows} 90° elbows
 - ${hangers} hangers
-- ${heads} nipples
-`;
+- ${heads} nipples`;
 }
 
 async function runAI(){
-
-  const input =
-    document.getElementById("aiInput").value;
-
-  const output =
-    document.getElementById("aiResult");
+  const input = document.getElementById("aiInput").value;
+  const output = document.getElementById("aiResult");
 
   if(!input){
-    output.textContent =
-      "Please enter project notes first.";
+    output.textContent = "Please enter project notes first.";
     return;
   }
 
-  output.textContent =
-    "Running AI estimate...";
+  output.textContent = "Running AI estimate...";
 
   try{
-
-    const response = await fetch(
-      AI_WORKER_URL,
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          text:input
-        })
-      }
-    );
+    const response = await fetch(AI_WORKER_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        text:input
+      })
+    });
 
     const data = await response.json();
 
@@ -168,12 +166,88 @@ async function runAI(){
       JSON.stringify(data,null,2);
 
   }catch(error){
-
-    output.textContent =
-      "Error: " + error.message;
+    output.textContent = "Error: " + error.message;
   }
 }
 
+async function extractPDFText(){
+  const fileInput = document.getElementById("pdfFile");
+  const output = document.getElementById("pdfTextResult");
+
+  if(!fileInput.files.length){
+    output.textContent = "Please upload a PDF first.";
+    return;
+  }
+
+  output.textContent = "Extracting PDF text...";
+  extractedPDFText = "";
+
+  try{
+    const file = fileInput.files[0];
+    const arrayBuffer = await file.arrayBuffer();
+
+    const pdf = await pdfjsLib.getDocument({
+      data: arrayBuffer
+    }).promise;
+
+    extractedPDFText += "FILE: " + file.name + "\n\n";
+
+    for(let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++){
+      const page = await pdf.getPage(pageNumber);
+      const content = await page.getTextContent();
+
+      const pageText = content.items
+        .map(item => item.str)
+        .join(" ");
+
+      extractedPDFText +=
+        "\n--- PAGE " + pageNumber + " ---\n" +
+        pageText +
+        "\n";
+    }
+
+    if(extractedPDFText.trim()){
+      output.textContent = extractedPDFText;
+    }else{
+      output.textContent = "No readable text found in this PDF.";
+    }
+
+  }catch(error){
+    output.textContent = "PDF extraction error: " + error.message;
+  }
+}
+
+async function analyzePDFWithAI(){
+  const output = document.getElementById("pdfAIResult");
+
+  if(!extractedPDFText.trim()){
+    output.textContent = "Please click Extract PDF Text first.";
+    return;
+  }
+
+  output.textContent = "Sending PDF text to AI...";
+
+  try{
+    const response = await fetch(AI_WORKER_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        text:extractedPDFText
+      })
+    });
+
+    const data = await response.json();
+
+    output.textContent =
+      data.result ||
+      JSON.stringify(data,null,2);
+
+  }catch(error){
+    output.textContent = "AI error: " + error.message;
+  }
+}
 </script>
 
 </body>
