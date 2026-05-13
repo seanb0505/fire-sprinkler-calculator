@@ -1,12 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Fire Protection Estimator Test</title>
-</head>
-<body style="background:#111827;color:white;font-family:Arial;padding:40px;">
-  <h1>Fire Protection Estimator</h1>
-  <p>If you can see this, the website is working again.</p>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fire Protection Estimator</title>
 
-  <button onclick="alert('Button works')">Test Button</button>
+  <style>
+    body{
+      font-family:Arial,sans-serif;
+      background:#111827;
+      color:white;
+      margin:0;
+      padding:0;
+    }
+
+    header{
+      background:#1f2937;
+      padding:30px;
+      text-align:center;
+    }
+
+    .container{
+      max-width:1000px;
+      margin:auto;
+      padding:20px;
+    }
+
+    .card{
+      background:#1f2937;
+      padding:20px;
+      border-radius:12px;
+      margin-bottom:20px;
+    }
+
+    input, textarea, button{
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      border:none;
+      border-radius:8px;
+      box-sizing:border-box;
+    }
+
+    textarea{
+      min-height:180px;
+    }
+
+    button{
+      background:#2563eb;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    pre{
+      background:#0f172a;
+      padding:15px;
+      border-radius:10px;
+      white-space:pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Fire Protection Estimator</h1>
+  <p>AI Sprinkler Estimating System</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Manual Estimator</h2>
+
+    <input id="heads" type="number" placeholder="Number of heads">
+
+    <button onclick="calculateEstimate()">
+      Calculate Estimate
+    </button>
+
+    <pre id="estimateResult">
+Estimate result will appear here.
+    </pre>
+  </div>
+
+  <div class="card">
+    <h2>AI Scope Analyzer</h2>
+
+    <textarea id="aiInput" placeholder="Paste drawing notes or project scope here"></textarea>
+
+    <button onclick="runAI()">
+      Run AI Estimate
+    </button>
+
+    <pre id="aiResult">
+AI response will appear here.
+    </pre>
+  </div>
+
+</div>
+
+<script>
+
+const AI_WORKER_URL =
+"https://fire-estimator-ai.seanmbarbour.workers.dev";
+
+function calculateEstimate(){
+
+  const heads =
+    Number(document.getElementById("heads").value || 0);
+
+  const labourHours = heads;
+  const elbows = heads * 3;
+  const hangers = heads;
+
+  document.getElementById("estimateResult").textContent =
+`
+Heads: ${heads}
+
+Estimated Labour Hours:
+${labourHours}
+
+Estimated Material:
+- ${elbows} 90° elbows
+- ${hangers} hangers
+- ${heads} nipples
+`;
+}
+
+async function runAI(){
+
+  const input =
+    document.getElementById("aiInput").value;
+
+  const output =
+    document.getElementById("aiResult");
+
+  if(!input){
+    output.textContent =
+      "Please enter project notes first.";
+    return;
+  }
+
+  output.textContent =
+    "Running AI estimate...";
+
+  try{
+
+    const response = await fetch(
+      AI_WORKER_URL,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          text:input
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    output.textContent =
+      data.result ||
+      JSON.stringify(data,null,2);
+
+  }catch(error){
+
+    output.textContent =
+      "Error: " + error.message;
+  }
+}
+
+</script>
+
 </body>
 </html>
