@@ -4,24 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fire Protection Estimator</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #111827;
       color: white;
       margin: 0;
-      padding: 0;
     }
 
     header {
       text-align: center;
       padding: 40px 20px;
       background: #1f2937;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 34px;
     }
 
     .container {
@@ -35,7 +32,6 @@
       padding: 24px;
       margin-bottom: 24px;
       border-radius: 14px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
     label {
@@ -130,12 +126,9 @@
 
     <div class="card">
       <h2>AI Drawing / Scope Analyzer</h2>
-      <p class="small">
-        Paste drawing notes, scope text, or PDF-extracted text below. The AI backend is connected to your Cloudflare Worker.
-      </p>
 
-      <label>Project / Drawing Text</label>
-      <textarea id="aiInput" placeholder="Paste sprinkler drawing notes, project scope, head counts, pipe sizes, or material notes here..."></textarea>
+      <label>Paste Project / Drawing Text</label>
+      <textarea id="aiInput" placeholder="Paste sprinkler notes, scope, head counts, pipe sizes, or extracted drawing text here..."></textarea>
 
       <button onclick="runAiEstimate()">Run AI Estimate</button>
 
@@ -144,21 +137,32 @@
     </div>
 
     <div class="card">
-      <h2>PDF Upload Placeholder</h2>
+      <h2>PDF Drawing Upload</h2>
       <p class="small">
-        This section is ready for the next step. After this AI connection works, we will add proper PDF text extraction and multi-file upload.
+        Upload one or more PDF drawings. The website will extract text from the PDFs and send it to the AI estimator.
       </p>
 
       <input type="file" id="pdfUpload" multiple accept=".pdf" />
-      <button onclick="handlePdfPlaceholder()">Analyze Uploaded PDFs</button>
 
-      <pre id="pdfResult">PDF analyzer will be upgraded next.</pre>
+      <button onclick="extractPdfText()">Extract PDF Text</button>
+      <button onclick="analyzePdfWithAi()">Analyze PDFs With AI</button>
+
+      <h3>Extracted PDF Text</h3>
+      <pre id="pdfTextResult">Extracted PDF text will appear here.</pre>
+
+      <h3>PDF AI Estimate</h3>
+      <pre id="pdfAiResult">PDF AI result will appear here.</pre>
     </div>
 
   </div>
 
   <script>
     const AI_WORKER_URL = "https://fire-estimator-ai.seanmbarbour.workers.dev";
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    let extractedPdfText = "";
 
     function calculateManualEstimate() {
       const projectName = document.getElementById("projectName").value || "Unnamed Project";
@@ -169,13 +173,13 @@
       const labourRate = Number(document.getElementById("labourRate").value || 0);
 
       const totalHeads = newHeads + relocateHeads;
-      const labourHours = totalHeads * 1;
+      const labourHours = totalHeads;
       const labourCost = labourHours * labourRate;
 
       const elbows = totalHeads * 3;
-      const nipples = totalHeads * 1;
-      const hangers = totalHeads * 1;
-      const rodAssemblies = totalHeads * 1;
+      const nipples = totalHeads;
+      const hangers = totalHeads;
+      const rodAssemblies = totalHeads;
       const mechTees = mechanicalTee === "yes" ? newHeads : 0;
 
       const result = `
@@ -225,38 +229,83 @@ Notes:
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            text: input
-          })
+          body: JSON.stringify({ text: input })
         });
 
         const data = await response.json();
 
-        if (data.result) {
-          output.textContent = data.result;
-        } else if (data.error) {
-          output.textContent = "AI Error: " + data.error;
-        } else {
-          output.textContent = JSON.stringify(data, null, 2);
-        }
+        output.textContent =
+          data.result || data.error || JSON.stringify(data, null, 2);
 
       } catch (error) {
         output.textContent = "Connection error: " + error.message;
       }
     }
 
-    function handlePdfPlaceholder() {
+    async function extractPdfText() {
       const files = document.getElementById("pdfUpload").files;
-      const result = document.getElementById("pdfResult");
+      const result = document.getElementById("pdfTextResult");
 
       if (!files.length) {
         result.textContent = "Please upload at least one PDF.";
         return;
       }
 
-      result.textContent =
-        "PDF upload detected: " + files.length +
-        " file(s). Next step is adding real PDF text extraction so these files can be sent to the AI Worker.";
+      result.textContent = "Extracting PDF text...";
+      extractedPdfText = "";
+
+      try {
+        for (const file of files) {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+          extractedPdfText += `\n\n===== FILE: ${file.name} =====\n`;
+
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const content = await page.getTextContent();
+            const pageText = content.items.map(item => item.str).join(" ");
+
+            extractedPdfText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
+          }
+        }
+
+        result.textContent = extractedPdfText || "No readable text found in the PDF.";
+
+      } catch (error) {
+        result.textContent = "PDF extraction error: " + error.message;
+      }
+    }
+
+    async function analyzePdfWithAi() {
+      const output = document.getElementById("pdfAiResult");
+
+      if (!extractedPdfText.trim()) {
+        output.textContent = "Please click Extract PDF Text first.";
+        return;
+      }
+
+      output.textContent = "Sending extracted PDF text to AI...";
+
+      try {
+        const response = await fetch(AI_WORKER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text: extractedPdfText
+          })
+        });
+
+        const data = await response.json();
+
+        output.textContent =
+          data.result || data.error || JSON.stringify(data, null, 2);
+
+      } catch (error) {
+        output.textContent = "AI connection error: " + error.message;
+      }
     }
   </script>
 </body>
