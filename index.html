@@ -96,10 +96,10 @@
   <div class="card">
     <h2>PDF Drawing Upload</h2>
 
-    <input id="pdfFile" type="file" accept="application/pdf">
+    <input id="pdfFile" type="file" accept="application/pdf" multiple>
 
     <button onclick="extractPDFText()">Extract PDF Text</button>
-    <button onclick="analyzePDFWithAI()">Analyze PDF With AI</button>
+    <button onclick="analyzePDFWithAI()">Analyze PDFs With AI</button>
 
     <h3>Extracted PDF Text</h3>
     <pre id="pdfTextResult">PDF text will appear here.</pre>
@@ -175,41 +175,47 @@ async function extractPDFText(){
   const output = document.getElementById("pdfTextResult");
 
   if(!fileInput.files.length){
-    output.textContent = "Please upload a PDF first.";
+    output.textContent = "Please upload at least one PDF first.";
     return;
   }
 
-  output.textContent = "Extracting PDF text...";
+  output.textContent = "Extracting PDF text from " + fileInput.files.length + " file(s)...";
   extractedPDFText = "";
 
   try{
-    const file = fileInput.files[0];
-    const arrayBuffer = await file.arrayBuffer();
+    for(const file of fileInput.files){
 
-    const pdf = await pdfjsLib.getDocument({
-      data: arrayBuffer
-    }).promise;
+      const arrayBuffer = await file.arrayBuffer();
 
-    extractedPDFText += "FILE: " + file.name + "\n\n";
-
-    for(let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++){
-      const page = await pdf.getPage(pageNumber);
-      const content = await page.getTextContent();
-
-      const pageText = content.items
-        .map(item => item.str)
-        .join(" ");
+      const pdf = await pdfjsLib.getDocument({
+        data: arrayBuffer
+      }).promise;
 
       extractedPDFText +=
-        "\n--- PAGE " + pageNumber + " ---\n" +
-        pageText +
-        "\n";
+        "\n\n====================================\n" +
+        "FILE: " + file.name + "\n" +
+        "PAGES: " + pdf.numPages + "\n" +
+        "====================================\n";
+
+      for(let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++){
+        const page = await pdf.getPage(pageNumber);
+        const content = await page.getTextContent();
+
+        const pageText = content.items
+          .map(item => item.str)
+          .join(" ");
+
+        extractedPDFText +=
+          "\n--- " + file.name + " | PAGE " + pageNumber + " ---\n" +
+          pageText +
+          "\n";
+      }
     }
 
     if(extractedPDFText.trim()){
       output.textContent = extractedPDFText;
     }else{
-      output.textContent = "No readable text found in this PDF.";
+      output.textContent = "No readable text found in the selected PDFs.";
     }
 
   }catch(error){
