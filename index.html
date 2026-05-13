@@ -8,64 +8,18 @@
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 
   <style>
-    body{
-      font-family:Arial,sans-serif;
-      background:#111827;
-      color:white;
-      margin:0;
-      padding:0;
-    }
-
-    header{
-      background:#1f2937;
-      padding:30px;
-      text-align:center;
-    }
-
-    .container{
-      max-width:1000px;
-      margin:auto;
-      padding:20px;
-    }
-
-    .card{
-      background:#1f2937;
-      padding:20px;
-      border-radius:12px;
-      margin-bottom:20px;
-    }
-
-    input, textarea, button{
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border:none;
-      border-radius:8px;
-      box-sizing:border-box;
-    }
-
-    textarea{
-      min-height:180px;
-    }
-
-    button{
-      background:#2563eb;
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    pre{
-      background:#0f172a;
-      padding:15px;
-      border-radius:10px;
-      white-space:pre-wrap;
-    }
+    body{font-family:Arial,sans-serif;background:#111827;color:white;margin:0;padding:0;}
+    header{background:#1f2937;padding:30px;text-align:center;}
+    .container{max-width:1000px;margin:auto;padding:20px;}
+    .card{background:#1f2937;padding:20px;border-radius:12px;margin-bottom:20px;}
+    input,textarea,button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;box-sizing:border-box;}
+    textarea{min-height:180px;}
+    button{background:#2563eb;color:white;font-weight:bold;cursor:pointer;}
+    pre{background:#0f172a;padding:15px;border-radius:10px;white-space:pre-wrap;}
   </style>
 </head>
 
 <body>
-
 <header>
   <h1>Fire Protection Estimator</h1>
   <p>AI Sprinkler Estimating System</p>
@@ -75,28 +29,26 @@
 
   <div class="card">
     <h2>Manual Estimator</h2>
-
     <input id="heads" type="number" placeholder="Number of heads">
-
     <button onclick="calculateEstimate()">Calculate Estimate</button>
-
     <pre id="estimateResult">Estimate result will appear here.</pre>
   </div>
 
   <div class="card">
     <h2>AI Scope Analyzer</h2>
-
     <textarea id="aiInput" placeholder="Paste drawing notes or project scope here"></textarea>
-
     <button onclick="runAI()">Run AI Estimate</button>
-
     <pre id="aiResult">AI response will appear here.</pre>
   </div>
 
   <div class="card">
     <h2>PDF Drawing Upload</h2>
 
-    <input id="pdfFile" type="file" accept="application/pdf" multiple>
+    <input class="pdfInput" type="file" accept="application/pdf">
+    <input class="pdfInput" type="file" accept="application/pdf">
+    <input class="pdfInput" type="file" accept="application/pdf">
+    <input class="pdfInput" type="file" accept="application/pdf">
+    <input class="pdfInput" type="file" accept="application/pdf">
 
     <button onclick="extractPDFText()">Extract PDF Text</button>
     <button onclick="analyzePDFWithAI()">Analyze PDFs With AI</button>
@@ -120,7 +72,6 @@ let extractedPDFText = "";
 
 function calculateEstimate(){
   const heads = Number(document.getElementById("heads").value || 0);
-
   const labourHours = heads;
   const elbows = heads * 3;
   const hangers = heads;
@@ -151,19 +102,12 @@ async function runAI(){
   try{
     const response = await fetch(AI_WORKER_URL,{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        text:input
-      })
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text:input})
     });
 
     const data = await response.json();
-
-    output.textContent =
-      data.result ||
-      JSON.stringify(data,null,2);
+    output.textContent = data.result || JSON.stringify(data,null,2);
 
   }catch(error){
     output.textContent = "Error: " + error.message;
@@ -171,25 +115,30 @@ async function runAI(){
 }
 
 async function extractPDFText(){
-  const fileInput = document.getElementById("pdfFile");
+  const inputs = document.querySelectorAll(".pdfInput");
   const output = document.getElementById("pdfTextResult");
 
-  if(!fileInput.files.length){
+  const files = [];
+
+  inputs.forEach(input => {
+    if(input.files.length){
+      files.push(input.files[0]);
+    }
+  });
+
+  if(!files.length){
     output.textContent = "Please upload at least one PDF first.";
     return;
   }
 
-  output.textContent = "Extracting PDF text from " + fileInput.files.length + " file(s)...";
+  output.textContent = "Extracting PDF text from " + files.length + " file(s)...";
   extractedPDFText = "";
 
   try{
-    for(const file of fileInput.files){
-
+    for(const file of files){
       const arrayBuffer = await file.arrayBuffer();
 
-      const pdf = await pdfjsLib.getDocument({
-        data: arrayBuffer
-      }).promise;
+      const pdf = await pdfjsLib.getDocument({data:arrayBuffer}).promise;
 
       extractedPDFText +=
         "\n\n====================================\n" +
@@ -212,11 +161,7 @@ async function extractPDFText(){
       }
     }
 
-    if(extractedPDFText.trim()){
-      output.textContent = extractedPDFText;
-    }else{
-      output.textContent = "No readable text found in the selected PDFs.";
-    }
+    output.textContent = extractedPDFText || "No readable text found.";
 
   }catch(error){
     output.textContent = "PDF extraction error: " + error.message;
@@ -236,19 +181,12 @@ async function analyzePDFWithAI(){
   try{
     const response = await fetch(AI_WORKER_URL,{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        text:extractedPDFText
-      })
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text:extractedPDFText})
     });
 
     const data = await response.json();
-
-    output.textContent =
-      data.result ||
-      JSON.stringify(data,null,2);
+    output.textContent = data.result || JSON.stringify(data,null,2);
 
   }catch(error){
     output.textContent = "AI error: " + error.message;
