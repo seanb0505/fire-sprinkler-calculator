@@ -4,145 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fire Protection Estimator</title>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
+      background: #111827;
+      color: white;
+      margin: 0;
+      padding: 0;
     }
 
     header {
-      padding: 50px 20px;
       text-align: center;
-      background: linear-gradient(135deg, #991b1b, #1e293b);
+      padding: 40px 20px;
+      background: #1f2937;
     }
 
-    header h1 {
+    h1 {
       margin: 0;
-      font-size: 42px;
+      font-size: 34px;
     }
 
-    header p {
-      font-size: 18px;
-      color: #e5e7eb;
-    }
-
-    main {
-      max-width: 1200px;
-      margin: auto;
-      padding: 30px 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
     }
 
     .card {
-      background: #1e293b;
-      border-radius: 16px;
+      background: #1f2937;
       padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    }
-
-    h2 {
-      margin-top: 0;
-      color: #fca5a5;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
     label {
       display: block;
       margin-top: 14px;
-      margin-bottom: 6px;
       font-weight: bold;
     }
 
     input, select, textarea, button {
       width: 100%;
       padding: 12px;
-      border-radius: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
       border: none;
-      font-size: 15px;
+      font-size: 16px;
+      box-sizing: border-box;
     }
 
-    input, select, textarea {
-      background: #334155;
-      color: white;
+    textarea {
+      min-height: 160px;
     }
 
     button {
-      margin-top: 18px;
-      background: #dc2626;
+      margin-top: 20px;
+      background: #2563eb;
       color: white;
-      font-weight: bold;
       cursor: pointer;
+      font-weight: bold;
     }
 
     button:hover {
-      background: #b91c1c;
+      background: #1d4ed8;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 18px;
+    pre {
+      white-space: pre-wrap;
       background: #0f172a;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #334155;
-      text-align: left;
-    }
-
-    th {
-      background: #334155;
-      color: #fca5a5;
-    }
-
-    .full {
-      grid-column: 1 / -1;
-    }
-
-    .summary {
-      font-size: 18px;
-      line-height: 1.7;
+      padding: 18px;
+      border-radius: 10px;
+      overflow-x: auto;
     }
 
     .small {
       color: #cbd5e1;
       font-size: 14px;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #334155;
-      color: #fecaca;
-      margin: 4px 4px 0 0;
-      font-size: 13px;
-    }
-
-    @media (max-width: 800px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      header h1 {
-        font-size: 32px;
-      }
     }
   </style>
 </head>
@@ -150,334 +88,175 @@
 <body>
   <header>
     <h1>Fire Protection Estimator</h1>
-    <p>Sprinkler material, labour, PDF drawing review, and project estimating tool.</p>
+    <p>AI-assisted sprinkler estimating, labour, and material breakdowns</p>
   </header>
 
-  <main>
-    <div class="grid">
+  <div class="container">
 
-      <section class="card">
-        <h2>Manual Estimate</h2>
+    <div class="card">
+      <h2>Manual Estimate</h2>
 
-        <label>Project Type</label>
-        <select id="projectType">
-          <option value="service">Service / Small Job</option>
-          <option value="tenant">Tenant Fit-Up</option>
-          <option value="newbuild">New Build</option>
-          <option value="retrofit">Retrofit</option>
-        </select>
+      <label>Project Name</label>
+      <input id="projectName" placeholder="Example: Office Renovation" />
 
-        <label>New Sprinkler Heads</label>
-        <input type="number" id="newHeads" value="0" min="0">
+      <label>Number of New Heads</label>
+      <input id="newHeads" type="number" value="0" />
 
-        <label>Relocated Sprinkler Heads</label>
-        <input type="number" id="relocateHeads" value="0" min="0">
+      <label>Number of Relocated Heads</label>
+      <input id="relocateHeads" type="number" value="0" />
 
-        <label>New Head Pipe Size</label>
-        <select id="pipeSize">
-          <option value="1">1&quot; Threaded</option>
-          <option value="1.25">1-1/4&quot; Threaded</option>
-          <option value="1.5">1-1/2&quot; Threaded</option>
-          <option value="2">2&quot; Grooved / Mechanical Tee</option>
-        </select>
+      <label>Pipe Size for New Drops</label>
+      <select id="pipeSize">
+        <option value="1">1&quot; Threaded Pipe</option>
+        <option value="1.25">1-1/4&quot; Pipe</option>
+        <option value="1.5">1-1/2&quot; Pipe</option>
+        <option value="2">2&quot; Pipe</option>
+      </select>
 
-        <label>Mechanical Tee Required?</label>
-        <select id="mechTeeRequired">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+      <label>Mechanical Tee Required for New Drops?</label>
+      <select id="mechanicalTee">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
 
-        <label>Hourly Labour Rate</label>
-        <input type="number" id="labourRate" value="95" min="0">
+      <label>Labour Rate Per Hour</label>
+      <input id="labourRate" type="number" value="95" />
 
-        <label>Material Markup %</label>
-        <input type="number" id="markup" value="25" min="0">
+      <button onclick="calculateManualEstimate()">Calculate Estimate</button>
 
-        <button onclick="calculateEstimate()">Calculate Estimate</button>
-      </section>
-
-      <section class="card">
-        <h2>PDF Drawing Analyzer</h2>
-
-        <p class="small">
-          Upload one or more sprinkler drawings. This version scans readable PDF text and creates a starter material takeoff.
-        </p>
-
-        <label>Upload PDF Drawings</label>
-        <input type="file" id="pdfFiles" accept="application/pdf" multiple>
-
-        <label>Optional AI Worker URL</label>
-        <input type="text" id="workerUrl" placeholder="Paste Cloudflare Worker URL later">
-
-        <button onclick="analyzePDFs()">Analyze PDFs</button>
-
-        <div id="pdfStatus" class="small"></div>
-      </section>
-
-      <section class="card full">
-        <h2>Estimate Summary</h2>
-        <div id="summary" class="summary">
-          Enter project details or upload drawings to begin.
-        </div>
-      </section>
-
-      <section class="card full">
-        <h2>Material Breakdown</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Material</th>
-              <th>Size / Spec</th>
-              <th>Connection</th>
-              <th>Qty</th>
-              <th>Unit Cost</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody id="materialTable">
-            <tr>
-              <td colspan="6">No materials calculated yet.</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="card full">
-        <h2>Drawing Notes Found</h2>
-        <div id="drawingNotes">
-          <span class="pill">No drawings analyzed yet</span>
-        </div>
-      </section>
-
+      <h3>Manual Estimate Result</h3>
+      <pre id="manualResult">Estimate will appear here.</pre>
     </div>
-  </main>
+
+    <div class="card">
+      <h2>AI Drawing / Scope Analyzer</h2>
+      <p class="small">
+        Paste drawing notes, scope text, or PDF-extracted text below. The AI backend is connected to your Cloudflare Worker.
+      </p>
+
+      <label>Project / Drawing Text</label>
+      <textarea id="aiInput" placeholder="Paste sprinkler drawing notes, project scope, head counts, pipe sizes, or material notes here..."></textarea>
+
+      <button onclick="runAiEstimate()">Run AI Estimate</button>
+
+      <h3>AI Result</h3>
+      <pre id="aiResult">AI result will appear here.</pre>
+    </div>
+
+    <div class="card">
+      <h2>PDF Upload Placeholder</h2>
+      <p class="small">
+        This section is ready for the next step. After this AI connection works, we will add proper PDF text extraction and multi-file upload.
+      </p>
+
+      <input type="file" id="pdfUpload" multiple accept=".pdf" />
+      <button onclick="handlePdfPlaceholder()">Analyze Uploaded PDFs</button>
+
+      <pre id="pdfResult">PDF analyzer will be upgraded next.</pre>
+    </div>
+
+  </div>
 
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const AI_WORKER_URL = "https://fire-estimator-ai.seanmbarbour.workers.dev";
 
-    let latestMaterials = [];
-
-    function money(value) {
-      return "$" + Number(value).toFixed(2);
-    }
-
-    function addMaterial(list, name, spec, connection, qty, unitCost) {
-      if (!qty || qty <= 0) return;
-
-      const existing = list.find(item =>
-        item.name === name &&
-        item.spec === spec &&
-        item.connection === connection &&
-        item.unitCost === unitCost
-      );
-
-      if (existing) {
-        existing.qty += qty;
-      } else {
-        list.push({ name, spec, connection, qty, unitCost });
-      }
-    }
-
-    function calculateEstimate() {
-      const projectType = document.getElementById("projectType").value;
+    function calculateManualEstimate() {
+      const projectName = document.getElementById("projectName").value || "Unnamed Project";
       const newHeads = Number(document.getElementById("newHeads").value || 0);
       const relocateHeads = Number(document.getElementById("relocateHeads").value || 0);
       const pipeSize = document.getElementById("pipeSize").value;
-      const mechTeeRequired = document.getElementById("mechTeeRequired").value;
+      const mechanicalTee = document.getElementById("mechanicalTee").value;
       const labourRate = Number(document.getElementById("labourRate").value || 0);
-      const markup = Number(document.getElementById("markup").value || 0);
 
       const totalHeads = newHeads + relocateHeads;
       const labourHours = totalHeads * 1;
+      const labourCost = labourHours * labourRate;
 
-      const materials = [];
+      const elbows = totalHeads * 3;
+      const nipples = totalHeads * 1;
+      const hangers = totalHeads * 1;
+      const rodAssemblies = totalHeads * 1;
+      const mechTees = mechanicalTee === "yes" ? newHeads : 0;
 
-      addMaterial(materials, "Sprinkler Head", "Pendant / Upright", "Threaded", totalHeads, 18);
-      addMaterial(materials, "Escutcheon / Plate", "Standard", "Slip-on", totalHeads, 4);
-      addMaterial(materials, "1 x 2 Nipple", "1 inch x 2 inch", "Threaded", totalHeads, 5.5);
-      addMaterial(materials, "90 Degree Elbow", "1 inch", "Threaded", totalHeads * 3, 4.25);
-      addMaterial(materials, "Hanger Assembly", "Rod + Ring + Fastener", "Threaded", totalHeads, 9);
+      const result = `
+Project: ${projectName}
 
-      if (newHeads > 0 && mechTeeRequired === "yes") {
-        addMaterial(materials, "Mechanical Tee", `2 inch x ${pipeSize} inch`, "Grooved Outlet", newHeads, 42);
-      }
+Scope:
+- New heads: ${newHeads}
+- Relocated heads: ${relocateHeads}
+- Total heads: ${totalHeads}
 
-      if (pipeSize === "2") {
-        addMaterial(materials, "Pipe", "2 inch Sch 10", "Grooved", Math.ceil(newHeads / 6), 85);
-        addMaterial(materials, "Grooved Coupling", "2 inch", "Grooved", Math.ceil(newHeads / 3), 14);
-      } else {
-        addMaterial(materials, "Pipe", `${pipeSize} inch Sch 40`, "Threaded", Math.ceil(totalHeads / 8), 65);
-      }
+Labour:
+- Estimated labour hours: ${labourHours}
+- Labour rate: $${labourRate}/hr
+- Labour cost: $${labourCost.toFixed(2)}
 
-      if (projectType === "newbuild") {
-        addMaterial(materials, "Main Pipe Allowance", "2 inch to 4 inch Sch 10", "Grooved", 10, 120);
-        addMaterial(materials, "Grooved Coupling Allowance", "2 inch to 4 inch", "Grooved", 20, 18);
-        addMaterial(materials, "Grooved 90 Allowance", "2 inch to 4 inch", "Grooved", 6, 55);
-      }
+Material:
+- ${pipeSize}" pipe for drops
+- 90° elbows: ${elbows}
+- 1" x 2" nipples: ${nipples}
+- Hangers: ${hangers}
+- Rod assemblies: ${rodAssemblies}
+- Mechanical tees: ${mechTees}
 
-      renderEstimate(materials, labourHours, labourRate, markup);
-    }
-
-    function renderEstimate(materials, labourHours, labourRate, markup) {
-      latestMaterials = materials;
-
-      const materialSubtotal = materials.reduce((sum, item) => {
-        return sum + item.qty * item.unitCost;
-      }, 0);
-
-      const materialTotal = materialSubtotal * (1 + markup / 100);
-      const labourTotal = labourHours * labourRate;
-      const total = materialTotal + labourTotal;
-
-      document.getElementById("summary").innerHTML = `
-        <strong>Labour Hours:</strong> ${labourHours.toFixed(1)} hrs<br>
-        <strong>Labour Total:</strong> ${money(labourTotal)}<br>
-        <strong>Material Subtotal:</strong> ${money(materialSubtotal)}<br>
-        <strong>Material With Markup:</strong> ${money(materialTotal)}<br>
-        <strong>Estimated Total:</strong> ${money(total)}
+Notes:
+- New/relocated drops are estimated at roughly 1 labour hour per head.
+- Relocated drops usually do not require mechanical tees.
+- Pendant drops usually use 1" threaded pipe.
       `;
 
-      const tbody = document.getElementById("materialTable");
-      tbody.innerHTML = "";
-
-      materials.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.spec}</td>
-          <td>${item.connection}</td>
-          <td>${item.qty}</td>
-          <td>${money(item.unitCost)}</td>
-          <td>${money(item.qty * item.unitCost)}</td>
-        `;
-        tbody.appendChild(row);
-      });
+      document.getElementById("manualResult").textContent = result;
     }
 
-    async function analyzePDFs() {
-      const files = document.getElementById("pdfFiles").files;
-      const workerUrl = document.getElementById("workerUrl").value.trim();
-      const status = document.getElementById("pdfStatus");
+    async function runAiEstimate() {
+      const input = document.getElementById("aiInput").value.trim();
+      const output = document.getElementById("aiResult");
+
+      if (!input) {
+        output.textContent = "Please paste project notes, drawing text, or scope information first.";
+        return;
+      }
+
+      output.textContent = "Running AI estimate...";
+
+      try {
+        const response = await fetch(AI_WORKER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text: input
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.result) {
+          output.textContent = data.result;
+        } else if (data.error) {
+          output.textContent = "AI Error: " + data.error;
+        } else {
+          output.textContent = JSON.stringify(data, null, 2);
+        }
+
+      } catch (error) {
+        output.textContent = "Connection error: " + error.message;
+      }
+    }
+
+    function handlePdfPlaceholder() {
+      const files = document.getElementById("pdfUpload").files;
+      const result = document.getElementById("pdfResult");
 
       if (!files.length) {
-        status.textContent = "Please upload at least one PDF.";
+        result.textContent = "Please upload at least one PDF.";
         return;
       }
 
-      status.textContent = "Reading PDF drawings...";
-
-      let combinedText = "";
-
-      for (const file of files) {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-          const page = await pdf.getPage(pageNumber);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items.map(item => item.str).join(" ");
-          combinedText += " " + pageText;
-        }
-      }
-
-      if (workerUrl) {
-        try {
-          status.textContent = "Sending drawings to AI backend...";
-
-          const response = await fetch(workerUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ drawingText: combinedText })
-          });
-
-          const data = await response.json();
-
-          if (data.materials) {
-            renderEstimate(data.materials, data.labourHours || 0, 95, 25);
-            renderNotes(combinedText);
-            status.textContent = "AI backend analysis complete.";
-            return;
-          }
-        } catch (error) {
-          console.error(error);
-          status.textContent = "AI backend failed. Using local drawing scan instead.";
-        }
-      }
-
-      const result = localDrawingScan(combinedText);
-      renderEstimate(result.materials, result.labourHours, 95, 25);
-      renderNotes(combinedText);
-
-      status.textContent = "PDF scan complete.";
-    }
-
-    function localDrawingScan(text) {
-      const lower = text.toLowerCase();
-      const materials = [];
-
-      const sprinklerMatches = lower.match(/sprinkler|head|pendant|upright/g) || [];
-      const mechTeeMatches = lower.match(/mechanical tee|mech tee|tee/g) || [];
-      const twoInchMatches = lower.match(/2"|2 inch|2in/g) || [];
-      const fourInchMatches = lower.match(/4"|4 inch|4in/g) || [];
-      const groovedMatches = lower.match(/grooved|coupling/g) || [];
-      const hangerMatches = lower.match(/hanger|rod/g) || [];
-
-      const estimatedHeads = Math.max(1, Math.ceil(sprinklerMatches.length / 2));
-      const estimatedMechTees = Math.max(0, Math.ceil(mechTeeMatches.length / 2));
-      const estimatedTwoPipe = Math.max(1, Math.ceil(twoInchMatches.length / 3));
-      const estimatedFourPipe = Math.ceil(fourInchMatches.length / 4);
-      const estimatedCouplings = Math.max(0, Math.ceil(groovedMatches.length / 2));
-      const estimatedHangers = Math.max(estimatedHeads, Math.ceil(hangerMatches.length / 2));
-
-      addMaterial(materials, "Sprinkler Head", "From Drawing Scan", "Threaded", estimatedHeads, 18);
-      addMaterial(materials, "1 x 2 Nipple", "1 inch x 2 inch", "Threaded", estimatedHeads, 5.5);
-      addMaterial(materials, "90 Degree Elbow", "1 inch", "Threaded", estimatedHeads * 3, 4.25);
-      addMaterial(materials, "Hanger Assembly", "Rod + Ring + Fastener", "Threaded", estimatedHangers, 9);
-      addMaterial(materials, "Mechanical Tee", "2 inch x 1 inch", "Grooved Outlet", estimatedMechTees, 42);
-      addMaterial(materials, "Pipe", "2 inch Sch 10", "Grooved", estimatedTwoPipe, 85);
-      addMaterial(materials, "Grooved Coupling", "2 inch", "Grooved", estimatedCouplings, 14);
-
-      if (estimatedFourPipe > 0) {
-        addMaterial(materials, "Pipe", "4 inch Sch 10", "Grooved", estimatedFourPipe, 145);
-        addMaterial(materials, "Grooved Coupling", "4 inch", "Grooved", estimatedFourPipe * 2, 32);
-      }
-
-      return {
-        materials,
-        labourHours: estimatedHeads
-      };
-    }
-
-    function renderNotes(text) {
-      const lower = text.toLowerCase();
-      const notes = [];
-
-      if (lower.includes("sprinkler")) notes.push("Sprinkler references found");
-      if (lower.includes("mechanical tee") || lower.includes("mech tee")) notes.push("Mechanical tee references found");
-      if (lower.includes("grooved")) notes.push("Grooved material references found");
-      if (lower.includes("threaded")) notes.push("Threaded material references found");
-      if (lower.includes("sch 10") || lower.includes("schedule 10")) notes.push("Schedule 10 pipe found");
-      if (lower.includes("sch 40") || lower.includes("schedule 40")) notes.push("Schedule 40 pipe found");
-      if (lower.includes("hanger")) notes.push("Hanger references found");
-      if (lower.includes("air vent")) notes.push("Air vent reference found");
-      if (lower.includes("fire department") || lower.includes("fdc")) notes.push("FDC reference found");
-      if (lower.includes("test header")) notes.push("Test header reference found");
-
-      const div = document.getElementById("drawingNotes");
-      div.innerHTML = "";
-
-      if (!notes.length) {
-        div.innerHTML = '<span class="pill">No major sprinkler notes detected</span>';
-        return;
-      }
-
-      notes.forEach(note => {
-        const span = document.createElement("span");
-        span.className = "pill";
-        span.textContent = note;
-        div.appendChild(span);
-      });
+      result.textContent =
+        "PDF upload detected: " + files.length +
+        " file(s). Next step is adding real PDF text extraction so these files can be sent to the AI Worker.";
     }
   </script>
 </body>
