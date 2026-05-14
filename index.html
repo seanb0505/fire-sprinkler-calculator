@@ -3,332 +3,889 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FireFlow AI | Fire Sprinkler Estimator</title>
+  <title>FireFlow AI Estimator</title>
 
   <style>
     :root {
-      --bg: #07111f;
-      --panel: #0d1b2e;
-      --panel-2: #101f34;
-      --panel-3: #14253d;
-      --text: #f8fafc;
-      --muted: #9fb2c7;
-      --soft: #d8e2ee;
-      --orange: #ff6a1a;
-      --orange-2: #ff8a3d;
-      --blue: #38bdf8;
+      --bg: #080d11;
+      --bg2: #0d141a;
+      --panel: #11181f;
+      --panel2: #151f27;
+      --panel3: #0d1217;
+      --border: #26323d;
+      --border2: #33414e;
+      --red: #dc2626;
+      --red2: #ef4444;
+      --red3: #991b1b;
       --green: #22c55e;
-      --red: #ef4444;
       --yellow: #facc15;
-      --border: rgba(255,255,255,0.1);
-      --shadow: 0 24px 80px rgba(0,0,0,0.35);
-      --radius: 22px;
+      --blue: #38bdf8;
+      --orange: #f97316;
+      --purple: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --muted2: #64748b;
+      --shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      --radius: 8px;
     }
 
     * {
       box-sizing: border-box;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
     body {
       margin: 0;
-      font-family: Inter, Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(255,106,26,0.18), transparent 34%),
-        radial-gradient(circle at top right, rgba(56,189,248,0.12), transparent 32%),
-        linear-gradient(180deg, #06101d 0%, #081524 48%, #050b14 100%);
+        radial-gradient(circle at top left, rgba(220, 38, 38, 0.12), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.07), transparent 40%),
+        var(--bg);
       color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    a {
-      color: inherit;
+    button,
+    input,
+    textarea,
+    select {
+      font-family: inherit;
     }
 
-    .app-shell {
+    button {
+      cursor: pointer;
+    }
+
+    .app {
       display: grid;
-      grid-template-columns: 290px 1fr;
+      grid-template-columns: 260px 1fr;
       min-height: 100vh;
     }
+
+    /* SIDEBAR */
 
     .sidebar {
+      background: linear-gradient(180deg, #0c1117, #081016);
+      border-right: 1px solid var(--border);
+      padding: 18px;
       position: sticky;
       top: 0;
       height: 100vh;
-      padding: 26px 20px;
-      background: rgba(5, 14, 25, 0.88);
-      border-right: 1px solid var(--border);
-      backdrop-filter: blur(20px);
       overflow-y: auto;
     }
 
-    .brand {
+    .logo {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 28px;
+      gap: 13px;
+      padding: 0 8px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
     }
 
-    .logo-mark {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      background:
-        radial-gradient(circle at 62% 24%, #fff7ed 0 9%, transparent 10%),
-        linear-gradient(145deg, #ff3d00, #ff8a1f 48%, #ffc247);
-      box-shadow: 0 14px 36px rgba(255,106,26,0.35);
-      position: relative;
+    .logo-icon {
+      width: 46px;
+      height: 46px;
+      border: 3px solid var(--red);
+      border-radius: 11px;
       display: grid;
       place-items: center;
+      color: var(--red2);
+      font-size: 24px;
       font-weight: 900;
-      letter-spacing: -2px;
-      color: #0b1220;
+      position: relative;
+      transform: rotate(45deg);
     }
 
-    .logo-mark::after {
-      content: "";
-      position: absolute;
-      width: 24px;
-      height: 31px;
-      border-radius: 80% 30% 70% 40%;
-      background: rgba(7,17,31,0.88);
-      transform: rotate(38deg);
-      bottom: 8px;
-      right: 11px;
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 25px;
-      line-height: 1;
-      letter-spacing: -0.8px;
-    }
-
-    .brand span {
+    .logo-icon span {
+      transform: rotate(-45deg);
       display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 5px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
     }
 
-    .nav-group {
+    .logo-text strong {
+      display: block;
+      font-size: 26px;
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+
+    .logo-text strong .red {
+      color: var(--red2);
+    }
+
+    .logo-text small {
+      color: #cbd5e1;
+      letter-spacing: 5px;
+      font-size: 11px;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .nav {
       display: grid;
-      gap: 8px;
-      margin: 24px 0;
+      gap: 7px;
     }
 
-    .nav-link {
+    .nav-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 13px;
-      color: var(--muted);
+      gap: 12px;
+      color: var(--text);
       text-decoration: none;
-      border-radius: 14px;
+      padding: 13px 14px;
+      border-radius: 6px;
+      font-size: 15px;
       border: 1px solid transparent;
-      font-size: 14px;
     }
 
-    .nav-link.active,
-    .nav-link:hover {
-      color: white;
-      background: rgba(255,255,255,0.07);
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--red), #b91c1c);
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
+    }
+
+    .nav-item:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
       border-color: var(--border);
     }
 
-    .sidebar-card {
-      background: linear-gradient(180deg, rgba(255,106,26,0.14), rgba(255,255,255,0.04));
-      border: 1px solid rgba(255,106,26,0.25);
-      border-radius: 18px;
-      padding: 16px;
+    .status-card {
       margin-top: 24px;
-    }
-
-    .sidebar-card strong {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-
-    .sidebar-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    main {
-      padding: 28px;
-      overflow: hidden;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-
-    .hero {
-      background:
-        linear-gradient(135deg, rgba(255,106,26,0.17), rgba(56,189,248,0.08)),
-        rgba(13,27,46,0.78);
       border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
+      padding: 16px;
     }
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      width: 270px;
-      height: 270px;
-      border-radius: 999px;
-      background: rgba(255,106,26,0.12);
-      right: -90px;
-      top: -100px;
-      filter: blur(2px);
+    .status-card h4 {
+      margin: 0 0 14px;
+      font-size: 13px;
+      letter-spacing: 0.03em;
     }
 
-    .hero h2 {
-      margin: 0;
-      font-size: clamp(28px, 4vw, 48px);
-      line-height: 1.02;
-      letter-spacing: -1.8px;
-      max-width: 780px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero h2 span {
-      color: var(--orange-2);
-    }
-
-    .hero p {
-      margin: 16px 0 0;
-      max-width: 840px;
-      color: var(--soft);
-      line-height: 1.6;
-      position: relative;
-      z-index: 1;
-    }
-
-    .status-pills {
+    .status-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .pill {
-      display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid var(--border);
-      color: var(--soft);
+      color: var(--muted);
       font-size: 13px;
+      margin-bottom: 9px;
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 999px;
       background: var(--muted);
     }
 
     .dot.green { background: var(--green); }
-    .dot.orange { background: var(--orange); }
     .dot.red { background: var(--red); }
     .dot.blue { background: var(--blue); }
+    .dot.orange { background: var(--orange); }
+    .dot.purple { background: var(--purple); }
 
-    .grid {
-      display: grid;
-      gap: 20px;
-    }
-
-    .dashboard-grid {
-      grid-template-columns: 1.08fr 0.92fr;
-      margin-top: 20px;
-    }
-
-    .panel {
-      background: rgba(13, 27, 46, 0.78);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 14px 50px rgba(0,0,0,0.22);
+    .credit-bar {
+      height: 7px;
+      background: #1f2937;
+      border-radius: 999px;
       overflow: hidden;
+      margin: 14px 0 8px;
     }
 
-    .panel-header {
-      padding: 18px 20px;
+    .credit-bar span {
+      display: block;
+      width: 92%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--red2));
+    }
+
+    .upgrade {
+      width: 100%;
+      border: 0;
+      background: #1f2937;
+      color: white;
+      padding: 12px;
+      border-radius: 5px;
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    /* MAIN */
+
+    .main {
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 86px;
+      background: rgba(8, 13, 17, 0.88);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 0 28px;
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-title h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .topbar-title p {
+      margin: 5px 0 0;
+      color: #e2e8f0;
+      font-size: 16px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: white;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--red);
+      color: white;
+      border-radius: 999px;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 7px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      background: var(--red);
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .project-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      padding: 20px 28px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 20, 26, 0.78);
+    }
+
+    .project-info {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .drawing-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.9), rgba(203,213,225,0.85));
+      border: 1px solid var(--border2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drawing-thumb::before,
+    .drawing-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      border: 1px solid #334155;
+    }
+
+    .drawing-thumb::after {
+      inset: 24px 16px;
+      border-color: #ef4444;
+    }
+
+    .project-info h2 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: 0.04em;
+    }
+
+    .active-pill {
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      padding: 4px 7px;
+      border-radius: 3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .project-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      color: #cbd5e1;
+      margin-top: 9px;
+      font-size: 14px;
+    }
+
+    .project-buttons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      border: 1px solid var(--border2);
+      background: #0b1117;
+      color: white;
+      padding: 12px 19px;
+      border-radius: 5px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      border-color: var(--red2);
+    }
+
+    .btn.red {
+      background: linear-gradient(135deg, var(--red), #b91c1c);
+      border-color: var(--red);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 28px;
+      background: #0e151b;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      color: #cbd5e1;
+      padding: 16px 24px;
+      font-size: 13px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab.active {
+      color: var(--red2);
+      border-color: var(--red2);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 18px;
+      padding: 16px 18px 26px;
+    }
+
+    .left-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
       gap: 14px;
-      background: rgba(255,255,255,0.025);
+      min-width: 0;
+    }
+
+    .panel {
+      background: rgba(17, 24, 31, 0.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
 
     .panel-header h3 {
       margin: 0;
-      font-size: 17px;
-      letter-spacing: -0.3px;
+      font-size: 14px;
+      letter-spacing: 0.02em;
     }
 
-    .panel-header span {
+    .panel-header small {
       color: var(--muted);
-      font-size: 13px;
     }
 
     .panel-body {
-      padding: 20px;
+      padding: 14px;
     }
 
-    label {
-      display: block;
-      font-size: 13px;
-      color: var(--soft);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+    /* DRAWING VIEWER */
 
-    input,
-    select,
-    textarea {
+    .drawing-select {
       width: 100%;
+      background: #0b1117;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.065);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 13px 14px;
+      color: white;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 12px;
       outline: none;
+    }
+
+    .drawing-view {
+      background: #f8fafc;
+      height: 250px;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border2);
+    }
+
+    .plan-lines {
+      position: absolute;
+      inset: 13px;
+      background:
+        linear-gradient(90deg, transparent 96%, rgba(15,23,42,0.25) 97%),
+        linear-gradient(0deg, transparent 96%, rgba(15,23,42,0.25) 97%);
+      background-size: 32px 32px;
+      opacity: 0.7;
+    }
+
+    .pipe-red,
+    .pipe-green,
+    .pipe-blue {
+      position: absolute;
+      height: 3px;
+      border-radius: 999px;
+    }
+
+    .pipe-red { background: #dc2626; }
+    .pipe-green { background: #16a34a; }
+    .pipe-blue { background: #0284c7; }
+
+    .sprinkler {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #dc2626;
+      border-radius: 999px;
+      box-shadow: 0 0 0 2px rgba(220,38,38,0.2);
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .tool-btn {
+      background: #0b1117;
+      border: 1px solid var(--border);
+      color: white;
+      height: 36px;
+      border-radius: 5px;
+    }
+
+    .layer-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .layer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+      font-size: 13px;
+    }
+
+    .layer label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check {
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--red2);
+      display: grid;
+      place-items: center;
+      border-radius: 3px;
+      color: white;
+      font-size: 11px;
+    }
+
+    /* ANALYSIS */
+
+    .analysis-controls {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .small-btn {
+      background: #0b1117;
+      color: white;
+      border: 1px solid var(--border2);
+      border-radius: 5px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .filter-tabs button {
+      background: #0b1117;
+      color: white;
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      border-radius: 5px;
+      font-size: 12px;
+    }
+
+    .filter-tabs button.active {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .materials-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mini-panel {
+      border: 1px solid var(--border);
+      background: rgba(8, 13, 17, 0.55);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .mini-title {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 8px 9px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-size: 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: #cbd5e1;
+      font-size: 10px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.025);
+    }
+
+    td {
+      color: #e2e8f0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .confidence {
+      color: var(--green);
+    }
+
+    .summary-strip {
+      margin-top: 13px;
+      border: 1px solid rgba(34,197,94,0.45);
+      background: rgba(34,197,94,0.07);
+      border-radius: 6px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .strip-item {
+      color: var(--muted);
+      font-size: 12px;
+      border-right: 1px solid var(--border);
+      padding-right: 12px;
+    }
+
+    .strip-item:last-child {
+      border-right: 0;
+    }
+
+    .strip-item strong {
+      display: block;
+      color: white;
+      font-size: 18px;
+      margin-top: 2px;
+    }
+
+    .assembly-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 9px;
+    }
+
+    .assembly-card {
+      border: 1px solid var(--border);
+      background: rgba(8,13,17,0.65);
+      border-radius: 7px;
+      padding: 10px;
+      min-height: 96px;
+      position: relative;
+    }
+
+    .assembly-card .icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #cbd5e1, #64748b);
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .assembly-card .icon::after {
+      content: "";
+      width: 8px;
+      height: 24px;
+      background: var(--red);
+      position: absolute;
+      left: 15px;
+      top: 8px;
+      border-radius: 999px;
+    }
+
+    .assembly-card strong {
+      font-size: 12px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .assembly-card small {
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .qty {
+      display: inline-block;
+      background: rgba(220,38,38,0.75);
+      color: white;
+      padding: 4px 7px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* RIGHT COLUMN */
+
+    .right-col {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .project-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .summary-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.04);
+      padding: 12px;
+      text-align: center;
+      border-radius: 4px;
+    }
+
+    .summary-box strong {
+      display: block;
+      font-size: 19px;
+    }
+
+    .summary-box span {
+      color: #cbd5e1;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .estimate-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      color: #e2e8f0;
       font-size: 14px;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: rgba(255,106,26,0.75);
-      box-shadow: 0 0 0 4px rgba(255,106,26,0.12);
+    .estimate-total {
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+      padding-top: 13px;
+      font-size: 17px;
+      font-weight: 800;
     }
 
-    select option {
-      background: #0d1b2e;
+    .estimate-total span:last-child {
+      color: var(--red2);
+      font-size: 20px;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .supplier-table td,
+    .supplier-table th {
+      text-align: center;
+      white-space: normal;
+    }
+
+    .supplier-table th.active-supplier {
+      background: rgba(220,38,38,0.8);
       color: white;
+    }
+
+    .confidence-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 40px;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      margin: 11px 0;
+      color: #e2e8f0;
+    }
+
+    .bar {
+      height: 7px;
+      background: #1f2937;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--green);
+    }
+
+    .bar.yellow span {
+      background: var(--yellow);
+    }
+
+    .revision {
+      display: grid;
+      grid-template-columns: 14px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .revision:last-child {
+      border-bottom: 0;
+    }
+
+    .revision strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .revision span {
+      color: var(--muted);
+    }
+
+    /* MODAL */
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      width: min(760px, 100%);
+      background: #0d141a;
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+    }
+
+    .modal-body {
+      padding: 18px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      background: #080d11;
+      border: 1px solid var(--border2);
+      color: white;
+      border-radius: 5px;
+      padding: 12px;
+      outline: none;
     }
 
     textarea {
@@ -337,341 +894,52 @@
       line-height: 1.5;
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 16px;
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--red2);
     }
 
-    .field {
-      margin-bottom: 16px;
-    }
-
-    .dropzone {
-      border: 1px dashed rgba(255,255,255,0.28);
-      background:
-        linear-gradient(135deg, rgba(255,106,26,0.09), rgba(56,189,248,0.06));
-      border-radius: 20px;
-      padding: 24px;
+    .upload-box {
+      border: 1px dashed var(--border2);
+      background: rgba(255,255,255,0.03);
+      border-radius: 7px;
+      padding: 20px;
       text-align: center;
-      transition: 0.18s ease;
-    }
-
-    .dropzone.dragover {
-      border-color: var(--orange);
-      background: rgba(255,106,26,0.14);
-      transform: translateY(-1px);
-    }
-
-    .dropzone-icon {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 12px;
-      display: grid;
-      place-items: center;
-      border-radius: 18px;
-      background: rgba(255,106,26,0.17);
-      color: var(--orange-2);
-      font-size: 26px;
-    }
-
-    .dropzone h4 {
-      margin: 0 0 7px;
-      font-size: 18px;
-    }
-
-    .dropzone p {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .file-input {
-      display: none;
-    }
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    button,
-    .button {
-      border: 0;
-      border-radius: 14px;
-      padding: 13px 18px;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
-      color: white;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid var(--border);
-      transition: 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      text-decoration: none;
-    }
-
-    button:hover,
-    .button:hover {
-      transform: translateY(-1px);
-      background: rgba(255,255,255,0.15);
-    }
-
-    .primary {
-      background: linear-gradient(135deg, #ff5b16, #ff8a1f);
-      color: #111827;
-      border-color: rgba(255,255,255,0.1);
-      box-shadow: 0 14px 28px rgba(255,106,26,0.22);
-    }
-
-    .primary:hover {
-      background: linear-gradient(135deg, #ff6a1a, #ffa044);
-    }
-
-    .danger {
-      background: rgba(239,68,68,0.14);
-      color: #fecaca;
-      border-color: rgba(239,68,68,0.3);
-    }
-
-    .secondary {
-      color: var(--soft);
+      margin-bottom: 14px;
     }
 
     .file-list {
       display: grid;
-      gap: 10px;
-      margin-top: 16px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
     .file-chip {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-      background: rgba(255,255,255,0.065);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 13px;
-      color: var(--soft);
-      font-size: 13px;
-    }
-
-    .file-chip strong {
-      color: white;
-      font-size: 13px;
-      overflow-wrap: anywhere;
-    }
-
-    .file-chip small {
-      color: var(--muted);
-    }
-
-    .metrics {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin: 20px 0;
-    }
-
-    .metric-card {
-      background: rgba(13,27,46,0.78);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: 0 12px 34px rgba(0,0,0,0.18);
-    }
-
-    .metric-card span {
-      display: block;
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-
-    .metric-card strong {
-      font-size: 25px;
-      letter-spacing: -0.7px;
-    }
-
-    .metric-card small {
-      display: block;
-      color: var(--muted);
-      margin-top: 7px;
-      line-height: 1.4;
-    }
-
-    .results-wrap {
-      margin-top: 20px;
-    }
-
-    .tabs {
       display: flex;
-      flex-wrap: wrap;
+      justify-content: space-between;
       gap: 10px;
-      padding: 14px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.025);
-    }
-
-    .tab-btn {
-      padding: 10px 13px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .tab-btn.active {
-      background: rgba(255,106,26,0.18);
-      color: white;
-      border-color: rgba(255,106,26,0.35);
-    }
-
-    .result-content {
-      padding: 20px;
-    }
-
-    .placeholder {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--muted);
-    }
-
-    .placeholder strong {
-      display: block;
-      color: white;
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-
-    .markdown {
-      color: var(--soft);
-      line-height: 1.6;
-    }
-
-    .markdown h1,
-    .markdown h2,
-    .markdown h3 {
-      color: white;
-      line-height: 1.2;
-      letter-spacing: -0.6px;
-      margin: 22px 0 12px;
-    }
-
-    .markdown h1 {
-      font-size: 30px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .markdown h2 {
-      font-size: 23px;
-      background: rgba(255,106,26,0.12);
-      border: 1px solid rgba(255,106,26,0.22);
-      border-radius: 16px;
-      padding: 14px 16px;
-    }
-
-    .markdown h3 {
-      font-size: 18px;
-      color: #fff7ed;
-    }
-
-    .markdown p {
-      margin: 10px 0;
-    }
-
-    .markdown ul {
-      padding-left: 22px;
-    }
-
-    .markdown li {
-      margin: 6px 0;
-    }
-
-    .table-scroll {
-      overflow-x: auto;
+      padding: 10px;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      margin: 14px 0 22px;
-      background: rgba(255,255,255,0.035);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 680px;
-    }
-
-    th {
-      background: rgba(255,255,255,0.08);
-      color: white;
-      font-size: 12px;
-      text-align: left;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 12px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      color: var(--soft);
+      background: rgba(255,255,255,0.03);
+      border-radius: 5px;
       font-size: 13px;
-      vertical-align: top;
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
-    }
-
-    tr:hover td {
-      background: rgba(255,255,255,0.035);
-    }
-
-    .raw-box {
-      white-space: pre-wrap;
-      background: rgba(0,0,0,0.24);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      color: var(--soft);
-      overflow-x: auto;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .notice {
-      border: 1px solid rgba(250,204,21,0.28);
-      background: rgba(250,204,21,0.09);
-      color: #fef3c7;
-      padding: 13px 14px;
-      border-radius: 14px;
-      font-size: 13px;
-      line-height: 1.45;
-      margin-bottom: 16px;
+      color: #cbd5e1;
     }
 
     .loading {
       display: none;
       align-items: center;
-      gap: 12px;
-      color: var(--soft);
-      margin-top: 16px;
+      gap: 10px;
+      margin-top: 14px;
+      color: #cbd5e1;
     }
 
     .spinner {
-      width: 22px;
-      height: 22px;
-      border: 3px solid rgba(255,255,255,0.18);
-      border-top-color: var(--orange);
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: var(--red2);
       border-radius: 999px;
       animation: spin 0.8s linear infinite;
     }
@@ -680,491 +948,672 @@
       to { transform: rotate(360deg); }
     }
 
-    footer {
-      color: var(--muted);
-      text-align: center;
-      padding: 34px 20px 18px;
+    .raw-output {
+      display: none;
+      white-space: pre-wrap;
+      background: #080d11;
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 7px;
+      color: #cbd5e1;
+      max-height: 420px;
+      overflow: auto;
+      margin-top: 12px;
       font-size: 13px;
+      line-height: 1.5;
     }
 
-    @media (max-width: 1050px) {
-      .app-shell {
+    /* RESPONSIVE */
+
+    @media (max-width: 1450px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .right-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .app {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
         position: relative;
         height: auto;
-        display: block;
       }
 
-      .nav-group {
-        display: flex;
-        flex-wrap: wrap;
-      }
-
-      .dashboard-grid,
-      .metrics {
+      .left-grid {
         grid-template-columns: 1fr;
       }
 
-      main {
-        padding: 18px;
-      }
-    }
-
-    @media (max-width: 680px) {
-      .form-grid {
+      .materials-grid,
+      .assembly-row,
+      .summary-strip,
+      .right-col {
         grid-template-columns: 1fr;
       }
 
-      .hero,
-      .panel-body {
-        padding: 18px;
+      .project-header {
+        grid-template-columns: 1fr;
       }
 
       .topbar {
+        height: auto;
+        padding: 18px;
         align-items: flex-start;
+        gap: 15px;
         flex-direction: column;
       }
+    }
 
-      .button-row button,
-      .button-row .button {
-        width: 100%;
+    @media (max-width: 700px) {
+      .project-buttons,
+      .topbar-actions {
+        flex-wrap: wrap;
+      }
+
+      .tabs {
+        overflow-x: auto;
+      }
+
+      .tab {
+        white-space: nowrap;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="app-shell">
+  <div class="app">
     <aside class="sidebar">
-      <div class="brand">
-        <div class="logo-mark">F</div>
-        <div>
-          <h1>FireFlow</h1>
-          <span>AI Estimator</span>
+      <div class="logo">
+        <div class="logo-icon"><span>🔥</span></div>
+        <div class="logo-text">
+          <strong><span class="red">FIRE</span>FLOW</strong>
+          <small>AI ESTIMATOR</small>
         </div>
       </div>
 
-      <nav class="nav-group">
-        <a class="nav-link active" href="#dashboard">🔥 Dashboard</a>
-        <a class="nav-link" href="#upload">📄 Drawing Upload</a>
-        <a class="nav-link" href="#results">📊 AI Takeoff</a>
-        <a class="nav-link" href="#settings">⚙️ Settings</a>
+      <nav class="nav">
+        <a href="#" class="nav-item active">🏠 Dashboard</a>
+        <a href="#" class="nav-item">📁 Projects</a>
+        <a href="#" class="nav-item" onclick="openModal(); return false;">⬆️ Upload Drawings</a>
+        <a href="#" class="nav-item">🧠 AI Analyzer</a>
+        <a href="#" class="nav-item">📋 Material Estimate</a>
+        <a href="#" class="nav-item">👷 Labor Estimate</a>
+        <a href="#" class="nav-item">🔩 Assemblies</a>
+        <a href="#" class="nav-item">🕘 Revisions</a>
+        <a href="#" class="nav-item">📄 Reports</a>
+        <a href="#" class="nav-item">🔗 Suppliers & Pricing</a>
+        <a href="#" class="nav-item">⚙️ Settings</a>
       </nav>
 
-      <div class="sidebar-card">
-        <strong>Contractor takeoff mode</strong>
-        <p>
-          Upload sprinkler drawings, hydraulic calculations, riser details, specs, and notes.
-          FireFlow will return a material and labour estimate.
-        </p>
-      </div>
+      <div class="status-card">
+        <h4>AI STATUS</h4>
+        <div class="status-row"><span class="dot green"></span><span id="aiStatus">Ready</span></div>
+        <div class="status-row" id="fileStatus">No files selected</div>
+        <div class="status-row" id="workerStatus">Worker not tested</div>
 
-      <div class="sidebar-card">
-        <strong>Accuracy reminder</strong>
-        <p>
-          AI takeoffs are for budgeting and review. Final ordering should still be verified from approved drawings.
-        </p>
+        <div style="height: 12px;"></div>
+
+        <div style="color:#cbd5e1; font-size:13px;">10,000 / 10,000 credits used</div>
+        <div class="credit-bar"><span></span></div>
+        <div style="color:#94a3b8; font-size:12px;">Resets in 12 days</div>
+
+        <button class="upgrade">Upgrade Plan</button>
       </div>
     </aside>
 
-    <main id="dashboard">
-      <section class="hero">
-        <h2>Fire sprinkler estimating, <span>built for contractors.</span></h2>
-        <p>
-          Upload drawings and project files to generate a cleaner sprinkler material breakdown,
-          riser allowance, head count, pipe/fitting summary, and labour estimate.
-        </p>
-
-        <div class="status-pills">
-          <div class="pill"><span class="dot green"></span><span id="workerStatus">Worker not tested yet</span></div>
-          <div class="pill"><span class="dot blue"></span><span id="fileStatus">0 files loaded</span></div>
-          <div class="pill"><span class="dot orange"></span><span id="aiStatus">AI ready</span></div>
-        </div>
-      </section>
-
-      <section class="grid metrics">
-        <div class="metric-card">
-          <span>Files Selected</span>
-          <strong id="metricFiles">0</strong>
-          <small>PDFs, images, calcs, and specs</small>
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1>AI-Powered Fire Sprinkler Estimating</h1>
+          <p>Upload. Analyze. Estimate. Win More Jobs.</p>
         </div>
 
-        <div class="metric-card">
-          <span>Project Type</span>
-          <strong id="metricProject">New</strong>
-          <small>Used to guide labour and material logic</small>
+        <div class="topbar-actions">
+          <span>🗓️ Projects</span>
+          <span>🔔 Notifications <span class="badge">3</span></span>
+          <span class="avatar">SB</span>
+          <span>Sean⌄</span>
         </div>
+      </header>
 
-        <div class="metric-card">
-          <span>Labour Rate</span>
-          <strong id="metricRate">$115</strong>
-          <small>Editable contractor rate</small>
-        </div>
-
-        <div class="metric-card">
-          <span>Takeoff Status</span>
-          <strong id="metricStatus">Ready</strong>
-          <small>Run analysis when files are loaded</small>
-        </div>
-      </section>
-
-      <section class="grid dashboard-grid">
-        <div class="panel" id="upload">
-          <div class="panel-header">
-            <div>
-              <h3>Drawing Upload</h3>
-              <span>Add sprinkler drawings, hydraulic calculations, notes, and images</span>
-            </div>
-          </div>
-
-          <div class="panel-body">
-            <div class="notice">
-              For best results, upload the sprinkler floor plans, riser detail, hydraulic calculations, and any notes/specs together.
-              If the file count says 2 files loaded, both files will be sent to the Worker.
-            </div>
-
-            <div class="dropzone" id="dropzone">
-              <div class="dropzone-icon">📎</div>
-              <h4>Drop files here or choose files</h4>
-              <p>PDF, PNG, JPG, TXT, DOCX, or calculation files. Multiple files are supported.</p>
-
-              <label class="button primary" for="fileInput">Choose Files</label>
-              <input
-                id="fileInput"
-                class="file-input"
-                type="file"
-                multiple
-                accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xlsx"
-              />
-            </div>
-
-            <div id="fileList" class="file-list"></div>
-
-            <div class="button-row">
-              <button class="danger" id="clearFilesBtn" type="button">Clear Files</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel" id="settings">
-          <div class="panel-header">
-            <div>
-              <h3>Estimate Settings</h3>
-              <span>Connect your Worker and set estimating assumptions</span>
-            </div>
-          </div>
-
-          <div class="panel-body">
-            <div class="field">
-              <label for="workerUrl">Cloudflare Worker URL</label>
-              <input
-                id="workerUrl"
-                type="url"
-                placeholder="https://fire-estimator-ai.yourname.workers.dev"
-              />
-            </div>
-
-            <div class="form-grid">
-              <div class="field">
-                <label for="projectType">Project Type</label>
-                <select id="projectType">
-                  <option value="New install">New install</option>
-                  <option value="Tenant improvement">Tenant improvement</option>
-                  <option value="Retrofit">Retrofit</option>
-                  <option value="Service / repair">Service / repair</option>
-                  <option value="Unknown">Unknown</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="labourRate">Labour Rate / Hour</label>
-                <input id="labourRate" type="number" min="0" step="1" value="115" />
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="instructions">Project Notes / Instructions</label>
-              <textarea id="instructions" placeholder="Example: Count all heads, separate steel and CPVC, include riser/FDC material, estimate fittings by pipe size, do not include surge restraints for steel pipe."></textarea>
-            </div>
-
-            <div class="button-row">
-              <button class="primary" id="analyzeBtn" type="button">🔥 Analyze Drawings</button>
-              <button class="secondary" id="testWorkerBtn" type="button">Test Worker</button>
-            </div>
-
-            <div class="loading" id="loading">
-              <div class="spinner"></div>
-              <span>Analyzing drawings and formatting takeoff...</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel results-wrap" id="results">
-        <div class="panel-header">
+      <section class="project-header">
+        <div class="project-info">
+          <div class="drawing-thumb"></div>
           <div>
-            <h3>AI Drawing Takeoff</h3>
-            <span>Material, riser, fittings, heads, labour, and notes</span>
-          </div>
-
-          <div class="button-row" style="margin:0;">
-            <button class="secondary" id="copyBtn" type="button">Copy Results</button>
-            <button class="secondary" id="downloadBtn" type="button">Download TXT</button>
-          </div>
-        </div>
-
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="formatted" type="button">Formatted View</button>
-          <button class="tab-btn" data-tab="raw" type="button">Raw AI Text</button>
-        </div>
-
-        <div class="result-content">
-          <div id="formattedView" class="markdown">
-            <div class="placeholder">
-              <strong>No takeoff generated yet</strong>
-              Upload drawings, confirm settings, then click Analyze Drawings.
+            <h2>INDUSTRIAL WAREHOUSE <span class="active-pill">ACTIVE</span></h2>
+            <div class="project-meta">
+              <span>Project ID: FF-2024-1001</span>
+              <span>|</span>
+              <span>Created: May 20, 2024</span>
+              <span>|</span>
+              <span>Location: Ontario, Canada</span>
+              <span>|</span>
+              <span>Type: New Construction</span>
             </div>
           </div>
+        </div>
 
-          <div id="rawView" style="display:none;">
-            <div class="raw-box" id="rawOutput">No raw output yet.</div>
-          </div>
+        <div class="project-buttons">
+          <button class="btn">Edit Project</button>
+          <button class="btn" onclick="openModal()">Upload Revision</button>
+          <button class="btn red" onclick="openModal()">New Estimate</button>
         </div>
       </section>
 
-      <footer>
-        FireFlow AI Contractor Takeoff Dashboard · Built for sprinkler estimating workflows
-      </footer>
+      <nav class="tabs">
+        <div class="tab">DRAWINGS</div>
+        <div class="tab active">AI ANALYSIS</div>
+        <div class="tab">MATERIALS</div>
+        <div class="tab">LABOR</div>
+        <div class="tab">SUMMARY</div>
+        <div class="tab">REVISION HISTORY</div>
+      </nav>
+
+      <section class="content">
+        <div>
+          <div class="left-grid">
+            <div>
+              <div class="panel">
+                <div class="panel-body">
+                  <select class="drawing-select">
+                    <option>FP1 - MAIN FLOOR PLAN</option>
+                    <option>FP2 - SECOND FLOOR PLAN</option>
+                    <option>Riser Detail</option>
+                    <option>Hydraulic Calculations</option>
+                  </select>
+
+                  <div class="drawing-view">
+                    <div class="plan-lines"></div>
+
+                    <div class="pipe-red" style="left:42px;top:75px;width:190px;"></div>
+                    <div class="pipe-red" style="left:95px;top:75px;width:3px;height:125px;"></div>
+                    <div class="pipe-green" style="left:35px;top:135px;width:245px;"></div>
+                    <div class="pipe-green" style="left:180px;top:50px;width:3px;height:160px;"></div>
+                    <div class="pipe-blue" style="left:62px;top:190px;width:200px;"></div>
+
+                    <span class="sprinkler" style="left:53px;top:70px;"></span>
+                    <span class="sprinkler" style="left:92px;top:70px;"></span>
+                    <span class="sprinkler" style="left:142px;top:70px;"></span>
+                    <span class="sprinkler" style="left:206px;top:70px;"></span>
+                    <span class="sprinkler" style="left:61px;top:132px;"></span>
+                    <span class="sprinkler" style="left:126px;top:132px;"></span>
+                    <span class="sprinkler" style="left:180px;top:132px;"></span>
+                    <span class="sprinkler" style="left:245px;top:132px;"></span>
+                    <span class="sprinkler" style="left:91px;top:194px;"></span>
+                    <span class="sprinkler" style="left:176px;top:194px;"></span>
+                    <span class="sprinkler" style="left:240px;top:194px;"></span>
+                  </div>
+
+                  <div class="tool-row">
+                    <button class="tool-btn">⌕</button>
+                    <button class="tool-btn">＋</button>
+                    <button class="tool-btn">－</button>
+                    <button class="tool-btn">⛓</button>
+                    <button class="tool-btn">⤢</button>
+                    <button class="tool-btn">◫</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-top:14px;">
+                <div class="panel-header">
+                  <h3>LAYERS</h3>
+                  <small>⌄</small>
+                </div>
+                <div class="panel-body">
+                  <div class="layer-list">
+                    <div class="layer"><label><span class="check">✓</span> Sprinkler Heads</label><span class="dot red"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Pipe (Wet)</label><span class="dot green"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Pipe (Dry)</label><span class="dot blue"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Fittings</label><span class="dot orange"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Valves</label><span class="dot purple"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Hangers</label><span class="dot" style="background:#fbbf24;"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Zones</label><span class="dot blue"></span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3>AI ANALYSIS RESULTS - DETAILED MATERIAL BREAKDOWN</h3>
+                <div class="analysis-controls">
+                  <button class="small-btn">✎ Edit Quantities</button>
+                  <button class="small-btn" onclick="downloadResults()">Export</button>
+                </div>
+              </div>
+
+              <div class="panel-body">
+                <div class="filter-tabs">
+                  <button class="active">All Materials</button>
+                  <button>Pipe</button>
+                  <button>Fittings</button>
+                  <button>Hangers</button>
+                  <button>Heads</button>
+                  <button>Valves</button>
+                  <button>Specialties</button>
+                  <button>Assemblies</button>
+                </div>
+
+                <div id="analysisContent">
+                  <div class="materials-grid">
+                    <div class="mini-panel">
+                      <div class="mini-title">PIPE</div>
+                      <table>
+                        <thead>
+                          <tr><th>Size</th><th>Type</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>2"</td><td>Sch 10 Grooved</td><td>180</td><td>FT</td><td class="confidence">92%</td></tr>
+                          <tr><td>1½"</td><td>Sch 10 Grooved</td><td>620</td><td>FT</td><td class="confidence">94%</td></tr>
+                          <tr><td>1"</td><td>Sch 40 Threaded</td><td>240</td><td>FT</td><td class="confidence">89%</td></tr>
+                          <tr><td>¾"</td><td>Sch 40 Threaded</td><td>120</td><td>FT</td><td class="confidence">85%</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="mini-panel">
+                      <div class="mini-title">SPRINKLER ASSEMBLIES</div>
+                      <table>
+                        <thead>
+                          <tr><th>Assembly</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>Concealed Pendant Assembly</td><td>80</td><td>EA</td><td class="confidence">98%</td></tr>
+                          <tr><td>Upright Assembly</td><td>24</td><td>EA</td><td class="confidence">97%</td></tr>
+                          <tr><td>Sidewall Assembly</td><td>6</td><td>EA</td><td class="confidence">96%</td></tr>
+                          <tr><td>Dry Pendant Assembly</td><td>2</td><td>EA</td><td class="confidence">95%</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="mini-panel">
+                      <div class="mini-title">GROOVED FITTINGS</div>
+                      <table>
+                        <thead>
+                          <tr><th>Item</th><th>Size</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>Coupling</td><td>2"</td><td>26</td><td>EA</td><td class="confidence">93%</td></tr>
+                          <tr><td>90° Elbow</td><td>2"</td><td>12</td><td>EA</td><td class="confidence">92%</td></tr>
+                          <tr><td>Tee</td><td>2"</td><td>6</td><td>EA</td><td class="confidence">91%</td></tr>
+                          <tr><td>Reducer</td><td>2" x 1½"</td><td>4</td><td>EA</td><td class="confidence">90%</td></tr>
+                          <tr><td>Reducer</td><td>1½" x 1"</td><td>6</td><td>EA</td><td class="confidence">88%</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="mini-panel">
+                      <div class="mini-title">VALVES & SPECIALTIES</div>
+                      <table>
+                        <thead>
+                          <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>DCVA</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
+                          <tr><td>FDC</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
+                          <tr><td>Waterflow Switch</td><td>2</td><td>EA</td><td class="confidence">97%</td></tr>
+                          <tr><td>Inspector Test & Drain</td><td>1</td><td>EA</td><td class="confidence">95%</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="mini-panel">
+                      <div class="mini-title">THREADED FITTINGS</div>
+                      <table>
+                        <thead>
+                          <tr><th>Item</th><th>Size/Type</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>90° Elbow</td><td>1"</td><td>86</td><td>EA</td><td class="confidence">95%</td></tr>
+                          <tr><td>Tee</td><td>1"</td><td>34</td><td>EA</td><td class="confidence">89%</td></tr>
+                          <tr><td>Coupling</td><td>1"</td><td>12</td><td>EA</td><td class="confidence">88%</td></tr>
+                          <tr><td>Bushing</td><td>1" x ½"</td><td>14</td><td>EA</td><td class="confidence">67%</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="mini-panel">
+                      <div class="mini-title">HANGERS & SUPPORTS</div>
+                      <table>
+                        <thead>
+                          <tr><th>Assembly</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>Pipe Hanger</td><td>156</td><td>EA</td><td>75%</td></tr>
+                          <tr><td>Trapeze Assembly</td><td>28</td><td>EA</td><td>70%</td></tr>
+                          <tr><td>Beam Clamp</td><td>42</td><td>EA</td><td>68%</td></tr>
+                          <tr><td>Threaded Rod</td><td>198</td><td>FT</td><td>72%</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="summary-strip">
+                  <div class="strip-item">Total Items <strong id="totalItems">247</strong></div>
+                  <div class="strip-item">Total Pipe <strong id="totalPipe">1,245 FT</strong></div>
+                  <div class="strip-item">Sprinkler Heads <strong id="totalHeads">364</strong></div>
+                  <div class="strip-item">AI Confidence <strong id="totalConfidence">89%</strong></div>
+                  <button class="btn" onclick="openModal()">Re-analyze Drawings</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px;">
+            <div class="panel-header">
+              <h3>TOP ASSEMBLIES DETECTED</h3>
+              <small style="color:var(--red2);">View All Assemblies</small>
+            </div>
+
+            <div class="panel-body">
+              <div class="assembly-row">
+                <div class="assembly-card"><div class="icon"></div><strong>Concealed Pendant</strong><small>K-5.6</small><span class="qty">QTY: 80</span></div>
+                <div class="assembly-card"><div class="icon"></div><strong>Upright Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 24</span></div>
+                <div class="assembly-card"><div class="icon"></div><strong>Sidewall Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 6</span></div>
+                <div class="assembly-card"><div class="icon"></div><strong>Dry Pendant</strong><small>K-5.6</small><span class="qty">QTY: 2</span></div>
+                <div class="assembly-card"><div class="icon"></div><strong>FDC Assembly</strong><small>6" Storz</small><span class="qty">QTY: 1</span></div>
+                <div class="assembly-card"><div class="icon"></div><strong>DCVA Assembly</strong><small>6"</small><span class="qty">QTY: 1</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="raw-output" id="rawOutput"></div>
+        </div>
+
+        <aside class="right-col">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>PROJECT SUMMARY</h3>
+            </div>
+            <div class="panel-body">
+              <div class="project-summary-grid">
+                <div class="summary-box"><strong>42,350</strong><span>SQ FT</span></div>
+                <div class="summary-box"><strong>OH2</strong><span>Hazard</span></div>
+                <div class="summary-box"><strong>2</strong><span>Risers</span></div>
+                <div class="summary-box"><strong id="summaryHeads">364</strong><span>Sprinkler Heads</span></div>
+                <div class="summary-box"><strong id="summaryPipe">1,245 FT</strong><span>Pipe Length</span></div>
+                <div class="summary-box"><strong id="summaryConfidence">89%</strong><span>AI Confidence</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>ESTIMATE SUMMARY</h3>
+            </div>
+            <div class="panel-body">
+              <div class="estimate-row"><span>Material Cost</span><span id="materialCost">$47,850.00</span></div>
+              <div class="estimate-row"><span>Labor Cost</span><span id="laborCost">$28,650.00</span></div>
+              <div class="estimate-row"><span>Equipment Cost</span><span>$2,450.00</span></div>
+              <div class="estimate-row estimate-total"><span>Total Cost</span><span id="totalCost">$78,950.00</span></div>
+              <button class="btn red full-width" style="margin-top:12px;">View Full Estimate</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>SUPPLIER PRICING</h3>
+              <small>Edit Suppliers⌄</small>
+            </div>
+            <div class="panel-body">
+              <table class="supplier-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th class="active-supplier">VICTAULIC<br><small>Preferred</small></th>
+                    <th>ANVIL<br><small>Standard</small></th>
+                    <th>WOLSELEY<br><small>Alternate</small></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Material</td><td>$47,850</td><td>$51,620</td><td>$45,780</td></tr>
+                  <tr><td>Shipping</td><td>$1,250</td><td>$1,450</td><td>$1,190</td></tr>
+                  <tr><td>Tax</td><td>$6,370</td><td>$6,860</td><td>$6,080</td></tr>
+                  <tr><td><strong>Total</strong></td><td><strong>$55,470</strong></td><td><strong>$59,930</strong></td><td><strong>$53,050</strong></td></tr>
+                </tbody>
+              </table>
+
+              <button class="btn full-width" style="margin-top:12px;">Compare Full Pricing</button>
+              <div style="color:var(--muted); font-size:11px; margin-top:10px; text-align:right;">Prices updated: May 20, 2024</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>AI CONFIDENCE</h3>
+              </div>
+              <div class="panel-body">
+                <div class="confidence-row"><span>Pipe Length</span><div class="bar"><span style="width:92%;"></span></div><span>92%</span></div>
+                <div class="confidence-row"><span>Sprinkler Heads</span><div class="bar"><span style="width:98%;"></span></div><span>98%</span></div>
+                <div class="confidence-row"><span>Fittings</span><div class="bar"><span style="width:91%;"></span></div><span>91%</span></div>
+                <div class="confidence-row"><span>Hangers</span><div class="bar yellow"><span style="width:72%;"></span></div><span>72%</span></div>
+                <div class="confidence-row"><span>Valves</span><div class="bar"><span style="width:95%;"></span></div><span>95%</span></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3>RECENT REVISIONS</h3>
+                <small style="color:var(--red2);">View All</small>
+              </div>
+              <div class="panel-body">
+                <div class="revision"><span class="dot purple"></span><div><strong>Rev 2</strong><span>May 20, 2024<br>Added office area, 14 heads</span></div></div>
+                <div class="revision"><span class="dot blue"></span><div><strong>Rev 1</strong><span>May 15, 2024<br>Riser location changed</span></div></div>
+                <div class="revision"><span class="dot green"></span><div><strong>Rev 0</strong><span>May 10, 2024<br>Issued for construction</span></div></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
     </main>
   </div>
 
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Upload Drawings / Run AI Analysis</h3>
+        <button class="small-btn" onclick="closeModal()">Close</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="field">
+          <label>Cloudflare Worker URL</label>
+          <input id="workerUrl" placeholder="https://fire-estimator-ai.yourname.workers.dev" />
+        </div>
+
+        <div class="upload-box">
+          <p style="margin-top:0;">Upload sprinkler drawings, hydraulic calculations, specs, notes, or images.</p>
+          <input id="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xlsx" />
+          <div id="fileList" class="file-list"></div>
+        </div>
+
+        <div class="field">
+          <label>Project Type</label>
+          <select id="projectType">
+            <option>New Construction</option>
+            <option>Tenant Improvement</option>
+            <option>Retrofit</option>
+            <option>Service / Repair</option>
+            <option>Unknown</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Labour Rate</label>
+          <input id="labourRate" type="number" value="115" />
+        </div>
+
+        <div class="field">
+          <label>Instructions to AI</label>
+          <textarea id="instructions"></textarea>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn" onclick="testWorker()">Test Worker</button>
+          <button class="btn red" onclick="analyzeDrawings()">Analyze Drawings</button>
+          <button class="btn" onclick="clearFiles()">Clear Files</button>
+        </div>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <span>Analyzing drawings...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    const modal = document.getElementById("modal");
     const fileInput = document.getElementById("fileInput");
-    const dropzone = document.getElementById("dropzone");
     const fileList = document.getElementById("fileList");
-
-    const workerUrlInput = document.getElementById("workerUrl");
-    const projectTypeInput = document.getElementById("projectType");
-    const labourRateInput = document.getElementById("labourRate");
-    const instructionsInput = document.getElementById("instructions");
-
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const testWorkerBtn = document.getElementById("testWorkerBtn");
-    const clearFilesBtn = document.getElementById("clearFilesBtn");
-    const copyBtn = document.getElementById("copyBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
-
+    const workerUrl = document.getElementById("workerUrl");
+    const instructions = document.getElementById("instructions");
+    const projectType = document.getElementById("projectType");
+    const labourRate = document.getElementById("labourRate");
     const loading = document.getElementById("loading");
-    const formattedView = document.getElementById("formattedView");
-    const rawView = document.getElementById("rawView");
-    const rawOutput = document.getElementById("rawOutput");
-
-    const workerStatus = document.getElementById("workerStatus");
-    const fileStatus = document.getElementById("fileStatus");
     const aiStatus = document.getElementById("aiStatus");
-
-    const metricFiles = document.getElementById("metricFiles");
-    const metricProject = document.getElementById("metricProject");
-    const metricRate = document.getElementById("metricRate");
-    const metricStatus = document.getElementById("metricStatus");
+    const fileStatus = document.getElementById("fileStatus");
+    const workerStatus = document.getElementById("workerStatus");
+    const rawOutput = document.getElementById("rawOutput");
+    const analysisContent = document.getElementById("analysisContent");
 
     let selectedFiles = [];
     let latestResultText = "";
 
     const savedWorkerUrl = localStorage.getItem("fireflowWorkerUrl");
-    if (savedWorkerUrl) {
-      workerUrlInput.value = savedWorkerUrl;
+    if (savedWorkerUrl) workerUrl.value = savedWorkerUrl;
+
+    instructions.value = `Act as a professional fire sprinkler estimator.
+
+Return a clean contractor material takeoff. Break material into:
+- Pipe by size, schedule, material, connection, footage, and order lengths
+- Sprinkler heads by type, floor, area, temperature, K-factor if visible
+- Threaded fittings by size
+- Grooved fittings by size
+- Mechanical tees and outlets by main x outlet size
+- Riser material
+- FDC material
+- Hangers and supports
+- Labour by task
+- Supplier pricing allowance
+- Accuracy confidence
+
+Important rules:
+- Count all heads on all drawings, not just hydraulic calculation design area.
+- Separate confirmed quantities from estimated quantities.
+- No surge restraints on steel pipe.
+- Surge restraints only apply to plastic/CPVC pipe.
+- 1 inch threaded drops should not receive grooved couplings.
+- Break down fittings by exact size whenever possible.
+- If a fitting cannot be confirmed, estimate based on visible pipe routing, branch turns, drops, riser details, and standard sprinkler installation practice.`;
+
+    function openModal() {
+      modal.style.display = "flex";
     }
 
-    const defaultInstructions = `Act as a professional fire sprinkler estimator.
-
-Return a clean contractor takeoff with:
-1. Drawing review summary
-2. System type and pipe material
-3. Sprinkler head count by floor/area/type
-4. Pipe by size, material, schedule, connection, footage, and order lengths
-5. Fittings separated by threaded, grooved, CPVC/plastic, mechanical tees/outlets
-6. Riser room material
-7. FDC/exterior material
-8. Hangers/supports
-9. Labour breakdown by task
-10. Accuracy review and missing information
-
-Important estimating rules:
-- Count all sprinkler heads on all plans, not only the hydraulic calculation design area.
-- Separate confirmed drawing quantities from estimated quantities.
-- Do not use surge restraints on steel pipe.
-- Surge restraints are only for plastic/CPVC pipe.
-- Threaded 1 inch drops should not receive grooved couplings.
-- Break fittings down by size wherever possible.
-- If exact fittings cannot be confirmed from drawings, estimate based on pipe runs, branch turns, risers, drops, and standard NFPA 13 sprinkler installation practice.
-- Make the output easy to read in markdown tables.`;
-
-    instructionsInput.value = defaultInstructions;
-
-    function formatBytes(bytes) {
-      if (!bytes && bytes !== 0) return "";
-      const units = ["B", "KB", "MB", "GB"];
-      let size = bytes;
-      let unitIndex = 0;
-
-      while (size >= 1024 && unitIndex < units.length - 1) {
-        size = size / 1024;
-        unitIndex++;
-      }
-
-      return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+    function closeModal() {
+      modal.style.display = "none";
     }
 
-    function updateMetrics() {
-      const count = selectedFiles.length;
-      fileStatus.textContent = `${count} file${count === 1 ? "" : "s"} loaded`;
-      metricFiles.textContent = count;
-      metricProject.textContent = projectTypeInput.value.replace("Tenant improvement", "TI");
-      metricRate.textContent = `$${labourRateInput.value || 0}`;
-    }
+    modal.addEventListener("click", function(event) {
+      if (event.target === modal) closeModal();
+    });
 
-    function renderFileList() {
+    fileInput.addEventListener("change", function(event) {
+      selectedFiles = Array.from(event.target.files || []);
+      renderFiles();
+    });
+
+    function renderFiles() {
       fileList.innerHTML = "";
 
-      if (!selectedFiles.length) {
-        updateMetrics();
-        return;
-      }
-
       selectedFiles.forEach((file, index) => {
-        const chip = document.createElement("div");
-        chip.className = "file-chip";
-        chip.innerHTML = `
-          <div>
-            <strong>${index + 1}. ${escapeHtml(file.name)}</strong><br>
-            <small>${escapeHtml(file.type || "Unknown file type")} · ${formatBytes(file.size)}</small>
-          </div>
-          <small>Loaded</small>
-        `;
-        fileList.appendChild(chip);
+        const div = document.createElement("div");
+        div.className = "file-chip";
+        div.innerHTML = `<span>${index + 1}. ${escapeHtml(file.name)}</span><span>${formatSize(file.size)}</span>`;
+        fileList.appendChild(div);
       });
 
-      updateMetrics();
+      fileStatus.textContent = selectedFiles.length
+        ? `${selectedFiles.length} file${selectedFiles.length === 1 ? "" : "s"} loaded`
+        : "No files selected";
     }
 
-    function addFiles(fileListObject) {
-      const incoming = Array.from(fileListObject || []);
-
-      incoming.forEach(file => {
-        const duplicate = selectedFiles.some(existing =>
-          existing.name === file.name &&
-          existing.size === file.size &&
-          existing.lastModified === file.lastModified
-        );
-
-        if (!duplicate) {
-          selectedFiles.push(file);
-        }
-      });
-
-      renderFileList();
-    }
-
-    fileInput.addEventListener("change", event => {
-      selectedFiles = [];
-      addFiles(event.target.files);
-    });
-
-    clearFilesBtn.addEventListener("click", () => {
+    function clearFiles() {
       selectedFiles = [];
       fileInput.value = "";
-      renderFileList();
-    });
+      renderFiles();
+    }
 
-    dropzone.addEventListener("dragover", event => {
-      event.preventDefault();
-      dropzone.classList.add("dragover");
-    });
+    function formatSize(bytes) {
+      if (!bytes && bytes !== 0) return "";
+      const mb = bytes / 1024 / 1024;
+      if (mb >= 1) return `${mb.toFixed(2)} MB`;
+      return `${Math.round(bytes / 1024)} KB`;
+    }
 
-    dropzone.addEventListener("dragleave", () => {
-      dropzone.classList.remove("dragover");
-    });
+    async function testWorker() {
+      const url = workerUrl.value.trim();
 
-    dropzone.addEventListener("drop", event => {
-      event.preventDefault();
-      dropzone.classList.remove("dragover");
-      selectedFiles = [];
-      addFiles(event.dataTransfer.files);
-    });
-
-    workerUrlInput.addEventListener("change", () => {
-      localStorage.setItem("fireflowWorkerUrl", workerUrlInput.value.trim());
-    });
-
-    projectTypeInput.addEventListener("change", updateMetrics);
-    labourRateInput.addEventListener("input", updateMetrics);
-
-    testWorkerBtn.addEventListener("click", async () => {
-      const workerUrl = workerUrlInput.value.trim();
-
-      if (!workerUrl) {
+      if (!url) {
         alert("Enter your Cloudflare Worker URL first.");
         return;
       }
 
       try {
         workerStatus.textContent = "Testing Worker...";
-        const response = await fetch(workerUrl, { method: "GET" });
+        const response = await fetch(url);
         const text = await response.text();
 
-        if (!response.ok) {
-          throw new Error(text || "Worker test failed.");
-        }
+        if (!response.ok) throw new Error(text);
 
         workerStatus.textContent = "Worker connected";
-        alert("Worker connected successfully.");
+        alert("Worker connected.");
       } catch (error) {
         workerStatus.textContent = "Worker error";
         alert("Worker test failed: " + error.message);
       }
-    });
+    }
 
-    analyzeBtn.addEventListener("click", async () => {
-      const workerUrl = workerUrlInput.value.trim();
+    async function analyzeDrawings() {
+      const url = workerUrl.value.trim();
 
-      if (!workerUrl) {
+      if (!url) {
         alert("Enter your Cloudflare Worker URL first.");
         return;
       }
 
       if (!selectedFiles.length) {
-        alert("Choose one or more drawing files first.");
+        alert("Upload one or more files first.");
         return;
       }
 
-      localStorage.setItem("fireflowWorkerUrl", workerUrl);
+      localStorage.setItem("fireflowWorkerUrl", url);
 
       const formData = new FormData();
-      formData.append("projectType", projectTypeInput.value);
-      formData.append("labourRate", labourRateInput.value || "115");
-      formData.append("instructions", instructionsInput.value || "");
+      formData.append("projectType", projectType.value);
+      formData.append("labourRate", labourRate.value || "115");
+      formData.append("instructions", instructions.value || "");
 
       selectedFiles.forEach(file => {
         formData.append("files", file, file.name);
       });
 
       loading.style.display = "flex";
-      analyzeBtn.disabled = true;
-      metricStatus.textContent = "Running";
       aiStatus.textContent = "Analyzing...";
-      formattedView.innerHTML = `
-        <div class="placeholder">
-          <strong>Analyzing drawings...</strong>
-          Reading files, sending them to the Worker, and formatting the takeoff.
-        </div>
-      `;
+      workerStatus.textContent = "Sending files to Worker";
 
       try {
-        const response = await fetch(workerUrl, {
+        const response = await fetch(url, {
           method: "POST",
           body: formData
         });
@@ -1189,42 +1638,44 @@ Important estimating rules:
         }
 
         latestResultText = resultText;
-        rawOutput.textContent = resultText || "No result returned.";
-        formattedView.innerHTML = markdownToHtml(resultText || "No result returned.");
+        rawOutput.style.display = "block";
+        rawOutput.textContent = resultText;
 
-        metricStatus.textContent = "Complete";
-        aiStatus.textContent = "Analysis complete";
+        analysisContent.innerHTML = aiResultToDashboard(resultText);
+
+        aiStatus.textContent = "Completed";
         workerStatus.textContent = "Worker connected";
+        closeModal();
       } catch (error) {
-        latestResultText = "";
-        rawOutput.textContent = error.message;
-        formattedView.innerHTML = `
-          <div class="placeholder">
-            <strong>Analysis failed</strong>
-            <p>${escapeHtml(error.message)}</p>
-          </div>
-        `;
-        metricStatus.textContent = "Error";
-        aiStatus.textContent = "AI error";
+        aiStatus.textContent = "Error";
+        workerStatus.textContent = "Worker error";
+        alert("Analysis failed: " + error.message);
       } finally {
         loading.style.display = "none";
-        analyzeBtn.disabled = false;
       }
-    });
+    }
 
-    copyBtn.addEventListener("click", async () => {
+    function aiResultToDashboard(text) {
+      const safe = escapeHtml(text || "No AI result returned.");
+
+      return `
+        <div class="mini-panel" style="margin-bottom:12px;">
+          <div class="mini-title">AI RESULT RECEIVED</div>
+          <div style="padding:12px; color:#cbd5e1; line-height:1.55; font-size:13px;">
+            The AI result has been loaded below. The next Worker update will return structured JSON so this dashboard can automatically fill every table.
+          </div>
+        </div>
+
+        <div class="mini-panel">
+          <div class="mini-title">RAW CONTRACTOR TAKEOFF</div>
+          <div style="padding:14px; white-space:pre-wrap; color:#e2e8f0; line-height:1.55; font-size:13px; max-height:620px; overflow:auto;">${safe}</div>
+        </div>
+      `;
+    }
+
+    function downloadResults() {
       if (!latestResultText) {
-        alert("No results to copy yet.");
-        return;
-      }
-
-      await navigator.clipboard.writeText(latestResultText);
-      alert("Results copied.");
-    });
-
-    downloadBtn.addEventListener("click", () => {
-      if (!latestResultText) {
-        alert("No results to download yet.");
+        alert("No results to export yet.");
         return;
       }
 
@@ -1232,164 +1683,13 @@ Important estimating rules:
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
 
-      const date = new Date().toISOString().slice(0, 10);
       link.href = url;
-      link.download = `fireflow-ai-takeoff-${date}.txt`;
+      link.download = "fireflow-ai-estimate.txt";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
       URL.revokeObjectURL(url);
-    });
-
-    document.querySelectorAll(".tab-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        const tab = button.dataset.tab;
-
-        if (tab === "raw") {
-          formattedView.style.display = "none";
-          rawView.style.display = "block";
-        } else {
-          formattedView.style.display = "block";
-          rawView.style.display = "none";
-        }
-      });
-    });
-
-    function markdownToHtml(markdown) {
-      if (!markdown) return "";
-
-      const lines = markdown.replace(/\r\n/g, "\n").split("\n");
-      let html = "";
-      let paragraph = [];
-      let inList = false;
-
-      function flushParagraph() {
-        if (paragraph.length) {
-          html += `<p>${inlineFormat(escapeHtml(paragraph.join(" ")))}</p>`;
-          paragraph = [];
-        }
-      }
-
-      function closeList() {
-        if (inList) {
-          html += "</ul>";
-          inList = false;
-        }
-      }
-
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const trimmed = line.trim();
-
-        if (!trimmed) {
-          flushParagraph();
-          closeList();
-          continue;
-        }
-
-        if (isMarkdownTableStart(lines, i)) {
-          flushParagraph();
-          closeList();
-
-          const tableLines = [];
-          while (i < lines.length && lines[i].trim().startsWith("|")) {
-            tableLines.push(lines[i].trim());
-            i++;
-          }
-          i--;
-
-          html += renderMarkdownTable(tableLines);
-          continue;
-        }
-
-        if (trimmed.startsWith("### ")) {
-          flushParagraph();
-          closeList();
-          html += `<h3>${inlineFormat(escapeHtml(trimmed.slice(4)))}</h3>`;
-          continue;
-        }
-
-        if (trimmed.startsWith("## ")) {
-          flushParagraph();
-          closeList();
-          html += `<h2>${inlineFormat(escapeHtml(trimmed.slice(3)))}</h2>`;
-          continue;
-        }
-
-        if (trimmed.startsWith("# ")) {
-          flushParagraph();
-          closeList();
-          html += `<h1>${inlineFormat(escapeHtml(trimmed.slice(2)))}</h1>`;
-          continue;
-        }
-
-        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-          flushParagraph();
-
-          if (!inList) {
-            html += "<ul>";
-            inList = true;
-          }
-
-          html += `<li>${inlineFormat(escapeHtml(trimmed.slice(2)))}</li>`;
-          continue;
-        }
-
-        paragraph.push(trimmed);
-      }
-
-      flushParagraph();
-      closeList();
-
-      return html;
-    }
-
-    function isMarkdownTableStart(lines, index) {
-      const current = lines[index]?.trim() || "";
-      const next = lines[index + 1]?.trim() || "";
-
-      return (
-        current.startsWith("|") &&
-        current.endsWith("|") &&
-        next.startsWith("|") &&
-        next.includes("---")
-      );
-    }
-
-    function renderMarkdownTable(tableLines) {
-      if (tableLines.length < 2) return "";
-
-      const headerCells = splitTableRow(tableLines[0]);
-      const bodyLines = tableLines.slice(2);
-
-      let tableHtml = `<div class="table-scroll"><table><thead><tr>`;
-      headerCells.forEach(cell => {
-        tableHtml += `<th>${inlineFormat(escapeHtml(cell))}</th>`;
-      });
-      tableHtml += `</tr></thead><tbody>`;
-
-      bodyLines.forEach(row => {
-        const cells = splitTableRow(row);
-        tableHtml += `<tr>`;
-        cells.forEach(cell => {
-          tableHtml += `<td>${inlineFormat(escapeHtml(cell))}</td>`;
-        });
-        tableHtml += `</tr>`;
-      });
-
-      tableHtml += `</tbody></table></div>`;
-      return tableHtml;
-    }
-
-    function splitTableRow(row) {
-      return row
-        .replace(/^\|/, "")
-        .replace(/\|$/, "")
-        .split("|")
-        .map(cell => cell.trim());
     }
 
     function escapeHtml(value) {
@@ -1400,14 +1700,6 @@ Important estimating rules:
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
-
-    function inlineFormat(text) {
-      return text
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/`(.*?)`/g, "<code>$1</code>");
-    }
-
-    updateMetrics();
   </script>
 </body>
 </html>
