@@ -223,6 +223,9 @@
       font-size: 0.95rem;
       line-height: 1.5;
       word-break: break-word;
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow-y: auto;
     }
 
     .results {
@@ -397,13 +400,13 @@
 
         <div class="upload-area">
           <div class="file-upload-row">
-            <label for="pdfUpload">Upload sprinkler drawings, hydraulic calculations, or PDFs</label>
+            <label for="pdfUpload">Add sprinkler drawings, hydraulic calculations, PDFs, or images</label>
             <input
               type="file"
               id="pdfUpload"
               accept="application/pdf,image/*"
               multiple
-              onchange="showSelectedFiles()"
+              onchange="addSelectedFiles()"
             />
           </div>
 
@@ -416,6 +419,10 @@
             <button class="ghost" onclick="clearUploads()">Clear Files</button>
           </div>
         </div>
+
+        <p class="note">
+          You can click the file upload box more than once. Each new file selection will be added to the list instead of replacing the old files.
+        </p>
 
         <p class="note">
           The AI should review all uploaded files together and estimate material from sprinkler heads, pipe sizes, pipe footage, turns, fittings, system notes, riser details, and hydraulic calculation pages.
@@ -481,7 +488,9 @@
   </footer>
 
   <script>
-    const AI_WORKER_URL = "https://fire-sprinkler-ai.seanb0505.workers.dev";
+    const AI_WORKER_URL = "https://fire-estimator-ai.seanmbarbour.workers.dev";
+
+    let selectedFiles = [];
 
     function calculateManualEstimate() {
       const jobType = document.getElementById("jobType").value;
@@ -586,23 +595,53 @@
       return map[value] || value;
     }
 
-    function showSelectedFiles() {
+    function addSelectedFiles() {
       const input = document.getElementById("pdfUpload");
-      const fileList = document.getElementById("fileList");
 
       if (!input.files || input.files.length === 0) {
+        renderFileList();
+        return;
+      }
+
+      const newFiles = Array.from(input.files);
+
+      newFiles.forEach(file => {
+        const alreadyAdded = selectedFiles.some(existingFile => {
+          return (
+            existingFile.name === file.name &&
+            existingFile.size === file.size &&
+            existingFile.lastModified === file.lastModified
+          );
+        });
+
+        if (!alreadyAdded) {
+          selectedFiles.push(file);
+        }
+      });
+
+      input.value = "";
+      renderFileList();
+    }
+
+    function renderFileList() {
+      const fileList = document.getElementById("fileList");
+
+      if (selectedFiles.length === 0) {
         fileList.textContent = "No files selected yet.";
         return;
       }
 
-      const names = Array.from(input.files).map((file, index) => {
-        return `${index + 1}. ${file.name}`;
+      const names = selectedFiles.map((file, index) => {
+        const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+        return `${index + 1}. ${file.name} (${sizeMB} MB)`;
       });
 
       fileList.textContent = names.join("\n");
     }
 
     function clearUploads() {
+      selectedFiles = [];
+
       const input = document.getElementById("pdfUpload");
       input.value = "";
 
@@ -612,28 +651,27 @@
     }
 
     async function analyzePDFs() {
-      const input = document.getElementById("pdfUpload");
       const status = document.getElementById("aiStatus");
       const results = document.getElementById("aiResults");
 
-      if (!input.files || input.files.length === 0) {
+      if (!selectedFiles || selectedFiles.length === 0) {
         status.textContent = "Please select at least one PDF or image file.";
         results.textContent = "No files selected.";
         return;
       }
 
-      status.textContent = "Analyzing uploaded drawings...";
+      status.textContent = `Analyzing ${selectedFiles.length} uploaded file(s)...`;
       results.textContent = "Reading files and sending them to the AI analyzer...";
 
       try {
         const filesPayload = [];
 
-        for (const file of input.files) {
+        for (const file of selectedFiles) {
           const base64 = await fileToBase64(file);
 
           filesPayload.push({
             name: file.name,
-            type: file.type,
+            type: file.type || "application/octet-stream",
             size: file.size,
             base64: base64
           });
@@ -651,7 +689,14 @@
           })
         });
 
-        const data = await response.json();
+        let data;
+
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          const text = await response.text();
+          data = { rawResponse: text };
+        }
 
         if (!response.ok) {
           status.textContent = "AI analyzer returned an error.";
@@ -665,13 +710,24 @@
           data.text ||
           data.analysis ||
           data.message ||
+          data.output ||
           JSON.stringify(data, null, 2);
 
         status.textContent = "Analysis complete.";
         results.textContent = aiText;
       } catch (error) {
-        status.textContent = "Something went wrong while analyzing the files.";
-        results.textContent = String(error);
+        status.textContent = "The website could not reach the Cloudflare Worker.";
+        results.textContent =
+          "FAILED TO FETCH\n\n" +
+          "This usually means one of these is wrong:\n\n" +
+          "1. The Worker URL is incorrect\n" +
+          "2. The Cloudflare Worker is not deployed\n" +
+          "3. The Worker is missing CORS headers\n" +
+          "4. The Worker crashed before responding\n\n" +
+          "Current Worker URL:\n" +
+          AI_WORKER_URL +
+          "\n\nBrowser error:\n" +
+          String(error);
       }
     }
 
