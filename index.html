@@ -80,11 +80,6 @@
       font-size: 1.45rem;
     }
 
-    .card h3 {
-      margin-top: 24px;
-      margin-bottom: 12px;
-    }
-
     label {
       display: block;
       margin: 14px 0 6px;
@@ -143,14 +138,16 @@
       background: #4b5563;
     }
 
-    .button-row {
+    .button-row,
+    .upload-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       margin-top: 18px;
     }
 
-    .button-row button {
+    .button-row button,
+    .upload-buttons button {
       flex: 1 1 180px;
     }
 
@@ -199,19 +196,6 @@
 
     .file-upload-row input[type="file"]::file-selector-button:hover {
       background: var(--blue-dark);
-    }
-
-    .upload-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 6px;
-      width: 100%;
-    }
-
-    .upload-buttons button {
-      flex: 1 1 180px;
-      min-width: 0;
     }
 
     .file-list {
@@ -421,7 +405,7 @@
         </div>
 
         <p class="note">
-          You can click the file upload box more than once. Each new file selection will be added to the list instead of replacing the old files.
+          You can select multiple files at once, or click the upload box again to add more files one at a time.
         </p>
 
         <p class="note">
@@ -673,29 +657,34 @@
             name: file.name,
             type: file.type || "application/octet-stream",
             size: file.size,
+            lastModified: file.lastModified,
             base64: base64
           });
         }
+
+        const requestBody = {
+          projectType: "fire sprinkler drawing material takeoff",
+          instructions: buildAnalyzerInstructions(),
+          files: filesPayload
+        };
 
         const response = await fetch(AI_WORKER_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            projectType: "fire sprinkler drawing material takeoff",
-            instructions: buildAnalyzerInstructions(),
-            files: filesPayload
-          })
+          body: JSON.stringify(requestBody)
         });
 
-        let data;
+        const text = await response.text();
 
+        let data;
         try {
-          data = await response.json();
+          data = JSON.parse(text);
         } catch (jsonError) {
-          const text = await response.text();
-          data = { rawResponse: text };
+          data = {
+            result: text
+          };
         }
 
         if (!response.ok) {
@@ -723,7 +712,8 @@
           "1. The Worker URL is incorrect\n" +
           "2. The Cloudflare Worker is not deployed\n" +
           "3. The Worker is missing CORS headers\n" +
-          "4. The Worker crashed before responding\n\n" +
+          "4. The Worker crashed before responding\n" +
+          "5. The uploaded file is too large for the Worker request\n\n" +
           "Current Worker URL:\n" +
           AI_WORKER_URL +
           "\n\nBrowser error:\n" +
