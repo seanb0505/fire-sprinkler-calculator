@@ -3,716 +3,750 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FireFlow AI - Fire Protection Estimator</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <title>Fire Protection Estimator</title>
 
   <style>
-    *{
-      box-sizing:border-box;
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #111827;
+      --bg-card-light: #1f2937;
+      --accent: #ef4444;
+      --accent-dark: #dc2626;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border: #374151;
+      --success: #22c55e;
+      --warning: #f59e0b;
     }
 
-    body{
-      margin:0;
-      font-family:Arial,sans-serif;
-      background:#070b12;
-      color:#f8fafc;
+    * {
+      box-sizing: border-box;
     }
 
-    header{
-      background:linear-gradient(135deg,#111827,#1d4ed8);
-      padding:30px 24px;
-      border-bottom:1px solid #1e293b;
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #020617, #111827);
+      color: var(--text-main);
     }
 
-    .topbar{
-      max-width:1200px;
-      margin:auto;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:20px;
-      flex-wrap:wrap;
+    header {
+      padding: 60px 20px 40px;
+      text-align: center;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      border-bottom: 1px solid var(--border);
     }
 
-    .brand h1{
-      margin:0;
-      font-size:36px;
-      letter-spacing:-1px;
+    header h1 {
+      margin: 0 0 14px;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 800;
     }
 
-    .brand span{
-      color:#60a5fa;
+    header p {
+      max-width: 850px;
+      margin: 0 auto;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
     }
 
-    .brand p{
-      margin:8px 0 0;
-      color:#cbd5e1;
+    main {
+      width: min(1200px, 94%);
+      margin: 32px auto 80px;
+      display: grid;
+      gap: 24px;
     }
 
-    .badge{
-      background:rgba(96,165,250,.15);
-      border:1px solid rgba(96,165,250,.4);
-      color:#dbeafe;
-      padding:12px 18px;
-      border-radius:999px;
-      font-size:14px;
-      font-weight:bold;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
     }
 
-    .container{
-      max-width:1200px;
-      margin:auto;
-      padding:24px;
+    .card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1.4fr;
-      gap:22px;
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 1.45rem;
     }
 
-    .card{
-      background:#111827;
-      border:1px solid #1e293b;
-      border-radius:20px;
-      padding:24px;
-      margin-bottom:22px;
-      box-shadow:0 20px 40px rgba(0,0,0,.25);
+    .card h3 {
+      margin-top: 24px;
+      margin-bottom: 12px;
     }
 
-    .card h2{
-      margin-top:0;
-      margin-bottom:10px;
-      font-size:24px;
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      color: #e5e7eb;
+      font-weight: 700;
     }
 
-    .muted{
-      color:#94a3b8;
-      line-height:1.5;
+    input,
+    select,
+    textarea {
+      width: 100%;
+      max-width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 1rem;
     }
 
-    .upload-box{
-      border:2px dashed #3b82f6;
-      background:rgba(37,99,235,.08);
-      border-radius:18px;
-      padding:36px 20px;
-      text-align:center;
-      cursor:pointer;
-      transition:.2s ease;
-      margin-top:18px;
+    textarea {
+      min-height: 110px;
+      resize: vertical;
     }
 
-    .upload-box:hover{
-      background:rgba(37,99,235,.18);
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: var(--accent);
+      transition: 0.2s ease;
+      font-size: 0.95rem;
     }
 
-    .upload-box strong{
-      display:block;
-      font-size:22px;
-      margin-bottom:10px;
+    button:hover {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
     }
 
-    .upload-box span{
-      display:block;
-      color:#bfdbfe;
-      font-size:14px;
+    button.secondary {
+      background: var(--blue);
     }
 
-    input[type="file"]{
-      display:none;
+    button.secondary:hover {
+      background: var(--blue-dark);
     }
 
-    textarea,
-    input{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:14px;
-      background:#0f172a;
-      color:white;
-      border:1px solid #334155;
-      margin-top:12px;
-      font-size:15px;
+    button.ghost {
+      background: #374151;
     }
 
-    textarea{
-      min-height:150px;
-      resize:vertical;
+    button.ghost:hover {
+      background: #4b5563;
     }
 
-    button{
-      width:100%;
-      display:block;
-      padding:14px;
-      border:none;
-      border-radius:14px;
-      background:#2563eb;
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
-      transition:.2s ease;
-      margin-top:14px;
-      font-size:15px;
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
     }
 
-    button:hover{
-      background:#1d4ed8;
+    .button-row button {
+      flex: 1 1 180px;
     }
 
-    button.secondary{
-      background:#334155;
+    .upload-area {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
     }
 
-    button.secondary:hover{
-      background:#475569;
+    .file-upload-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
     }
 
-    .status{
-      margin-top:16px;
-      background:#0f172a;
-      border:1px solid #334155;
-      border-radius:16px;
-      padding:16px;
-      color:#cbd5e1;
-      white-space:pre-wrap;
-      line-height:1.5;
+    .file-upload-row label {
+      margin: 0;
+      font-weight: 700;
+      color: #e5e7eb;
     }
 
-    .results{
-      background:#020617;
-      border:1px solid #334155;
-      border-radius:18px;
-      padding:24px;
-      min-height:450px;
-      white-space:pre-wrap;
-      overflow-x:auto;
-      line-height:1.5;
-      color:#f8fafc;
+    .file-upload-row input[type="file"] {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #020617;
+      color: #f9fafb;
+      overflow: hidden;
     }
 
-    .stat-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-      margin-bottom:22px;
+    .file-upload-row input[type="file"]::file-selector-button {
+      margin-right: 12px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--blue);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
     }
 
-    .stat{
-      background:#0f172a;
-      border:1px solid #334155;
-      border-radius:16px;
-      padding:16px;
+    .file-upload-row input[type="file"]::file-selector-button:hover {
+      background: var(--blue-dark);
     }
 
-    .stat small{
-      color:#94a3b8;
+    .upload-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+      width: 100%;
     }
 
-    .stat strong{
-      display:block;
-      margin-top:6px;
-      font-size:24px;
+    .upload-buttons button {
+      flex: 1 1 180px;
+      min-width: 0;
     }
 
-    .file-list{
-      list-style:none;
-      padding:0;
-      margin-top:18px;
+    .file-list {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      word-break: break-word;
     }
 
-    .file-list li{
-      background:#0f172a;
-      border:1px solid #334155;
-      border-radius:12px;
-      padding:12px;
-      margin-top:10px;
-      color:#dbeafe;
-      font-size:14px;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    .results {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      min-height: 180px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      color: #e5e7eb;
+      overflow-x: auto;
     }
 
-    @media(max-width:950px){
+    .status {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
 
-      .grid{
-        grid-template-columns:1fr;
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #1f2937;
+      border: 1px solid var(--border);
+      color: #d1d5db;
+      font-size: 0.9rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #1f2937;
+    }
+
+    td {
+      background: #020617;
+    }
+
+    .note {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 32px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 850px) {
+      .grid {
+        grid-template-columns: 1fr;
       }
 
-      .stat-grid{
-        grid-template-columns:1fr;
+      header {
+        padding: 42px 18px 30px;
       }
 
-      .brand h1{
-        font-size:30px;
+      .card {
+        padding: 18px;
+      }
+
+      .button-row,
+      .upload-buttons {
+        flex-direction: column;
+      }
+
+      .button-row button,
+      .upload-buttons button {
+        width: 100%;
+        flex: 1 1 auto;
       }
     }
   </style>
 </head>
 
 <body>
+  <header>
+    <h1>Fire Protection Estimator</h1>
+    <p>
+      Estimate sprinkler materials, labour hours, pipe, fittings, heads, valves, hangers, and AI-assisted drawing takeoffs for fire protection work.
+    </p>
 
-<header>
-  <div class="topbar">
-
-    <div class="brand">
-      <h1>FireFlow <span>AI</span></h1>
-      <p>AI Fire Sprinkler Estimating & Drawing Analysis Platform</p>
+    <div class="pill-row" style="justify-content:center;">
+      <span class="pill">Sprinkler Material Lists</span>
+      <span class="pill">AI Drawing Review</span>
+      <span class="pill">Labour Estimating</span>
+      <span class="pill">CPVC / Steel Logic</span>
     </div>
+  </header>
 
-    <div class="badge">
-      Contractor Estimator Beta
-    </div>
-
-  </div>
-</header>
-
-<div class="container">
-
-  <div class="grid">
-
-    <div>
-
+  <main>
+    <section class="grid">
       <div class="card">
+        <h2>Manual Estimate</h2>
 
-        <h2>Upload Drawing PDFs</h2>
+        <label for="jobType">Job Type</label>
+        <select id="jobType">
+          <option value="new">New Install</option>
+          <option value="relocate">Relocate Heads</option>
+          <option value="add">Add New Heads</option>
+          <option value="service">Service Work</option>
+        </select>
 
-        <p class="muted">
-          Upload sprinkler drawings, hydraulic calculations,
-          specs, and material lists for AI visual analysis.
-        </p>
+        <label for="headCount">Number of Sprinkler Heads</label>
+        <input id="headCount" type="number" min="0" value="10" />
 
-        <label class="upload-box" for="pdfFiles">
-          <strong>Upload Drawing PDFs</strong>
-          <span>Multiple PDF files supported</span>
-        </label>
+        <label for="pipeType">Pipe Type</label>
+        <select id="pipeType">
+          <option value="cpvc">BlazeMaster / CPVC</option>
+          <option value="steel-threaded">Steel - Threaded</option>
+          <option value="steel-grooved">Steel - Grooved</option>
+        </select>
 
-        <input
-          id="pdfFiles"
-          type="file"
-          accept="application/pdf"
-          multiple
-        />
+        <label for="pipeSize">Typical Branch Pipe Size</label>
+        <select id="pipeSize">
+          <option value="1">1"</option>
+          <option value="1.25">1-1/4"</option>
+          <option value="1.5">1-1/2"</option>
+          <option value="2">2"</option>
+          <option value="2.5">2-1/2"</option>
+          <option value="3">3"</option>
+          <option value="4">4"</option>
+        </select>
 
-        <ul id="fileList" class="file-list"></ul>
+        <label for="pipeLength">Estimated Pipe Length / Footage</label>
+        <input id="pipeLength" type="number" min="0" value="100" />
 
-        <button onclick="analyzeDrawingPDFs()">
-          Analyze Drawings With AI
-        </button>
+        <label for="directionChanges">Estimated Direction Changes / Turns</label>
+        <input id="directionChanges" type="number" min="0" value="10" />
 
-        <button class="secondary" onclick="clearProject()">
-          Clear Project
-        </button>
+        <label for="labourRate">Labour Hours Per Head</label>
+        <input id="labourRate" type="number" min="0" step="0.25" value="1" />
 
-        <div id="uploadStatus" class="status">
-No drawings uploaded yet.
+        <div class="button-row">
+          <button onclick="calculateManualEstimate()">Calculate Estimate</button>
+          <button class="ghost" onclick="clearManualEstimate()">Clear</button>
         </div>
 
-      </div>
-
-      <div class="card">
-
-        <h2>Quick Labour Estimator</h2>
-
-        <p class="muted">
-          Quick sprinkler head/drop labour allowance tool.
+        <p class="note">
+          Rule of thumb: new drops or relocated heads are currently set to 1 labour hour per head. This can be adjusted.
         </p>
-
-        <input
-          id="heads"
-          type="number"
-          placeholder="Number of sprinkler heads / drops"
-        />
-
-        <button onclick="calculateEstimate()">
-          Calculate Estimate
-        </button>
-
-        <div id="estimateResult" class="status">
-Quick estimate will appear here.
-        </div>
-
       </div>
 
       <div class="card">
+        <h2>AI Drawing Analyzer</h2>
 
-        <h2>Project Notes</h2>
-
-        <p class="muted">
-          Optional project details to help AI estimating.
-        </p>
-
-        <textarea
-          id="aiInput"
-          placeholder="Example: New install. Mostly BlazeMaster CPVC with some steel riser work. Approx 144 labour hours. Material list may be incomplete."
-        ></textarea>
-
-        <button onclick="runAI()">
-          Analyze Notes Only
-        </button>
-
-      </div>
-
-    </div>
-
-    <div>
-
-      <div class="card">
-
-        <h2>Estimate Dashboard</h2>
-
-        <div class="stat-grid">
-
-          <div class="stat">
-            <small>Uploaded PDFs</small>
-            <strong id="pdfCount">0</strong>
+        <div class="upload-area">
+          <div class="file-upload-row">
+            <label for="pdfUpload">Upload sprinkler drawings, hydraulic calculations, or PDFs</label>
+            <input
+              type="file"
+              id="pdfUpload"
+              accept="application/pdf,image/*"
+              multiple
+              onchange="showSelectedFiles()"
+            />
           </div>
 
-          <div class="stat">
-            <small>Pages Scanned</small>
-            <strong id="pageCount">0</strong>
+          <div id="fileList" class="file-list">
+            No files selected yet.
           </div>
 
-          <div class="stat">
-            <small>AI Mode</small>
-            <strong>Visual + Text</strong>
+          <div class="upload-buttons">
+            <button class="secondary" onclick="analyzePDFs()">Analyze Drawings</button>
+            <button class="ghost" onclick="clearUploads()">Clear Files</button>
           </div>
-
         </div>
 
-        <div id="aiResult" class="results">
-AI estimate will appear here.
-        </div>
+        <p class="note">
+          The AI should review all uploaded files together and estimate material from sprinkler heads, pipe sizes, pipe footage, turns, fittings, system notes, riser details, and hydraulic calculation pages.
+        </p>
+      </div>
+    </section>
 
+    <section class="grid">
+      <div class="card">
+        <h2>Manual Estimate Results</h2>
+        <div id="manualResults" class="results">
+          Enter project details and click Calculate Estimate.
+        </div>
       </div>
 
-    </div>
+      <div class="card">
+        <h2>AI Drawing Results</h2>
+        <div id="aiStatus" class="status">Waiting for drawing upload.</div>
+        <div id="aiResults" class="results">
+          Upload drawings and click Analyze Drawings.
+        </div>
+      </div>
+    </section>
 
-  </div>
+    <section class="card">
+      <h2>Estimator Logic Notes</h2>
 
-</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Current Logic</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Labour</td>
+            <td>Defaults to 1 hour per new or relocated head, adjustable above.</td>
+          </tr>
+          <tr>
+            <td>CPVC / Plastic Pipe</td>
+            <td>Includes CPVC fittings and surge restraints.</td>
+          </tr>
+          <tr>
+            <td>Steel Pipe</td>
+            <td>Does not include surge restraints. Uses threaded or grooved fitting logic depending on selected pipe type.</td>
+          </tr>
+          <tr>
+            <td>Fittings</td>
+            <td>Estimated from head count, pipe length, connection type, and number of direction changes.</td>
+          </tr>
+          <tr>
+            <td>AI Takeoff</td>
+            <td>Should not only count the hydraulic design area. It should review full floor plans, riser details, notes, schedules, and calculation pages.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
 
-<script>
-const AI_WORKER_URL =
-"https://fire-estimator-ai.seanmbarbour.workers.dev";
+  <footer>
+    Fire Protection Estimator — working prototype
+  </footer>
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-"https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+  <script>
+    const AI_WORKER_URL = "https://fire-sprinkler-ai.seanb0505.workers.dev";
 
-let extractedPDFText = "";
-let drawingImages = [];
-let uploadedFiles = [];
+    function calculateManualEstimate() {
+      const jobType = document.getElementById("jobType").value;
+      const headCount = Number(document.getElementById("headCount").value || 0);
+      const pipeType = document.getElementById("pipeType").value;
+      const pipeSize = document.getElementById("pipeSize").value;
+      const pipeLength = Number(document.getElementById("pipeLength").value || 0);
+      const directionChanges = Number(document.getElementById("directionChanges").value || 0);
+      const labourRate = Number(document.getElementById("labourRate").value || 0);
 
-const MAX_PAGES_PER_FILE = 5;
-const IMAGE_SCALE = 1.4;
-const IMAGE_QUALITY = 0.8;
+      const pipeLengths = Math.ceil(pipeLength / 21);
+      const hangers = Math.ceil(pipeLength / 10);
+      const labourHours = headCount * labourRate;
 
-document
-.getElementById("pdfFiles")
-.addEventListener("change", function(){
+      let material = [];
 
-  uploadedFiles = Array.from(this.files || []);
+      material.push(["Sprinkler Heads", headCount]);
+      material.push([`${pipeSize}" Pipe Lengths`, pipeLengths]);
+      material.push([`${pipeSize}" Hangers`, hangers]);
 
-  updateFileList();
-});
-
-function updateFileList(){
-
-  const fileList =
-    document.getElementById("fileList");
-
-  const pdfCount =
-    document.getElementById("pdfCount");
-
-  fileList.innerHTML = "";
-
-  pdfCount.textContent = uploadedFiles.length;
-
-  if(!uploadedFiles.length){
-
-    document.getElementById("uploadStatus")
-    .textContent =
-    "No drawings uploaded yet.";
-
-    return;
-  }
-
-  uploadedFiles.forEach(file => {
-
-    const li = document.createElement("li");
-
-    li.textContent = file.name;
-
-    fileList.appendChild(li);
-  });
-
-  document.getElementById("uploadStatus")
-  .textContent =
-  uploadedFiles.length +
-  " PDF file(s) ready for AI analysis.";
-}
-
-function calculateEstimate(){
-
-  const heads =
-    Number(document.getElementById("heads").value || 0);
-
-  const labourHours = heads;
-
-  const elbows = heads * 3;
-
-  const hangers = heads;
-
-  document.getElementById("estimateResult")
-  .textContent =
-
-`Heads / Drops: ${heads}
-
-Estimated Labour:
-- ${labourHours} fitter hours
-
-Basic Material Allowance:
-- ${heads} sprinkler heads
-- ${heads} pipe/nipple allowances
-- ${elbows} 90° elbows
-- ${hangers} hanger assemblies
-
-Note:
-Quick allowance only.
-Use AI drawing analysis for full estimate.`;
-}
-
-async function runAI(){
-
-  const input =
-    document.getElementById("aiInput").value;
-
-  const output =
-    document.getElementById("aiResult");
-
-  if(!input.trim()){
-
-    output.textContent =
-    "Please enter project notes first.";
-
-    return;
-  }
-
-  output.textContent =
-  "Running AI estimate...";
-
-  try{
-
-    const response = await fetch(
-      AI_WORKER_URL,
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          text:input,
-          images:[]
-        })
+      if (jobType === "add" || jobType === "new") {
+        material.push([`${pipeSize}" Mechanical Tees / Branch Connections`, headCount]);
       }
-    );
 
-    const data = await response.json();
+      if (jobType === "relocate") {
+        material.push(["Existing Connection Reused / No Mechanical Tee Assumed", headCount]);
+      }
 
-    output.textContent =
-      data.result ||
-      JSON.stringify(data,null,2);
+      if (pipeType === "cpvc") {
+        material.push([`${pipeSize}" CPVC 90s`, directionChanges]);
+        material.push([`${pipeSize}" CPVC Couplings`, Math.max(0, pipeLengths - 1)]);
+        material.push(["CPVC Surge Restraints", headCount]);
+        material.push(["CPVC Cement / Primer Allowance", "As required"]);
+      }
 
-  }catch(error){
+      if (pipeType === "steel-threaded") {
+        material.push([`${pipeSize}" Threaded 90s`, directionChanges]);
+        material.push([`${pipeSize}" Threaded Couplings`, Math.max(0, pipeLengths - 1)]);
+        material.push(["Surge Restraints", 0]);
+      }
 
-    output.textContent =
-    "AI error: " + error.message;
-  }
-}
+      if (pipeType === "steel-grooved") {
+        material.push([`${pipeSize}" Grooved 90s`, directionChanges]);
+        material.push([`${pipeSize}" Grooved Couplings`, Math.max(0, pipeLengths - 1) + directionChanges]);
+        material.push(["Surge Restraints", 0]);
+      }
 
-async function analyzeDrawingPDFs(){
+      if (jobType === "new" || jobType === "add" || jobType === "relocate") {
+        material.push(["Drop Assemblies", headCount]);
+        material.push(["Escutcheons / Cover Plates", headCount]);
+      }
 
-  const output =
-    document.getElementById("aiResult");
+      let output = "";
+      output += "MANUAL ESTIMATE SUMMARY\n";
+      output += "-----------------------\n";
+      output += `Job Type: ${formatJobType(jobType)}\n`;
+      output += `Pipe Type: ${formatPipeType(pipeType)}\n`;
+      output += `Typical Pipe Size: ${pipeSize}"\n`;
+      output += `Sprinkler Heads: ${headCount}\n`;
+      output += `Estimated Pipe Footage: ${pipeLength} ft\n`;
+      output += `Estimated Labour: ${labourHours.toFixed(2)} hours\n\n`;
 
-  const status =
-    document.getElementById("uploadStatus");
+      output += "MATERIAL BREAKDOWN\n";
+      output += "------------------\n";
 
-  if(!uploadedFiles.length){
+      material.forEach(item => {
+        output += `${item[0]}: ${item[1]}\n`;
+      });
 
-    status.textContent =
-    "Please upload at least one PDF first.";
+      output += "\nNOTES\n";
+      output += "-----\n";
+      output += "- Surge restraints are only included for CPVC/plastic pipe.\n";
+      output += "- Steel pipe does not include surge restraints.\n";
+      output += "- Fittings are estimated from pipe type, pipe footage, and direction changes.\n";
+      output += "- Final material list should be verified against drawings, riser details, notes, and site conditions.\n";
 
-    return;
-  }
+      document.getElementById("manualResults").textContent = output;
+    }
 
-  extractedPDFText = "";
-  drawingImages = [];
+    function clearManualEstimate() {
+      document.getElementById("manualResults").textContent = "Enter project details and click Calculate Estimate.";
+    }
 
-  output.textContent =
-  "Preparing drawings for AI analysis...";
+    function formatJobType(value) {
+      const map = {
+        new: "New Install",
+        relocate: "Relocate Heads",
+        add: "Add New Heads",
+        service: "Service Work"
+      };
 
-  status.textContent =
-  "Converting PDF pages into drawing images...";
+      return map[value] || value;
+    }
 
-  try{
+    function formatPipeType(value) {
+      const map = {
+        cpvc: "BlazeMaster / CPVC",
+        "steel-threaded": "Steel - Threaded",
+        "steel-grooved": "Steel - Grooved"
+      };
 
-    let totalPagesScanned = 0;
+      return map[value] || value;
+    }
 
-    for(const file of uploadedFiles){
+    function showSelectedFiles() {
+      const input = document.getElementById("pdfUpload");
+      const fileList = document.getElementById("fileList");
 
-      const arrayBuffer =
-        await file.arrayBuffer();
+      if (!input.files || input.files.length === 0) {
+        fileList.textContent = "No files selected yet.";
+        return;
+      }
 
-      const pdf =
-        await pdfjsLib
-        .getDocument({data:arrayBuffer})
-        .promise;
+      const names = Array.from(input.files).map((file, index) => {
+        return `${index + 1}. ${file.name}`;
+      });
 
-      const pagesToProcess =
-        Math.min(pdf.numPages, MAX_PAGES_PER_FILE);
+      fileList.textContent = names.join("\n");
+    }
 
-      extractedPDFText +=
-      "\nFILE: " + file.name + "\n";
+    function clearUploads() {
+      const input = document.getElementById("pdfUpload");
+      input.value = "";
 
-      for(let pageNumber = 1;
-          pageNumber <= pagesToProcess;
-          pageNumber++){
+      document.getElementById("fileList").textContent = "No files selected yet.";
+      document.getElementById("aiStatus").textContent = "Waiting for drawing upload.";
+      document.getElementById("aiResults").textContent = "Upload drawings and click Analyze Drawings.";
+    }
 
-        status.textContent =
-        "Processing " +
-        file.name +
-        " | Page " +
-        pageNumber +
-        " of " +
-        pagesToProcess;
+    async function analyzePDFs() {
+      const input = document.getElementById("pdfUpload");
+      const status = document.getElementById("aiStatus");
+      const results = document.getElementById("aiResults");
 
-        const page =
-          await pdf.getPage(pageNumber);
+      if (!input.files || input.files.length === 0) {
+        status.textContent = "Please select at least one PDF or image file.";
+        results.textContent = "No files selected.";
+        return;
+      }
 
-        const textContent =
-          await page.getTextContent();
+      status.textContent = "Analyzing uploaded drawings...";
+      results.textContent = "Reading files and sending them to the AI analyzer...";
 
-        const pageText =
-          textContent.items
-          .map(item => item.str)
-          .join(" ");
+      try {
+        const filesPayload = [];
 
-        extractedPDFText +=
-          "\nPAGE " +
-          pageNumber +
-          ":\n" +
-          pageText +
-          "\n";
+        for (const file of input.files) {
+          const base64 = await fileToBase64(file);
 
-        const viewport =
-          page.getViewport({
-            scale:IMAGE_SCALE
+          filesPayload.push({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            base64: base64
           });
+        }
 
-        const canvas =
-          document.createElement("canvas");
-
-        const context =
-          canvas.getContext("2d");
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        await page.render({
-          canvasContext:context,
-          viewport:viewport
-        }).promise;
-
-        const imageDataUrl =
-          canvas.toDataURL(
-            "image/jpeg",
-            IMAGE_QUALITY
-          );
-
-        drawingImages.push({
-          fileName:file.name,
-          pageNumber:pageNumber,
-          image:imageDataUrl
+        const response = await fetch(AI_WORKER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            projectType: "fire sprinkler drawing material takeoff",
+            instructions: buildAnalyzerInstructions(),
+            files: filesPayload
+          })
         });
 
-        totalPagesScanned++;
+        const data = await response.json();
 
-        document.getElementById("pageCount")
-        .textContent =
-        totalPagesScanned;
+        if (!response.ok) {
+          status.textContent = "AI analyzer returned an error.";
+          results.textContent = JSON.stringify(data, null, 2);
+          return;
+        }
+
+        const aiText =
+          data.result ||
+          data.response ||
+          data.text ||
+          data.analysis ||
+          data.message ||
+          JSON.stringify(data, null, 2);
+
+        status.textContent = "Analysis complete.";
+        results.textContent = aiText;
+      } catch (error) {
+        status.textContent = "Something went wrong while analyzing the files.";
+        results.textContent = String(error);
       }
     }
 
-    status.textContent =
-    "Sending drawings to FireFlow AI...";
+    function buildAnalyzerInstructions() {
+      return `
+You are a fire sprinkler estimating assistant.
 
-    output.textContent =
-    "AI is visually reviewing the sprinkler drawings...";
+Analyze every uploaded drawing, PDF page, image, calculation sheet, schedule, notes page, riser detail, and floor plan together.
 
-    const projectNotes =
-      document.getElementById("aiInput").value || "";
+Important:
+- Do not only count sprinklers in the hydraulic remote design area.
+- Count all sprinkler heads shown on the full project drawings.
+- Separate head types where possible: concealed, pendant, upright, sidewall, dry, residential, quick response, etc.
+- Estimate pipe and fittings from pipe size, pipe length, branch layout, mains, risers, and direction changes.
+- Identify whether pipe is CPVC/plastic, threaded steel, grooved steel, galvanized, or another material.
+- Surge restraints are only used on plastic pipe / CPVC. Do not include surge restraints for steel pipe.
+- Include hangers, couplings, tees, 90s, 45s, reducers, bushings, nipples, valves, drains, FDC materials, test and drain, check valves, flow switches, gauges, and riser trim where visible or reasonably required.
+- Flag anything uncertain instead of pretending it is exact.
+- If drawings are missing scale or pages, say so.
+- Give a contractor-style material list with quantities by size and connection type.
+- Also provide estimated labour hours.
+- For new drops or relocated heads, default to roughly 1 labour hour per head unless the drawing complexity suggests otherwise.
 
-    const response = await fetch(
-      AI_WORKER_URL,
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          text:
-            "PROJECT NOTES:\n" +
-            projectNotes +
-            "\n\nPDF TEXT:\n" +
-            extractedPDFText,
-          images:drawingImages
-        })
-      }
-    );
+Return the answer in this format:
 
-    const data = await response.json();
+PROJECT SUMMARY
+- Building/project type
+- System type
+- Pipe material
+- Drawing limitations
 
-    output.textContent =
-      data.result ||
-      JSON.stringify(data,null,2);
+SPRINKLER HEAD TAKEOFF
+- Quantity by head type
+- Notes about where they were counted from
 
-    status.textContent =
-    "Analysis complete.";
+PIPE TAKEOFF
+- Size
+- Material
+- Estimated footage
+- Connection type
 
-  }catch(error){
+FITTINGS AND MATERIAL
+- Quantity
+- Size
+- Description
+- Material/connection type
+- Confidence level
 
-    output.textContent =
-    "Analysis error: " + error.message;
+RISER / VALVE / DRAIN / FDC MATERIAL
+- Detailed list
 
-    status.textContent =
-    "Error during analysis.";
-  }
-}
+LABOUR ESTIMATE
+- Estimated hours
+- Crew assumptions
+- Notes
 
-function clearProject(){
+UNCERTAINTIES / ITEMS TO VERIFY
+- List anything that should be checked manually
+`;
+    }
 
-  uploadedFiles = [];
-  extractedPDFText = "";
-  drawingImages = [];
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
 
-  document.getElementById("pdfFiles").value = "";
+        reader.onload = () => {
+          const result = reader.result;
+          const base64 = String(result).split(",")[1];
+          resolve(base64);
+        };
 
-  document.getElementById("fileList").innerHTML = "";
-
-  document.getElementById("pdfCount").textContent = "0";
-
-  document.getElementById("pageCount").textContent = "0";
-
-  document.getElementById("uploadStatus")
-  .textContent =
-  "No drawings uploaded yet.";
-
-  document.getElementById("aiResult")
-  .textContent =
-  "AI estimate will appear here.";
-}
-</script>
-
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+  </script>
 </body>
 </html>
