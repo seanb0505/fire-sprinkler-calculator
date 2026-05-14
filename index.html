@@ -3,671 +3,1081 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>FireFlow AI - Fire Sprinkler Estimator</title>
+  <title>FireFlow AI | Fire Sprinkler Estimator</title>
 
   <style>
     :root {
       --bg: #07111f;
       --panel: #0d1b2e;
-      --panel2: #10243d;
-      --border: rgba(255, 255, 255, 0.12);
+      --panel-2: #101f34;
+      --panel-3: #14253d;
       --text: #f8fafc;
-      --muted: #94a3b8;
-      --brand: #ef4444;
-      --brand2: #f97316;
-      --good: #22c55e;
-      --warn: #facc15;
-      --bad: #ef4444;
-      --card: rgba(15, 23, 42, 0.94);
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --muted: #9fb2c7;
+      --soft: #d8e2ee;
+      --orange: #ff6a1a;
+      --orange-2: #ff8a3d;
+      --blue: #38bdf8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #facc15;
+      --border: rgba(255,255,255,0.1);
+      --shadow: 0 24px 80px rgba(0,0,0,0.35);
+      --radius: 22px;
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Inter, Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(239, 68, 68, 0.18), transparent 34%),
-        radial-gradient(circle at top right, rgba(249, 115, 22, 0.12), transparent 30%),
-        linear-gradient(180deg, #06101d 0%, #0b1220 100%);
+        radial-gradient(circle at top left, rgba(255,106,26,0.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(56,189,248,0.12), transparent 32%),
+        linear-gradient(180deg, #06101d 0%, #081524 48%, #050b14 100%);
       color: var(--text);
       min-height: 100vh;
     }
 
-    header {
-      padding: 34px 20px 20px;
-      text-align: center;
+    a {
+      color: inherit;
     }
 
-    .logo {
-      display: inline-flex;
+    .app-shell {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 26px 20px;
+      background: rgba(5, 14, 25, 0.88);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      color: #fecaca;
-      font-weight: 700;
-      margin-bottom: 18px;
+      gap: 14px;
+      margin-bottom: 28px;
     }
 
-    .flame {
-      width: 26px;
-      height: 26px;
+    .logo-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 62% 24%, #fff7ed 0 9%, transparent 10%),
+        linear-gradient(145deg, #ff3d00, #ff8a1f 48%, #ffc247);
+      box-shadow: 0 14px 36px rgba(255,106,26,0.35);
+      position: relative;
       display: grid;
       place-items: center;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      color: white;
+      font-weight: 900;
+      letter-spacing: -2px;
+      color: #0b1220;
     }
 
-    h1 {
-      font-size: clamp(34px, 5vw, 64px);
+    .logo-mark::after {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 31px;
+      border-radius: 80% 30% 70% 40%;
+      background: rgba(7,17,31,0.88);
+      transform: rotate(38deg);
+      bottom: 8px;
+      right: 11px;
+    }
+
+    .brand h1 {
       margin: 0;
-      line-height: 1.02;
-      letter-spacing: -1.6px;
+      font-size: 25px;
+      line-height: 1;
+      letter-spacing: -0.8px;
     }
 
-    .subtitle {
-      max-width: 850px;
-      margin: 16px auto 0;
+    .brand span {
+      display: block;
       color: var(--muted);
-      font-size: 18px;
-      line-height: 1.55;
+      font-size: 12px;
+      margin-top: 5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 8px;
+      margin: 24px 0;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 13px;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+    }
+
+    .nav-link.active,
+    .nav-link:hover {
+      color: white;
+      background: rgba(255,255,255,0.07);
+      border-color: var(--border);
+    }
+
+    .sidebar-card {
+      background: linear-gradient(180deg, rgba(255,106,26,0.14), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,106,26,0.25);
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 24px;
+    }
+
+    .sidebar-card strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
     }
 
     main {
-      width: min(1240px, calc(100% - 32px));
-      margin: 24px auto 60px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-
-    @media (min-width: 1040px) {
-      main {
-        grid-template-columns: 420px 1fr;
-        align-items: start;
-      }
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
+      padding: 28px;
       overflow: hidden;
     }
 
-    .card-header {
-      padding: 22px 22px 14px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 24px;
     }
 
-    .card-header h2 {
+    .hero {
+      background:
+        linear-gradient(135deg, rgba(255,106,26,0.17), rgba(56,189,248,0.08)),
+        rgba(13,27,46,0.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 270px;
+      height: 270px;
+      border-radius: 999px;
+      background: rgba(255,106,26,0.12);
+      right: -90px;
+      top: -100px;
+      filter: blur(2px);
+    }
+
+    .hero h2 {
       margin: 0;
-      font-size: 22px;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.02;
+      letter-spacing: -1.8px;
+      max-width: 780px;
+      position: relative;
+      z-index: 1;
     }
 
-    .card-header p {
-      margin: 8px 0 0;
+    .hero h2 span {
+      color: var(--orange-2);
+    }
+
+    .hero p {
+      margin: 16px 0 0;
+      max-width: 840px;
+      color: var(--soft);
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .status-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      color: var(--soft);
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--muted);
+    }
+
+    .dot.green { background: var(--green); }
+    .dot.orange { background: var(--orange); }
+    .dot.red { background: var(--red); }
+    .dot.blue { background: var(--blue); }
+
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .dashboard-grid {
+      grid-template-columns: 1.08fr 0.92fr;
+      margin-top: 20px;
+    }
+
+    .panel {
+      background: rgba(13, 27, 46, 0.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 14px 50px rgba(0,0,0,0.22);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: rgba(255,255,255,0.025);
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+    }
+
+    .panel-header span {
       color: var(--muted);
-      line-height: 1.4;
+      font-size: 13px;
     }
 
-    .card-body {
-      padding: 22px;
+    .panel-body {
+      padding: 20px;
     }
 
     label {
       display: block;
+      font-size: 13px;
+      color: var(--soft);
       font-weight: 700;
-      margin: 16px 0 8px;
-      color: #e2e8f0;
+      margin-bottom: 8px;
     }
 
     input,
-    textarea,
-    select {
+    select,
+    textarea {
       width: 100%;
       border: 1px solid var(--border);
-      background: #07111f;
+      background: rgba(255,255,255,0.065);
       color: var(--text);
       border-radius: 14px;
       padding: 13px 14px;
-      font-size: 15px;
       outline: none;
+      font-size: 14px;
     }
 
     input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: rgba(249, 115, 22, 0.8);
-      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
+    select:focus,
+    textarea:focus {
+      border-color: rgba(255,106,26,0.75);
+      box-shadow: 0 0 0 4px rgba(255,106,26,0.12);
+    }
+
+    select option {
+      background: #0d1b2e;
+      color: white;
     }
 
     textarea {
-      min-height: 125px;
+      min-height: 130px;
       resize: vertical;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
-    .row {
+    .form-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 16px;
     }
 
-    @media (min-width: 560px) {
-      .row.two {
-        grid-template-columns: 1fr 1fr;
-      }
+    .field {
+      margin-bottom: 16px;
     }
 
     .dropzone {
-      border: 2px dashed rgba(255, 255, 255, 0.22);
+      border: 1px dashed rgba(255,255,255,0.28);
+      background:
+        linear-gradient(135deg, rgba(255,106,26,0.09), rgba(56,189,248,0.06));
       border-radius: 20px;
-      padding: 22px;
-      background: rgba(255, 255, 255, 0.035);
+      padding: 24px;
       text-align: center;
-      transition: 0.2s ease;
-      cursor: pointer;
-    }
-
-    .dropzone.dragover {
-      border-color: var(--brand2);
-      background: rgba(249, 115, 22, 0.10);
-    }
-
-    .dropzone strong {
-      display: block;
-      font-size: 17px;
-      margin-bottom: 6px;
-    }
-
-    .dropzone span {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    #fileInput {
-      display: none;
-    }
-
-    .important-note {
-      margin-top: 12px;
-      color: #fed7aa;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .file-list {
-      margin-top: 14px;
-      display: grid;
-      gap: 9px;
-    }
-
-    .file-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: #e2e8f0;
-      font-size: 14px;
-    }
-
-    .file-item small {
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 14px;
-      padding: 13px 17px;
-      color: white;
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 15px;
       transition: 0.18s ease;
     }
 
-    button.primary {
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      flex: 1;
-      min-width: 190px;
-    }
-
-    button.secondary {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border);
-    }
-
-    button:hover {
+    .dropzone.dragover {
+      border-color: var(--orange);
+      background: rgba(255,106,26,0.14);
       transform: translateY(-1px);
-      filter: brightness(1.05);
     }
 
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .status {
-      margin-top: 16px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.045);
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .status.good {
-      color: #bbf7d0;
-      border-color: rgba(34, 197, 94, 0.35);
-      background: rgba(34, 197, 94, 0.08);
-    }
-
-    .status.warn {
-      color: #fef3c7;
-      border-color: rgba(250, 204, 21, 0.35);
-      background: rgba(250, 204, 21, 0.08);
-    }
-
-    .status.bad {
-      color: #fecaca;
-      border-color: rgba(239, 68, 68, 0.35);
-      background: rgba(239, 68, 68, 0.08);
-    }
-
-    .results {
-      min-height: 680px;
-    }
-
-    .results-toolbar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .results-output {
-      padding: 24px;
-      white-space: pre-wrap;
-      line-height: 1.62;
-      color: #e5e7eb;
-      font-size: 15px;
-      overflow-x: auto;
-    }
-
-    .results-output h1,
-    .results-output h2,
-    .results-output h3 {
-      color: white;
-    }
-
-    .placeholder {
-      color: var(--muted);
-    }
-
-    .pill-grid {
+    .dropzone-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 12px;
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 18px;
+      place-items: center;
+      border-radius: 18px;
+      background: rgba(255,106,26,0.17);
+      color: var(--orange-2);
+      font-size: 26px;
     }
 
-    @media (min-width: 560px) {
-      .pill-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .pill {
-      padding: 12px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-    }
-
-    .pill strong {
-      display: block;
+    .dropzone h4 {
+      margin: 0 0 7px;
       font-size: 18px;
     }
 
-    .pill span {
-      display: block;
+    .dropzone p {
+      margin: 0 0 14px;
       color: var(--muted);
-      font-size: 13px;
-      margin-top: 2px;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
-    .debug {
-      margin-top: 14px;
+    .file-input {
       display: none;
-      color: var(--muted);
-      font-size: 13px;
-      white-space: pre-wrap;
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
-      max-height: 260px;
-      overflow: auto;
     }
 
-    .debug.show {
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    button,
+    .button {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      color: white;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      transition: 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    button:hover,
+    .button:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.15);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #ff5b16, #ff8a1f);
+      color: #111827;
+      border-color: rgba(255,255,255,0.1);
+      box-shadow: 0 14px 28px rgba(255,106,26,0.22);
+    }
+
+    .primary:hover {
+      background: linear-gradient(135deg, #ff6a1a, #ffa044);
+    }
+
+    .danger {
+      background: rgba(239,68,68,0.14);
+      color: #fecaca;
+      border-color: rgba(239,68,68,0.3);
+    }
+
+    .secondary {
+      color: var(--soft);
+    }
+
+    .file-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .file-chip {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      background: rgba(255,255,255,0.065);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 13px;
+      color: var(--soft);
+      font-size: 13px;
+    }
+
+    .file-chip strong {
+      color: white;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .file-chip small {
+      color: var(--muted);
+    }
+
+    .metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin: 20px 0;
+    }
+
+    .metric-card {
+      background: rgba(13,27,46,0.78);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.18);
+    }
+
+    .metric-card span {
       display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .metric-card strong {
+      font-size: 25px;
+      letter-spacing: -0.7px;
+    }
+
+    .metric-card small {
+      display: block;
+      color: var(--muted);
+      margin-top: 7px;
+      line-height: 1.4;
+    }
+
+    .results-wrap {
+      margin-top: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.025);
+    }
+
+    .tab-btn {
+      padding: 10px 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tab-btn.active {
+      background: rgba(255,106,26,0.18);
+      color: white;
+      border-color: rgba(255,106,26,0.35);
+    }
+
+    .result-content {
+      padding: 20px;
+    }
+
+    .placeholder {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+    }
+
+    .placeholder strong {
+      display: block;
+      color: white;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .markdown {
+      color: var(--soft);
+      line-height: 1.6;
+    }
+
+    .markdown h1,
+    .markdown h2,
+    .markdown h3 {
+      color: white;
+      line-height: 1.2;
+      letter-spacing: -0.6px;
+      margin: 22px 0 12px;
+    }
+
+    .markdown h1 {
+      font-size: 30px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .markdown h2 {
+      font-size: 23px;
+      background: rgba(255,106,26,0.12);
+      border: 1px solid rgba(255,106,26,0.22);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+
+    .markdown h3 {
+      font-size: 18px;
+      color: #fff7ed;
+    }
+
+    .markdown p {
+      margin: 10px 0;
+    }
+
+    .markdown ul {
+      padding-left: 22px;
+    }
+
+    .markdown li {
+      margin: 6px 0;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin: 14px 0 22px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    th {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 12px;
+      text-align: left;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      color: var(--soft);
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tr:hover td {
+      background: rgba(255,255,255,0.035);
+    }
+
+    .raw-box {
+      white-space: pre-wrap;
+      background: rgba(0,0,0,0.24);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      color: var(--soft);
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .notice {
+      border: 1px solid rgba(250,204,21,0.28);
+      background: rgba(250,204,21,0.09);
+      color: #fef3c7;
+      padding: 13px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+
+    .loading {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      color: var(--soft);
+      margin-top: 16px;
+    }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(255,255,255,0.18);
+      border-top-color: var(--orange);
+      border-radius: 999px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 34px 20px 18px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 1050px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+        display: block;
+      }
+
+      .nav-group {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .dashboard-grid,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      main {
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .panel-body {
+        padding: 18px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .button-row button,
+      .button-row .button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="logo">
-      <div class="flame">🔥</div>
-      FireFlow AI
-    </div>
-
-    <h1>Fire Sprinkler Estimator</h1>
-
-    <p class="subtitle">
-      Upload sprinkler drawings, hydraulic calculations, PDFs, images, or notes.
-      FireFlow AI creates a cleaner contractor-style takeoff with heads, pipe, fittings, riser material, FDC material, and labour hours.
-    </p>
-  </header>
-
-  <main>
-    <section class="card">
-      <div class="card-header">
-        <h2>AI Drawing Analyzer</h2>
-        <p>Upload the full drawing package. The AI will break material down by size and labour by task.</p>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-mark">F</div>
+        <div>
+          <h1>FireFlow</h1>
+          <span>AI Estimator</span>
+        </div>
       </div>
 
-      <div class="card-body">
-        <label for="workerUrl">Cloudflare Worker URL</label>
-        <input id="workerUrl" placeholder="https://fire-estimator-ai.seanmbarbour.workers.dev" />
+      <nav class="nav-group">
+        <a class="nav-link active" href="#dashboard">🔥 Dashboard</a>
+        <a class="nav-link" href="#upload">📄 Drawing Upload</a>
+        <a class="nav-link" href="#results">📊 AI Takeoff</a>
+        <a class="nav-link" href="#settings">⚙️ Settings</a>
+      </nav>
 
-        <div class="actions">
-          <button class="secondary" id="saveWorkerBtn" type="button">Save Worker URL</button>
-          <button class="secondary" id="testWorkerBtn" type="button">Test Worker</button>
+      <div class="sidebar-card">
+        <strong>Contractor takeoff mode</strong>
+        <p>
+          Upload sprinkler drawings, hydraulic calculations, riser details, specs, and notes.
+          FireFlow will return a material and labour estimate.
+        </p>
+      </div>
+
+      <div class="sidebar-card">
+        <strong>Accuracy reminder</strong>
+        <p>
+          AI takeoffs are for budgeting and review. Final ordering should still be verified from approved drawings.
+        </p>
+      </div>
+    </aside>
+
+    <main id="dashboard">
+      <section class="hero">
+        <h2>Fire sprinkler estimating, <span>built for contractors.</span></h2>
+        <p>
+          Upload drawings and project files to generate a cleaner sprinkler material breakdown,
+          riser allowance, head count, pipe/fitting summary, and labour estimate.
+        </p>
+
+        <div class="status-pills">
+          <div class="pill"><span class="dot green"></span><span id="workerStatus">Worker not tested yet</span></div>
+          <div class="pill"><span class="dot blue"></span><span id="fileStatus">0 files loaded</span></div>
+          <div class="pill"><span class="dot orange"></span><span id="aiStatus">AI ready</span></div>
+        </div>
+      </section>
+
+      <section class="grid metrics">
+        <div class="metric-card">
+          <span>Files Selected</span>
+          <strong id="metricFiles">0</strong>
+          <small>PDFs, images, calcs, and specs</small>
         </div>
 
-        <label>Upload Drawings / Files</label>
-
-        <div class="dropzone" id="dropzone">
-          <strong>Click here or drag files in</strong>
-          <span>
-            Select multiple PDFs, images, hydraulic calculations, notes, or material lists.
-          </span>
-
-          <input
-            id="fileInput"
-            type="file"
-            multiple
-            accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.doc,.docx,.xls,.xlsx,.rtf,.md,image/*,application/pdf"
-          />
+        <div class="metric-card">
+          <span>Project Type</span>
+          <strong id="metricProject">New</strong>
+          <small>Used to guide labour and material logic</small>
         </div>
 
-        <div class="important-note">
-          Selected files will show below before sending. If only one file shows here, only one file will be sent.
+        <div class="metric-card">
+          <span>Labour Rate</span>
+          <strong id="metricRate">$115</strong>
+          <small>Editable contractor rate</small>
         </div>
 
-        <div class="file-list" id="fileList"></div>
+        <div class="metric-card">
+          <span>Takeoff Status</span>
+          <strong id="metricStatus">Ready</strong>
+          <small>Run analysis when files are loaded</small>
+        </div>
+      </section>
 
-        <div class="row two">
+      <section class="grid dashboard-grid">
+        <div class="panel" id="upload">
+          <div class="panel-header">
+            <div>
+              <h3>Drawing Upload</h3>
+              <span>Add sprinkler drawings, hydraulic calculations, notes, and images</span>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="notice">
+              For best results, upload the sprinkler floor plans, riser detail, hydraulic calculations, and any notes/specs together.
+              If the file count says 2 files loaded, both files will be sent to the Worker.
+            </div>
+
+            <div class="dropzone" id="dropzone">
+              <div class="dropzone-icon">📎</div>
+              <h4>Drop files here or choose files</h4>
+              <p>PDF, PNG, JPG, TXT, DOCX, or calculation files. Multiple files are supported.</p>
+
+              <label class="button primary" for="fileInput">Choose Files</label>
+              <input
+                id="fileInput"
+                class="file-input"
+                type="file"
+                multiple
+                accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xlsx"
+              />
+            </div>
+
+            <div id="fileList" class="file-list"></div>
+
+            <div class="button-row">
+              <button class="danger" id="clearFilesBtn" type="button">Clear Files</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" id="settings">
+          <div class="panel-header">
+            <div>
+              <h3>Estimate Settings</h3>
+              <span>Connect your Worker and set estimating assumptions</span>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="field">
+              <label for="workerUrl">Cloudflare Worker URL</label>
+              <input
+                id="workerUrl"
+                type="url"
+                placeholder="https://fire-estimator-ai.yourname.workers.dev"
+              />
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="projectType">Project Type</label>
+                <select id="projectType">
+                  <option value="New install">New install</option>
+                  <option value="Tenant improvement">Tenant improvement</option>
+                  <option value="Retrofit">Retrofit</option>
+                  <option value="Service / repair">Service / repair</option>
+                  <option value="Unknown">Unknown</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="labourRate">Labour Rate / Hour</label>
+                <input id="labourRate" type="number" min="0" step="1" value="115" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="instructions">Project Notes / Instructions</label>
+              <textarea id="instructions" placeholder="Example: Count all heads, separate steel and CPVC, include riser/FDC material, estimate fittings by pipe size, do not include surge restraints for steel pipe."></textarea>
+            </div>
+
+            <div class="button-row">
+              <button class="primary" id="analyzeBtn" type="button">🔥 Analyze Drawings</button>
+              <button class="secondary" id="testWorkerBtn" type="button">Test Worker</button>
+            </div>
+
+            <div class="loading" id="loading">
+              <div class="spinner"></div>
+              <span>Analyzing drawings and formatting takeoff...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel results-wrap" id="results">
+        <div class="panel-header">
           <div>
-            <label for="projectType">Project Type</label>
-            <select id="projectType">
-              <option value="auto">Let AI determine</option>
-              <option value="new install">New install</option>
-              <option value="retrofit">Retrofit</option>
-              <option value="tenant improvement">Tenant improvement</option>
-              <option value="service">Service</option>
-            </select>
+            <h3>AI Drawing Takeoff</h3>
+            <span>Material, riser, fittings, heads, labour, and notes</span>
           </div>
 
-          <div>
-            <label for="labourRate">Labour Rate / Hour</label>
-            <input id="labourRate" type="number" value="115" min="0" step="1" />
+          <div class="button-row" style="margin:0;">
+            <button class="secondary" id="copyBtn" type="button">Copy Results</button>
+            <button class="secondary" id="downloadBtn" type="button">Download TXT</button>
           </div>
         </div>
 
-        <label for="notes">Project Notes / Instructions</label>
-        <textarea id="notes" placeholder="Example: New install. Count all heads on all sheets, not just hydraulic design area. Break down pipe and fittings by size. Include riser, FDC, hangers, drains, valves, and labour by task."></textarea>
-
-        <div class="actions">
-          <button class="primary" id="analyzeBtn" type="button">Analyze Drawings</button>
-          <button class="secondary" id="clearBtn" type="button">Clear</button>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="formatted" type="button">Formatted View</button>
+          <button class="tab-btn" data-tab="raw" type="button">Raw AI Text</button>
         </div>
 
-        <div id="status" class="status">
-          Ready. Select files, then click Analyze Drawings.
-        </div>
-
-        <div class="debug" id="debugBox"></div>
-      </div>
-    </section>
-
-    <section class="card results">
-      <div class="card-header">
-        <h2>Contractor Takeoff Results</h2>
-        <p>Cleaner output for material ordering, risers, FDC, head counts, and labour hours.</p>
-
-        <div class="pill-grid">
-          <div class="pill">
-            <strong id="fileCountPill">0</strong>
-            <span>Files selected</span>
+        <div class="result-content">
+          <div id="formattedView" class="markdown">
+            <div class="placeholder">
+              <strong>No takeoff generated yet</strong>
+              Upload drawings, confirm settings, then click Analyze Drawings.
+            </div>
           </div>
 
-          <div class="pill">
-            <strong id="workerPill">Not set</strong>
-            <span>Worker status</span>
-          </div>
-
-          <div class="pill">
-            <strong id="aiPill">Idle</strong>
-            <span>AI status</span>
+          <div id="rawView" style="display:none;">
+            <div class="raw-box" id="rawOutput">No raw output yet.</div>
           </div>
         </div>
+      </section>
 
-        <div class="results-toolbar">
-          <button class="secondary" id="copyResultsBtn" type="button">Copy Results</button>
-          <button class="secondary" id="downloadResultsBtn" type="button">Download TXT</button>
-        </div>
-      </div>
-
-      <div id="resultsOutput" class="results-output placeholder">
-        Your contractor-style material takeoff and labour estimate will appear here.
-      </div>
-    </section>
-  </main>
+      <footer>
+        FireFlow AI Contractor Takeoff Dashboard · Built for sprinkler estimating workflows
+      </footer>
+    </main>
+  </div>
 
   <script>
-    const workerUrlInput = document.getElementById("workerUrl");
-    const saveWorkerBtn = document.getElementById("saveWorkerBtn");
-    const testWorkerBtn = document.getElementById("testWorkerBtn");
-
-    const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
+    const dropzone = document.getElementById("dropzone");
     const fileList = document.getElementById("fileList");
 
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const copyResultsBtn = document.getElementById("copyResultsBtn");
-    const downloadResultsBtn = document.getElementById("downloadResultsBtn");
-
-    const statusBox = document.getElementById("status");
-    const debugBox = document.getElementById("debugBox");
-    const resultsOutput = document.getElementById("resultsOutput");
-
-    const fileCountPill = document.getElementById("fileCountPill");
-    const workerPill = document.getElementById("workerPill");
-    const aiPill = document.getElementById("aiPill");
-
+    const workerUrlInput = document.getElementById("workerUrl");
     const projectTypeInput = document.getElementById("projectType");
     const labourRateInput = document.getElementById("labourRate");
-    const notesInput = document.getElementById("notes");
+    const instructionsInput = document.getElementById("instructions");
+
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const testWorkerBtn = document.getElementById("testWorkerBtn");
+    const clearFilesBtn = document.getElementById("clearFilesBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    const loading = document.getElementById("loading");
+    const formattedView = document.getElementById("formattedView");
+    const rawView = document.getElementById("rawView");
+    const rawOutput = document.getElementById("rawOutput");
+
+    const workerStatus = document.getElementById("workerStatus");
+    const fileStatus = document.getElementById("fileStatus");
+    const aiStatus = document.getElementById("aiStatus");
+
+    const metricFiles = document.getElementById("metricFiles");
+    const metricProject = document.getElementById("metricProject");
+    const metricRate = document.getElementById("metricRate");
+    const metricStatus = document.getElementById("metricStatus");
 
     let selectedFiles = [];
+    let latestResultText = "";
 
     const savedWorkerUrl = localStorage.getItem("fireflowWorkerUrl");
-
     if (savedWorkerUrl) {
       workerUrlInput.value = savedWorkerUrl;
-      workerPill.textContent = "Saved";
-    } else {
-      workerUrlInput.value = "https://fire-estimator-ai.seanmbarbour.workers.dev";
     }
 
-    function setStatus(message, type = "") {
-      statusBox.className = "status" + (type ? " " + type : "");
-      statusBox.textContent = message;
-    }
+    const defaultInstructions = `Act as a professional fire sprinkler estimator.
 
-    function setDebug(data) {
-      if (!data) {
-        debugBox.classList.remove("show");
-        debugBox.textContent = "";
-        return;
-      }
+Return a clean contractor takeoff with:
+1. Drawing review summary
+2. System type and pipe material
+3. Sprinkler head count by floor/area/type
+4. Pipe by size, material, schedule, connection, footage, and order lengths
+5. Fittings separated by threaded, grooved, CPVC/plastic, mechanical tees/outlets
+6. Riser room material
+7. FDC/exterior material
+8. Hangers/supports
+9. Labour breakdown by task
+10. Accuracy review and missing information
 
-      debugBox.classList.add("show");
-      debugBox.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
-    }
+Important estimating rules:
+- Count all sprinkler heads on all plans, not only the hydraulic calculation design area.
+- Separate confirmed drawing quantities from estimated quantities.
+- Do not use surge restraints on steel pipe.
+- Surge restraints are only for plastic/CPVC pipe.
+- Threaded 1 inch drops should not receive grooved couplings.
+- Break fittings down by size wherever possible.
+- If exact fittings cannot be confirmed from drawings, estimate based on pipe runs, branch turns, risers, drops, and standard NFPA 13 sprinkler installation practice.
+- Make the output easy to read in markdown tables.`;
+
+    instructionsInput.value = defaultInstructions;
 
     function formatBytes(bytes) {
       if (!bytes && bytes !== 0) return "";
-
       const units = ["B", "KB", "MB", "GB"];
-      let value = bytes;
+      let size = bytes;
       let unitIndex = 0;
 
-      while (value >= 1024 && unitIndex < units.length - 1) {
-        value = value / 1024;
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size = size / 1024;
         unitIndex++;
       }
 
-      return `${value.toFixed(value >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+      return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
     }
 
-    function dedupeFiles(files) {
-      const map = new Map();
-
-      for (const file of files) {
-        const key = `${file.name}_${file.size}_${file.lastModified}`;
-        map.set(key, file);
-      }
-
-      return Array.from(map.values());
+    function updateMetrics() {
+      const count = selectedFiles.length;
+      fileStatus.textContent = `${count} file${count === 1 ? "" : "s"} loaded`;
+      metricFiles.textContent = count;
+      metricProject.textContent = projectTypeInput.value.replace("Tenant improvement", "TI");
+      metricRate.textContent = `$${labourRateInput.value || 0}`;
     }
 
-    function addFiles(files) {
-      const incoming = Array.from(files || []).filter(file => file && file.name);
-
-      if (!incoming.length) return;
-
-      selectedFiles = dedupeFiles([...selectedFiles, ...incoming]);
-
-      renderFiles();
-
-      setStatus(`${selectedFiles.length} file(s) selected. Ready to analyze.`, "good");
-    }
-
-    function renderFiles() {
+    function renderFileList() {
       fileList.innerHTML = "";
-      fileCountPill.textContent = selectedFiles.length;
+
+      if (!selectedFiles.length) {
+        updateMetrics();
+        return;
+      }
 
       selectedFiles.forEach((file, index) => {
-        const row = document.createElement("div");
-        row.className = "file-item";
-
-        const name = document.createElement("div");
-        name.textContent = `${index + 1}. ${file.name}`;
-
-        const size = document.createElement("small");
-        size.textContent = formatBytes(file.size);
-
-        row.appendChild(name);
-        row.appendChild(size);
-        fileList.appendChild(row);
+        const chip = document.createElement("div");
+        chip.className = "file-chip";
+        chip.innerHTML = `
+          <div>
+            <strong>${index + 1}. ${escapeHtml(file.name)}</strong><br>
+            <small>${escapeHtml(file.type || "Unknown file type")} · ${formatBytes(file.size)}</small>
+          </div>
+          <small>Loaded</small>
+        `;
+        fileList.appendChild(chip);
       });
+
+      updateMetrics();
     }
 
-    function getWorkerUrl() {
-      return workerUrlInput.value.trim().replace(/\/$/, "");
-    }
+    function addFiles(fileListObject) {
+      const incoming = Array.from(fileListObject || []);
 
-    saveWorkerBtn.addEventListener("click", () => {
-      const url = getWorkerUrl();
+      incoming.forEach(file => {
+        const duplicate = selectedFiles.some(existing =>
+          existing.name === file.name &&
+          existing.size === file.size &&
+          existing.lastModified === file.lastModified
+        );
 
-      if (!url) {
-        setStatus("Paste your Cloudflare Worker URL first.", "warn");
-        return;
-      }
-
-      localStorage.setItem("fireflowWorkerUrl", url);
-      workerPill.textContent = "Saved";
-      setStatus("Worker URL saved.", "good");
-    });
-
-    testWorkerBtn.addEventListener("click", async () => {
-      const url = getWorkerUrl();
-
-      if (!url) {
-        setStatus("Paste your Cloudflare Worker URL first.", "warn");
-        return;
-      }
-
-      try {
-        workerPill.textContent = "Testing";
-        setStatus("Testing Worker connection...");
-
-        const response = await fetch(url, {
-          method: "GET"
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-          throw new Error(data?.error || `Worker returned HTTP ${response.status}`);
+        if (!duplicate) {
+          selectedFiles.push(file);
         }
+      });
 
-        workerPill.textContent = "Online";
-        setStatus(data?.message || "Worker is online.", "good");
-        setDebug(data);
-      } catch (error) {
-        workerPill.textContent = "Error";
-        setStatus(`Worker test failed: ${error.message}`, "bad");
-        setDebug(error.stack || error.message);
-      }
-    });
-
-    dropzone.addEventListener("click", () => {
-      fileInput.click();
-    });
+      renderFileList();
+    }
 
     fileInput.addEventListener("change", event => {
+      selectedFiles = [];
       addFiles(event.target.files);
+    });
+
+    clearFilesBtn.addEventListener("click", () => {
+      selectedFiles = [];
       fileInput.value = "";
+      renderFileList();
     });
 
     dropzone.addEventListener("dragover", event => {
@@ -682,170 +1092,322 @@
     dropzone.addEventListener("drop", event => {
       event.preventDefault();
       dropzone.classList.remove("dragover");
+      selectedFiles = [];
       addFiles(event.dataTransfer.files);
     });
 
-    clearBtn.addEventListener("click", () => {
-      selectedFiles = [];
-      renderFiles();
-      setDebug(null);
-
-      aiPill.textContent = "Idle";
-
-      resultsOutput.classList.add("placeholder");
-      resultsOutput.textContent = "Your contractor-style material takeoff and labour estimate will appear here.";
-
-      setStatus("Cleared. Select files, then click Analyze Drawings.");
+    workerUrlInput.addEventListener("change", () => {
+      localStorage.setItem("fireflowWorkerUrl", workerUrlInput.value.trim());
     });
 
-    copyResultsBtn.addEventListener("click", async () => {
-      const text = resultsOutput.textContent || "";
+    projectTypeInput.addEventListener("change", updateMetrics);
+    labourRateInput.addEventListener("input", updateMetrics);
 
-      if (!text.trim() || resultsOutput.classList.contains("placeholder")) {
-        setStatus("No results to copy yet.", "warn");
+    testWorkerBtn.addEventListener("click", async () => {
+      const workerUrl = workerUrlInput.value.trim();
+
+      if (!workerUrl) {
+        alert("Enter your Cloudflare Worker URL first.");
         return;
       }
 
       try {
-        await navigator.clipboard.writeText(text);
-        setStatus("Results copied.", "good");
+        workerStatus.textContent = "Testing Worker...";
+        const response = await fetch(workerUrl, { method: "GET" });
+        const text = await response.text();
+
+        if (!response.ok) {
+          throw new Error(text || "Worker test failed.");
+        }
+
+        workerStatus.textContent = "Worker connected";
+        alert("Worker connected successfully.");
       } catch (error) {
-        setStatus("Could not copy results. Highlight the results and copy manually.", "warn");
+        workerStatus.textContent = "Worker error";
+        alert("Worker test failed: " + error.message);
       }
-    });
-
-    downloadResultsBtn.addEventListener("click", () => {
-      const text = resultsOutput.textContent || "";
-
-      if (!text.trim() || resultsOutput.classList.contains("placeholder")) {
-        setStatus("No results to download yet.", "warn");
-        return;
-      }
-
-      const blob = new Blob([text], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-
-      a.href = url;
-      a.download = "fireflow-ai-contractor-takeoff.txt";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      URL.revokeObjectURL(url);
-
-      setStatus("TXT file downloaded.", "good");
     });
 
     analyzeBtn.addEventListener("click", async () => {
-      const url = getWorkerUrl();
+      const workerUrl = workerUrlInput.value.trim();
 
-      if (!url) {
-        setStatus("Paste and save your Cloudflare Worker URL first.", "warn");
+      if (!workerUrl) {
+        alert("Enter your Cloudflare Worker URL first.");
         return;
       }
 
       if (!selectedFiles.length) {
-        setStatus("Select at least one drawing, PDF, image, or file first.", "warn");
+        alert("Choose one or more drawing files first.");
         return;
       }
 
+      localStorage.setItem("fireflowWorkerUrl", workerUrl);
+
       const formData = new FormData();
+      formData.append("projectType", projectTypeInput.value);
+      formData.append("labourRate", labourRateInput.value || "115");
+      formData.append("instructions", instructionsInput.value || "");
 
       selectedFiles.forEach(file => {
         formData.append("files", file, file.name);
       });
 
-      formData.append("projectType", projectTypeInput.value);
-      formData.append("labourRate", labourRateInput.value || "115");
-      formData.append("notes", notesInput.value || "");
-
+      loading.style.display = "flex";
       analyzeBtn.disabled = true;
-      aiPill.textContent = "Analyzing";
-
-      setDebug(null);
-
-      resultsOutput.classList.remove("placeholder");
-      resultsOutput.textContent =
-        "Analyzing uploaded files...\n\n" +
-        "FireFlow AI is preparing a contractor-style takeoff:\n" +
-        "- Head count by type and area\n" +
-        "- Pipe by size\n" +
-        "- Threaded and grooved fittings by size\n" +
-        "- Mechanical tees/outlets\n" +
-        "- Hangers/supports\n" +
-        "- Riser and FDC material\n" +
-        "- Labour hours by task\n";
-
-      setStatus(`Sending ${selectedFiles.length} file(s) to Worker...`);
+      metricStatus.textContent = "Running";
+      aiStatus.textContent = "Analyzing...";
+      formattedView.innerHTML = `
+        <div class="placeholder">
+          <strong>Analyzing drawings...</strong>
+          Reading files, sending them to the Worker, and formatting the takeoff.
+        </div>
+      `;
 
       try {
-        const response = await fetch(url, {
+        const response = await fetch(workerUrl, {
           method: "POST",
           body: formData
         });
 
-        const text = await response.text();
+        const contentType = response.headers.get("content-type") || "";
+        let resultText = "";
 
-        let data;
-
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = null;
+        if (contentType.includes("application/json")) {
+          const json = await response.json();
+          resultText =
+            json.result ||
+            json.analysis ||
+            json.message ||
+            json.text ||
+            JSON.stringify(json, null, 2);
+        } else {
+          resultText = await response.text();
         }
 
         if (!response.ok) {
-          const message = data?.error || data?.message || text || `HTTP ${response.status}`;
-          throw new Error(message);
+          throw new Error(resultText || "Worker returned an error.");
         }
 
-        if (!data) {
-          throw new Error("Worker returned a non-JSON response.");
-        }
+        latestResultText = resultText;
+        rawOutput.textContent = resultText || "No result returned.";
+        formattedView.innerHTML = markdownToHtml(resultText || "No result returned.");
 
-        aiPill.textContent = "Complete";
-
-        const receivedCount = data.file_count_received ?? 0;
-        const analyzedCount = data.file_count_analyzed ?? 0;
-
-        if (receivedCount === 0) {
-          setStatus("Worker received 0 files. The upload is still not reaching Cloudflare correctly.", "bad");
-        } else {
-          setStatus(`Analysis complete. Worker received ${receivedCount} file(s) and sent ${analyzedCount} file(s) to AI.`, "good");
-        }
-
-        resultsOutput.textContent = data.result || "No AI result text returned.";
-
-        setDebug({
-          file_count_selected_in_browser: selectedFiles.length,
-          file_count_received_by_worker: receivedCount,
-          file_count_analyzed_by_ai: analyzedCount,
-          request_keys_received: data.request_keys_received || null,
-          files: data.files || [],
-          skipped_files: data.skipped_files || [],
-          usage: data.usage || null
-        });
+        metricStatus.textContent = "Complete";
+        aiStatus.textContent = "Analysis complete";
+        workerStatus.textContent = "Worker connected";
       } catch (error) {
-        aiPill.textContent = "Error";
-
-        setStatus(`Analysis failed: ${error.message}`, "bad");
-
-        resultsOutput.textContent =
-          "Analysis failed.\n\n" +
-          error.message +
-          "\n\nCheck:\n" +
-          "1. Worker URL is correct.\n" +
-          "2. OpenAI API key is saved in Cloudflare as OPENAI_API_KEY.\n" +
-          "3. OpenAI billing/quota is active.\n" +
-          "4. Uploaded files are not too large.\n" +
-          "5. GitHub Pages is showing the newest index.html.";
-
-        setDebug(error.stack || error.message);
+        latestResultText = "";
+        rawOutput.textContent = error.message;
+        formattedView.innerHTML = `
+          <div class="placeholder">
+            <strong>Analysis failed</strong>
+            <p>${escapeHtml(error.message)}</p>
+          </div>
+        `;
+        metricStatus.textContent = "Error";
+        aiStatus.textContent = "AI error";
       } finally {
+        loading.style.display = "none";
         analyzeBtn.disabled = false;
       }
     });
+
+    copyBtn.addEventListener("click", async () => {
+      if (!latestResultText) {
+        alert("No results to copy yet.");
+        return;
+      }
+
+      await navigator.clipboard.writeText(latestResultText);
+      alert("Results copied.");
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!latestResultText) {
+        alert("No results to download yet.");
+        return;
+      }
+
+      const blob = new Blob([latestResultText], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      const date = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `fireflow-ai-takeoff-${date}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+
+    document.querySelectorAll(".tab-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const tab = button.dataset.tab;
+
+        if (tab === "raw") {
+          formattedView.style.display = "none";
+          rawView.style.display = "block";
+        } else {
+          formattedView.style.display = "block";
+          rawView.style.display = "none";
+        }
+      });
+    });
+
+    function markdownToHtml(markdown) {
+      if (!markdown) return "";
+
+      const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+      let html = "";
+      let paragraph = [];
+      let inList = false;
+
+      function flushParagraph() {
+        if (paragraph.length) {
+          html += `<p>${inlineFormat(escapeHtml(paragraph.join(" ")))}</p>`;
+          paragraph = [];
+        }
+      }
+
+      function closeList() {
+        if (inList) {
+          html += "</ul>";
+          inList = false;
+        }
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+          flushParagraph();
+          closeList();
+          continue;
+        }
+
+        if (isMarkdownTableStart(lines, i)) {
+          flushParagraph();
+          closeList();
+
+          const tableLines = [];
+          while (i < lines.length && lines[i].trim().startsWith("|")) {
+            tableLines.push(lines[i].trim());
+            i++;
+          }
+          i--;
+
+          html += renderMarkdownTable(tableLines);
+          continue;
+        }
+
+        if (trimmed.startsWith("### ")) {
+          flushParagraph();
+          closeList();
+          html += `<h3>${inlineFormat(escapeHtml(trimmed.slice(4)))}</h3>`;
+          continue;
+        }
+
+        if (trimmed.startsWith("## ")) {
+          flushParagraph();
+          closeList();
+          html += `<h2>${inlineFormat(escapeHtml(trimmed.slice(3)))}</h2>`;
+          continue;
+        }
+
+        if (trimmed.startsWith("# ")) {
+          flushParagraph();
+          closeList();
+          html += `<h1>${inlineFormat(escapeHtml(trimmed.slice(2)))}</h1>`;
+          continue;
+        }
+
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          flushParagraph();
+
+          if (!inList) {
+            html += "<ul>";
+            inList = true;
+          }
+
+          html += `<li>${inlineFormat(escapeHtml(trimmed.slice(2)))}</li>`;
+          continue;
+        }
+
+        paragraph.push(trimmed);
+      }
+
+      flushParagraph();
+      closeList();
+
+      return html;
+    }
+
+    function isMarkdownTableStart(lines, index) {
+      const current = lines[index]?.trim() || "";
+      const next = lines[index + 1]?.trim() || "";
+
+      return (
+        current.startsWith("|") &&
+        current.endsWith("|") &&
+        next.startsWith("|") &&
+        next.includes("---")
+      );
+    }
+
+    function renderMarkdownTable(tableLines) {
+      if (tableLines.length < 2) return "";
+
+      const headerCells = splitTableRow(tableLines[0]);
+      const bodyLines = tableLines.slice(2);
+
+      let tableHtml = `<div class="table-scroll"><table><thead><tr>`;
+      headerCells.forEach(cell => {
+        tableHtml += `<th>${inlineFormat(escapeHtml(cell))}</th>`;
+      });
+      tableHtml += `</tr></thead><tbody>`;
+
+      bodyLines.forEach(row => {
+        const cells = splitTableRow(row);
+        tableHtml += `<tr>`;
+        cells.forEach(cell => {
+          tableHtml += `<td>${inlineFormat(escapeHtml(cell))}</td>`;
+        });
+        tableHtml += `</tr>`;
+      });
+
+      tableHtml += `</tbody></table></div>`;
+      return tableHtml;
+    }
+
+    function splitTableRow(row) {
+      return row
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map(cell => cell.trim());
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function inlineFormat(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/`(.*?)`/g, "<code>$1</code>");
+    }
+
+    updateMetrics();
   </script>
 </body>
 </html>
