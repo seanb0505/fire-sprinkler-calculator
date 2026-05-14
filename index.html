@@ -1,101 +1,851 @@
-# FireFlow AI Drawing Estimate
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-## 1. Upload / Drawing Review Status
-- Number of files received: 2
-- Number of files reviewed: 2
-- File names reviewed: 2026-NSD-033 Industrial Building C FP-1 Rev 1.pdf, 2026-NSD-033 Industrial Building C FP-2 Rev 1.pdf
-- Drawing readability: Good. The drawings are clear with detailed notes, site plans, sprinkler layouts, and material specifications.
-- Is this enough for a full takeoff? Explain. Yes, the package includes full sprinkler system design notes, site plan, sprinkler head layouts for main and second floors, material specifications, hanger details, and hydraulic design areas. This is sufficient for a comprehensive material takeoff and labor estimate.
+  <title>FireFlow AI - Fire Sprinkler Estimator</title>
 
-## 2. Project Type
-- New installation for a 20,811 sq. ft. addition to an existing warehouse building. This is confirmed by the project scope note stating "new overhead wet sprinkler system" and the building description as a new addition.
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: #0d1b2e;
+      --panel2: #10243d;
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --brand: #ef4444;
+      --brand2: #f97316;
+      --good: #22c55e;
+      --warn: #facc15;
+      --bad: #ef4444;
+      --card: rgba(15, 23, 42, 0.94);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
 
-## 3. System / Material Type
-- Pipe: Black steel Schedule 40 threaded pipe for 1" to 2" sizes, Schedule 10 roll grooved black steel for 1 1/4" to 8" sizes.
-- Fittings: Cast iron threaded fittings for 1" to 2", grooved fittings and couplings for 1 1/4" to 8".
-- Sprinkler heads: Reliable brand, various types including upright, pendent, semi-recessed pendent, sidewall.
-- Hangers: Steel beam clamps, threaded rods, swivel ring hangers.
-- No CPVC or plastic pipe used.
-- Surge restraints not required (steel pipe).
+    * {
+      box-sizing: border-box;
+    }
 
-## 4. Drawing Observations
-- The system is a wet pipe sprinkler system designed per NFPA 13 (2019) and Ontario Building Code (2024).
-- Four design areas with different hazard classifications: Extra Hazard I (compressor/oil tank room), Ordinary Hazard II (warehouse storage, wash bays, second floor), Light Hazard (stairs).
-- Water supply static pressure 63 psi, residual pressures and flows provided.
-- Sprinkler heads are a mix of quick response and standard response, upright, pendent, semi-recessed pendent, and sidewall types.
-- Sprinkler head guards required in mechanical and electrical rooms.
-- Pipe routing shown on main and second floor plans with hanger spacing and details.
-- Fire department connection with forward flow test valves.
-- Spare head boxes with wrenches required.
-- Air vents at high points, low point drains at trapped sections.
-- Electrical wiring by others.
-- No underground or incoming water supply included.
-- Site visit and dimension verification required before fabrication.
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(239, 68, 68, 0.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(249, 115, 22, 0.12), transparent 30%),
+        linear-gradient(180deg, #06101d 0%, #0b1220 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
 
-## 5. Sprinkler Head Count
-- Pendant heads (semi-recessed): 13 (Design Area #3 and #4)
-- Upright heads (standard and quick response): 18 (Design Area #2) + 6 (Design Area #1 compressor room) + additional upright heads with guards (quantity not explicitly stated but visible on plans)
-- Sidewall heads: 1/2" 212 5.6 quick response horizontal sidewall heads shown in legend; count from plans needed.
-- Concealed heads: None indicated.
-- Residential heads: None.
-- Unknown type heads: None.
-- Total heads: Approximately 40-45 heads estimated from plans and hydraulic design areas.
-- Confidence: Estimated based on hydraulic design head counts and visible heads on plans; exact count requires detailed head-by-head tally from drawings.
+    header {
+      padding: 34px 20px 20px;
+      text-align: center;
+    }
 
-## 6. Pipe Estimate
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fecaca;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
 
-| Size       | Material       | Connection Type | Estimated Length | Confidence | Notes                              |
-|------------|----------------|-----------------|------------------|------------|-----------------------------------|
-| 1" - 2"    | Black Steel Sch 40 | Threaded       | ~1200 ft         | Medium     | Branch lines and drops             |
-| 1 1/4" - 8"| Black Steel Sch 10 | Grooved        | ~800 ft          | Medium     | Mains, risers, header             |
-| 8"         | Black Steel Sch 10 | Grooved        | ~20 ft           | High       | Incoming flange connection        |
+    .flame {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color: white;
+    }
 
-Lengths are approximate based on scaled plan measurements and typical pipe routing.
+    h1 {
+      font-size: clamp(34px, 5vw, 64px);
+      margin: 0;
+      line-height: 1.02;
+      letter-spacing: -1.6px;
+    }
 
-## 7. Detailed Material List
+    .subtitle {
+      max-width: 850px;
+      margin: 16px auto 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.55;
+    }
 
-| Qty | Size   | Material Item               | Type/Spec           | Connection | Confidence | Notes                                  |
-|-----|--------|-----------------------------|---------------------|------------|------------|---------------------------------------|
-| ~40 | Heads  | Reliable Sprinkler Heads     | Various types (upright, pendent, sidewall) | N/A        | Medium     | Includes guards where required        |
-| ~1200 ft | Pipe   | Black Steel Schedule 40     | Threaded            | Threaded   | Medium     | 1" to 2" branch and drops             |
-| ~800 ft  | Pipe   | Black Steel Schedule 10     | Roll Grooved        | Grooved    | Medium     | 1 1/4" to 8" mains and risers         |
-| 50+  | Fittings | Cast Iron Threaded Fittings | Elbows, Tees, Couplings | Threaded   | Medium     | For 1" to 2" pipe                     |
-| 30+  | Fittings | Grooved Fittings & Couplings | Elbows, Tees, Couplings | Grooved    | Medium     | For 1 1/4" to 8" pipe                 |
-| 100+ | Hangers | Beam Clamps, Rods, Swivel Rings | Steel               | N/A        | Medium     | Per hanger details and pipe sizes     |
-| 2    | Valves  | Grooved Butterfly Valves     | 4"                  | Grooved    | High       | Includes tamper switches               |
-| 1    | Valve   | Double Check Valve Assembly  | 4"                  | Grooved    | High       | With 2 grooved butterfly valves       |
-| 1    | Flow Switch | Water Flow Switch          | 4" Potter VSR       | Grooved    | High       |                                      |
-| 2    | Drains  | Drain with Angle Globe Valve | 1 1/2"              | Threaded   | High       | Low point drains                      |
-| 1    | Pressure Gauge | 4" Header Pressure Gauge | Threaded            | Threaded   | High       |                                      |
-| 1    | Spare Head Box | Metal Cabinet with Wrenches | Per NFPA 13         | N/A        | High       | Mounted near main valve header       |
-| 4+   | Air Vents | Automatic Air Vents          | Model PAV-W/WS      | Threaded   | Medium     | At high points                        |
-| 1    | FDC     | Fire Department Connection   | Grooved             | Grooved    | High       | With test and drain assembly          |
+    main {
+      width: min(1240px, calc(100% - 32px));
+      margin: 24px auto 60px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
 
-## 8. Labour Estimate
+    @media (min-width: 1040px) {
+      main {
+        grid-template-columns: 420px 1fr;
+        align-items: start;
+      }
+    }
 
-- Estimated fitter hours: 160 hours (based on system size, pipe lengths, fittings, and head installation)
-- Estimated helper/apprentice hours: 80 hours (assisting with material handling, hangers, and prep)
-- Total labour hours: 240 hours
-- Labour cost: 240 hours x $115/hr = $27,600
-- Assumptions: Standard installation productivity for new wet pipe system in warehouse environment, includes hanger installation, pipe cutting, threading, fitting assembly, head installation, and testing prep.
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
 
-## 9. Missing / Unclear Items
-- Exact sprinkler head count and types per room/area for final confirmation.
-- Final pipe lengths and fitting counts require detailed takeoff from scaled drawings.
-- Confirmation of hanger quantities and types per pipe run.
-- Confirmation of any specialty fittings or seismic bracing requirements.
-- Verification of coordination with other trades for pipe routing.
-- Confirmation of spare head quantities per NFPA 13.
-- Electrical wiring scope excluded; coordination required.
+    .card-header {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+    }
 
-## 10. Next Step
-- Conduct a detailed head-by-head count and pipe routing measurement on the drawings.
-- Perform a site visit to verify dimensions and existing conditions.
-- Coordinate with electrical and fire alarm contractors for device wiring.
-- Prepare a detailed material submittal package for design consultant review.
-- Confirm hanger and support requirements with structural engineer if needed.
-- Finalize labor productivity assumptions based on site conditions and crew experience.
+    .card-header h2 {
+      margin: 0;
+      font-size: 22px;
+    }
 
----
+    .card-header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
 
-This estimate provides a solid basis for budgeting and procurement but should be refined with detailed takeoff and site verification
+    .card-body {
+      padding: 22px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 16px 0 8px;
+      color: #e2e8f0;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #07111f;
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(249, 115, 22, 0.8);
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
+    }
+
+    textarea {
+      min-height: 125px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 560px) {
+      .row.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .dropzone {
+      border: 2px dashed rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.035);
+      text-align: center;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .dropzone.dragover {
+      border-color: var(--brand2);
+      background: rgba(249, 115, 22, 0.10);
+    }
+
+    .dropzone strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    .dropzone span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .important-note {
+      margin-top: 12px;
+      color: #fed7aa;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .file-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+
+    .file-item small {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 17px;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.18s ease;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      flex: 1;
+      min-width: 190px;
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .status.good {
+      color: #bbf7d0;
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .status.warn {
+      color: #fef3c7;
+      border-color: rgba(250, 204, 21, 0.35);
+      background: rgba(250, 204, 21, 0.08);
+    }
+
+    .status.bad {
+      color: #fecaca;
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .results {
+      min-height: 680px;
+    }
+
+    .results-toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .results-output {
+      padding: 24px;
+      white-space: pre-wrap;
+      line-height: 1.62;
+      color: #e5e7eb;
+      font-size: 15px;
+      overflow-x: auto;
+    }
+
+    .results-output h1,
+    .results-output h2,
+    .results-output h3 {
+      color: white;
+    }
+
+    .placeholder {
+      color: var(--muted);
+    }
+
+    .pill-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    @media (min-width: 560px) {
+      .pill-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .pill {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .pill strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .pill span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .debug {
+      margin-top: 14px;
+      display: none;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: pre-wrap;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .debug.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <div class="flame">🔥</div>
+      FireFlow AI
+    </div>
+
+    <h1>Fire Sprinkler Estimator</h1>
+
+    <p class="subtitle">
+      Upload sprinkler drawings, hydraulic calculations, PDFs, images, or notes.
+      FireFlow AI creates a cleaner contractor-style takeoff with heads, pipe, fittings, riser material, FDC material, and labour hours.
+    </p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="card-header">
+        <h2>AI Drawing Analyzer</h2>
+        <p>Upload the full drawing package. The AI will break material down by size and labour by task.</p>
+      </div>
+
+      <div class="card-body">
+        <label for="workerUrl">Cloudflare Worker URL</label>
+        <input id="workerUrl" placeholder="https://fire-estimator-ai.seanmbarbour.workers.dev" />
+
+        <div class="actions">
+          <button class="secondary" id="saveWorkerBtn" type="button">Save Worker URL</button>
+          <button class="secondary" id="testWorkerBtn" type="button">Test Worker</button>
+        </div>
+
+        <label>Upload Drawings / Files</label>
+
+        <div class="dropzone" id="dropzone">
+          <strong>Click here or drag files in</strong>
+          <span>
+            Select multiple PDFs, images, hydraulic calculations, notes, or material lists.
+          </span>
+
+          <input
+            id="fileInput"
+            type="file"
+            multiple
+            accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.doc,.docx,.xls,.xlsx,.rtf,.md,image/*,application/pdf"
+          />
+        </div>
+
+        <div class="important-note">
+          Selected files will show below before sending. If only one file shows here, only one file will be sent.
+        </div>
+
+        <div class="file-list" id="fileList"></div>
+
+        <div class="row two">
+          <div>
+            <label for="projectType">Project Type</label>
+            <select id="projectType">
+              <option value="auto">Let AI determine</option>
+              <option value="new install">New install</option>
+              <option value="retrofit">Retrofit</option>
+              <option value="tenant improvement">Tenant improvement</option>
+              <option value="service">Service</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="labourRate">Labour Rate / Hour</label>
+            <input id="labourRate" type="number" value="115" min="0" step="1" />
+          </div>
+        </div>
+
+        <label for="notes">Project Notes / Instructions</label>
+        <textarea id="notes" placeholder="Example: New install. Count all heads on all sheets, not just hydraulic design area. Break down pipe and fittings by size. Include riser, FDC, hangers, drains, valves, and labour by task."></textarea>
+
+        <div class="actions">
+          <button class="primary" id="analyzeBtn" type="button">Analyze Drawings</button>
+          <button class="secondary" id="clearBtn" type="button">Clear</button>
+        </div>
+
+        <div id="status" class="status">
+          Ready. Select files, then click Analyze Drawings.
+        </div>
+
+        <div class="debug" id="debugBox"></div>
+      </div>
+    </section>
+
+    <section class="card results">
+      <div class="card-header">
+        <h2>Contractor Takeoff Results</h2>
+        <p>Cleaner output for material ordering, risers, FDC, head counts, and labour hours.</p>
+
+        <div class="pill-grid">
+          <div class="pill">
+            <strong id="fileCountPill">0</strong>
+            <span>Files selected</span>
+          </div>
+
+          <div class="pill">
+            <strong id="workerPill">Not set</strong>
+            <span>Worker status</span>
+          </div>
+
+          <div class="pill">
+            <strong id="aiPill">Idle</strong>
+            <span>AI status</span>
+          </div>
+        </div>
+
+        <div class="results-toolbar">
+          <button class="secondary" id="copyResultsBtn" type="button">Copy Results</button>
+          <button class="secondary" id="downloadResultsBtn" type="button">Download TXT</button>
+        </div>
+      </div>
+
+      <div id="resultsOutput" class="results-output placeholder">
+        Your contractor-style material takeoff and labour estimate will appear here.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const workerUrlInput = document.getElementById("workerUrl");
+    const saveWorkerBtn = document.getElementById("saveWorkerBtn");
+    const testWorkerBtn = document.getElementById("testWorkerBtn");
+
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const fileList = document.getElementById("fileList");
+
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const copyResultsBtn = document.getElementById("copyResultsBtn");
+    const downloadResultsBtn = document.getElementById("downloadResultsBtn");
+
+    const statusBox = document.getElementById("status");
+    const debugBox = document.getElementById("debugBox");
+    const resultsOutput = document.getElementById("resultsOutput");
+
+    const fileCountPill = document.getElementById("fileCountPill");
+    const workerPill = document.getElementById("workerPill");
+    const aiPill = document.getElementById("aiPill");
+
+    const projectTypeInput = document.getElementById("projectType");
+    const labourRateInput = document.getElementById("labourRate");
+    const notesInput = document.getElementById("notes");
+
+    let selectedFiles = [];
+
+    const savedWorkerUrl = localStorage.getItem("fireflowWorkerUrl");
+
+    if (savedWorkerUrl) {
+      workerUrlInput.value = savedWorkerUrl;
+      workerPill.textContent = "Saved";
+    } else {
+      workerUrlInput.value = "https://fire-estimator-ai.seanmbarbour.workers.dev";
+    }
+
+    function setStatus(message, type = "") {
+      statusBox.className = "status" + (type ? " " + type : "");
+      statusBox.textContent = message;
+    }
+
+    function setDebug(data) {
+      if (!data) {
+        debugBox.classList.remove("show");
+        debugBox.textContent = "";
+        return;
+      }
+
+      debugBox.classList.add("show");
+      debugBox.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes && bytes !== 0) return "";
+
+      const units = ["B", "KB", "MB", "GB"];
+      let value = bytes;
+      let unitIndex = 0;
+
+      while (value >= 1024 && unitIndex < units.length - 1) {
+        value = value / 1024;
+        unitIndex++;
+      }
+
+      return `${value.toFixed(value >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+    }
+
+    function dedupeFiles(files) {
+      const map = new Map();
+
+      for (const file of files) {
+        const key = `${file.name}_${file.size}_${file.lastModified}`;
+        map.set(key, file);
+      }
+
+      return Array.from(map.values());
+    }
+
+    function addFiles(files) {
+      const incoming = Array.from(files || []).filter(file => file && file.name);
+
+      if (!incoming.length) return;
+
+      selectedFiles = dedupeFiles([...selectedFiles, ...incoming]);
+
+      renderFiles();
+
+      setStatus(`${selectedFiles.length} file(s) selected. Ready to analyze.`, "good");
+    }
+
+    function renderFiles() {
+      fileList.innerHTML = "";
+      fileCountPill.textContent = selectedFiles.length;
+
+      selectedFiles.forEach((file, index) => {
+        const row = document.createElement("div");
+        row.className = "file-item";
+
+        const name = document.createElement("div");
+        name.textContent = `${index + 1}. ${file.name}`;
+
+        const size = document.createElement("small");
+        size.textContent = formatBytes(file.size);
+
+        row.appendChild(name);
+        row.appendChild(size);
+        fileList.appendChild(row);
+      });
+    }
+
+    function getWorkerUrl() {
+      return workerUrlInput.value.trim().replace(/\/$/, "");
+    }
+
+    saveWorkerBtn.addEventListener("click", () => {
+      const url = getWorkerUrl();
+
+      if (!url) {
+        setStatus("Paste your Cloudflare Worker URL first.", "warn");
+        return;
+      }
+
+      localStorage.setItem("fireflowWorkerUrl", url);
+      workerPill.textContent = "Saved";
+      setStatus("Worker URL saved.", "good");
+    });
+
+    testWorkerBtn.addEventListener("click", async () => {
+      const url = getWorkerUrl();
+
+      if (!url) {
+        setStatus("Paste your Cloudflare Worker URL first.", "warn");
+        return;
+      }
+
+      try {
+        workerPill.textContent = "Testing";
+        setStatus("Testing Worker connection...");
+
+        const response = await fetch(url, {
+          method: "GET"
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(data?.error || `Worker returned HTTP ${response.status}`);
+        }
+
+        workerPill.textContent = "Online";
+        setStatus(data?.message || "Worker is online.", "good");
+        setDebug(data);
+      } catch (error) {
+        workerPill.textContent = "Error";
+        setStatus(`Worker test failed: ${error.message}`, "bad");
+        setDebug(error.stack || error.message);
+      }
+    });
+
+    dropzone.addEventListener("click", () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", event => {
+      addFiles(event.target.files);
+      fileInput.value = "";
+    });
+
+    dropzone.addEventListener("dragover", event => {
+      event.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", event => {
+      event.preventDefault();
+      dropzone.classList.remove("dragover");
+      addFiles(event.dataTransfer.files);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      selectedFiles = [];
+      renderFiles();
+      setDebug(null);
+
+      aiPill.textContent = "Idle";
+
+      resultsOutput.classList.add("placeholder");
+      resultsOutput.textContent = "Your contractor-style material takeoff and labour estimate will appear here.";
+
+      setStatus("Cleared. Select files, then click Analyze Drawings.");
+    });
+
+    copyResultsBtn.addEventListener("click", async () => {
+      const text = resultsOutput.textContent || "";
+
+      if (!text.trim() || resultsOutput.classList.contains("placeholder")) {
+        setStatus("No results to copy yet.", "warn");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus("Results copied.", "good");
+      } catch (error) {
+        setStatus("Could not copy results. Highlight the results and copy manually.", "warn");
+      }
+    });
+
+    downloadResultsBtn.addEventListener("click", () => {
+      const text = resultsOutput.textContent || "";
+
+      if (!text.trim() || resultsOutput.classList.contains("placeholder")) {
+        setStatus("No results to download yet.", "warn");
+        return;
+      }
+
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = "fireflow-ai-contractor-takeoff.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(url);
+
+      setStatus("TXT file downloaded.", "good");
+    });
+
+    analyzeBtn.addEventListener("click", async () => {
+      const url = getWorkerUrl();
+
+      if (!url) {
+        setStatus("Paste and save your Cloudflare Worker URL first.", "warn");
+        return;
+      }
+
+      if (!selectedFiles.length) {
+        setStatus("Select at least one drawing, PDF, image, or file first.", "warn");
+        return;
+      }
+
+      const formData = new FormData();
+
+      selectedFiles.forEach(file => {
+        formData.append("files", file, file.name);
+      });
+
+      formData.append("projectType", projectTypeInput.value);
+      formData.append("labourRate", labourRateInput.value || "115");
+      formData.append("notes", notesInput.value || "");
+
+      analyzeBtn.disabled = true;
+      aiPill.textContent = "Analyzing";
+
+      setDebug(null);
+
+      resultsOutput.classList.remove("placeholder");
+      resultsOutput.textContent =
+        "Analyzing uploaded files...\n\n" +
+        "FireFlow AI is preparing a contractor-style takeoff:\n" +
+        "- Head count by type and area\n" +
+        "- Pipe by size\n" +
+        "- Threaded and grooved fittings by size\n" +
+        "- Mechanical tees/outlets\n" +
+        "- Hangers/supports\n" +
+        "- Riser and FDC material\n" +
+        "- Labour hours by task\n";
+
+      setStatus(`Sending ${selectedFiles.length} file(s) to Worker...`);
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          body: formData
+        });
+
+        const text = await response.text();
+
+        let data;
+
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = null;
+        }
+
+        if (!response.ok) {
+          const message = data?.error || data?.message || text || `HTTP ${response.status}`;
+          throw new Error(message);
+        }
+
+        if (!data) {
+          throw new Error("Worker returned a non-JSON response.");
+        }
+
+        aiPill.textContent = "Complete";
+
+        const receivedCount = data.file_count_received ?? 0;
+        const analyzedCount = data.file_count_analyzed ?? 0;
+
+        if (receivedCount === 0) {
+          setStatus("Worker received 0 files. The upload is still not reaching Cloudflare correctly.", "bad");
+        } else {
+          setStatus(`Analysis complete. Worker received ${receivedCount} file(s) and sent ${analyzedCount} file(s) to AI.`, "good");
+        }
+
+        resultsOutput.textContent = data.result || "No AI result text returned.";
+
+        setDebug({
+          file_count_selected_in_browser: selectedFiles.length,
+          file_count_received_by_worker: receivedCount,
+          file_count_analyzed_by_ai: analyzedCount,
+          request_keys_received: data.request_keys_received || null,
+          files: data.files || [],
+          skipped_files: data.skipped_files || [],
+          usage: data.usage || null
+        });
+      } catch (error) {
+        aiPill.textContent = "Error";
+
+        setStatus(`Analysis failed: ${error.message}`, "bad");
+
+        resultsOutput.textContent =
+          "Analysis failed.\n\n" +
+          error.message +
+          "\n\nCheck:\n" +
+          "1. Worker URL is correct.\n" +
+          "2. OpenAI API key is saved in Cloudflare as OPENAI_API_KEY.\n" +
+          "3. OpenAI billing/quota is active.\n" +
+          "4. Uploaded files are not too large.\n" +
+          "5. GitHub Pages is showing the newest index.html.";
+
+        setDebug(error.stack || error.message);
+      } finally {
+        analyzeBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
