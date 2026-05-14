@@ -8,243 +8,262 @@
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
+    *{
+      box-sizing:border-box;
     }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #070b12;
-      color: #f9fafb;
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:#070b12;
+      color:#f8fafc;
     }
 
-    header {
-      padding: 28px 24px;
-      background: linear-gradient(135deg, #111827, #1e3a8a);
-      border-bottom: 1px solid #243244;
+    header{
+      background:linear-gradient(135deg,#111827,#1d4ed8);
+      padding:30px 24px;
+      border-bottom:1px solid #1e293b;
     }
 
-    .topbar {
-      max-width: 1200px;
-      margin: auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
+    .topbar{
+      max-width:1200px;
+      margin:auto;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      flex-wrap:wrap;
     }
 
-    .brand h1 {
-      margin: 0;
-      font-size: 34px;
-      letter-spacing: -1px;
+    .brand h1{
+      margin:0;
+      font-size:36px;
+      letter-spacing:-1px;
     }
 
-    .brand span {
-      color: #60a5fa;
+    .brand span{
+      color:#60a5fa;
     }
 
-    .brand p {
-      margin: 8px 0 0;
-      color: #cbd5e1;
+    .brand p{
+      margin:8px 0 0;
+      color:#cbd5e1;
     }
 
-    .badge {
-      background: rgba(96,165,250,0.15);
-      border: 1px solid rgba(96,165,250,0.4);
-      color: #bfdbfe;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-weight: bold;
-      font-size: 14px;
+    .badge{
+      background:rgba(96,165,250,.15);
+      border:1px solid rgba(96,165,250,.4);
+      color:#dbeafe;
+      padding:12px 18px;
+      border-radius:999px;
+      font-size:14px;
+      font-weight:bold;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 24px;
+    .container{
+      max-width:1200px;
+      margin:auto;
+      padding:24px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1.4fr;
-      gap: 22px;
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1.4fr;
+      gap:22px;
     }
 
-    .card {
-      background: #111827;
-      border: 1px solid #243244;
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    .card{
+      background:#111827;
+      border:1px solid #1e293b;
+      border-radius:20px;
+      padding:24px;
+      margin-bottom:22px;
+      box-shadow:0 20px 40px rgba(0,0,0,.25);
     }
 
-    .card h2 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 22px;
+    .card h2{
+      margin-top:0;
+      margin-bottom:10px;
+      font-size:24px;
     }
 
-    .muted {
-      color: #94a3b8;
-      line-height: 1.5;
+    .muted{
+      color:#94a3b8;
+      line-height:1.5;
     }
 
-    .upload-box {
-      border: 2px dashed #3b82f6;
-      background: rgba(37,99,235,0.08);
-      border-radius: 18px;
-      padding: 28px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s ease;
+    .upload-box{
+      border:2px dashed #3b82f6;
+      background:rgba(37,99,235,.08);
+      border-radius:18px;
+      padding:36px 20px;
+      text-align:center;
+      cursor:pointer;
+      transition:.2s ease;
+      margin-top:18px;
     }
 
-    .upload-box:hover {
-      background: rgba(37,99,235,0.16);
+    .upload-box:hover{
+      background:rgba(37,99,235,.18);
     }
 
-    .upload-box strong {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 8px;
+    .upload-box strong{
+      display:block;
+      font-size:22px;
+      margin-bottom:10px;
     }
 
-    input[type="file"] {
-      display: none;
+    .upload-box span{
+      display:block;
+      color:#bfdbfe;
+      font-size:14px;
+    }
+
+    input[type="file"]{
+      display:none;
     }
 
     textarea,
-    input,
-    button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
+    input{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:14px;
+      background:#0f172a;
+      color:white;
+      border:1px solid #334155;
+      margin-top:12px;
+      font-size:15px;
     }
 
-    textarea {
-      min-height: 150px;
-      background: #0f172a;
-      color: white;
-      border: 1px solid #334155;
+    textarea{
+      min-height:150px;
+      resize:vertical;
     }
 
-    input {
-      background: #0f172a;
-      color: white;
-      border: 1px solid #334155;
+    button{
+      width:100%;
+      display:block;
+      padding:14px;
+      border:none;
+      border-radius:14px;
+      background:#2563eb;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      transition:.2s ease;
+      margin-top:14px;
+      font-size:15px;
     }
 
-    button {
-      background: #2563eb;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s ease;
+    button:hover{
+      background:#1d4ed8;
     }
 
-    button:hover {
-      background: #1d4ed8;
+    button.secondary{
+      background:#334155;
     }
 
-    button.secondary {
-      background: #334155;
+    button.secondary:hover{
+      background:#475569;
     }
 
-    button.secondary:hover {
-      background: #475569;
+    .status{
+      margin-top:16px;
+      background:#0f172a;
+      border:1px solid #334155;
+      border-radius:16px;
+      padding:16px;
+      color:#cbd5e1;
+      white-space:pre-wrap;
+      line-height:1.5;
     }
 
-    .status {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 14px;
-      padding: 14px;
-      color: #cbd5e1;
-      margin-top: 14px;
-      white-space: pre-wrap;
+    .results{
+      background:#020617;
+      border:1px solid #334155;
+      border-radius:18px;
+      padding:24px;
+      min-height:450px;
+      white-space:pre-wrap;
+      overflow-x:auto;
+      line-height:1.5;
+      color:#f8fafc;
     }
 
-    .results {
-      background: #020617;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-      min-height: 360px;
-      white-space: pre-wrap;
-      line-height: 1.45;
-      color: #e5e7eb;
-      overflow-x: auto;
+    .stat-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-bottom:22px;
     }
 
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 18px 0;
+    .stat{
+      background:#0f172a;
+      border:1px solid #334155;
+      border-radius:16px;
+      padding:16px;
     }
 
-    .stat {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 14px;
-      padding: 14px;
+    .stat small{
+      color:#94a3b8;
     }
 
-    .stat small {
-      color: #94a3b8;
+    .stat strong{
+      display:block;
+      margin-top:6px;
+      font-size:24px;
     }
 
-    .stat strong {
-      display: block;
-      font-size: 22px;
-      margin-top: 6px;
+    .file-list{
+      list-style:none;
+      padding:0;
+      margin-top:18px;
     }
 
-    .file-list {
-      margin-top: 14px;
-      padding: 0;
-      list-style: none;
+    .file-list li{
+      background:#0f172a;
+      border:1px solid #334155;
+      border-radius:12px;
+      padding:12px;
+      margin-top:10px;
+      color:#dbeafe;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    .file-list li {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 10px;
-      margin-top: 8px;
-      color: #dbeafe;
-      font-size: 14px;
-    }
+    @media(max-width:950px){
 
-    .hidden {
-      display: none;
-    }
-
-    @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: 1fr;
+      .grid{
+        grid-template-columns:1fr;
       }
 
-      .stat-grid {
-        grid-template-columns: 1fr;
+      .stat-grid{
+        grid-template-columns:1fr;
+      }
+
+      .brand h1{
+        font-size:30px;
       }
     }
   </style>
 </head>
 
 <body>
+
 <header>
   <div class="topbar">
+
     <div class="brand">
       <h1>FireFlow <span>AI</span></h1>
-      <p>Fire sprinkler estimating, PDF drawing review, and material takeoff assistant.</p>
+      <p>AI Fire Sprinkler Estimating & Drawing Analysis Platform</p>
     </div>
-    <div class="badge">Contractor Estimator Beta</div>
+
+    <div class="badge">
+      Contractor Estimator Beta
+    </div>
+
   </div>
 </header>
 
@@ -255,45 +274,83 @@
     <div>
 
       <div class="card">
+
         <h2>Upload Drawing PDFs</h2>
+
         <p class="muted">
-          Upload sprinkler drawings, hydraulic calculations, specs, or rough material lists.
-          The system will convert PDF pages into images and send them to AI for visual review.
+          Upload sprinkler drawings, hydraulic calculations,
+          specs, and material lists for AI visual analysis.
         </p>
 
         <label class="upload-box" for="pdfFiles">
-          <strong>Click to upload PDFs</strong>
-          <span>Multiple files allowed</span>
+          <strong>Upload Drawing PDFs</strong>
+          <span>Multiple PDF files supported</span>
         </label>
 
-        <input id="pdfFiles" type="file" accept="application/pdf" multiple />
+        <input
+          id="pdfFiles"
+          type="file"
+          accept="application/pdf"
+          multiple
+        />
 
         <ul id="fileList" class="file-list"></ul>
 
-        <button onclick="analyzeDrawingPDFs()">Analyze Drawings With AI</button>
-        <button class="secondary" onclick="clearProject()">Clear Project</button>
+        <button onclick="analyzeDrawingPDFs()">
+          Analyze Drawings With AI
+        </button>
 
-        <div id="uploadStatus" class="status">No drawings uploaded yet.</div>
+        <button class="secondary" onclick="clearProject()">
+          Clear Project
+        </button>
+
+        <div id="uploadStatus" class="status">
+No drawings uploaded yet.
+        </div>
+
       </div>
 
       <div class="card">
-        <h2>Manual Quick Estimate</h2>
-        <p class="muted">Use this for quick head/drop labour and basic material allowances.</p>
 
-        <input id="heads" type="number" placeholder="Number of heads / drops" />
+        <h2>Quick Labour Estimator</h2>
 
-        <button onclick="calculateEstimate()">Calculate Quick Estimate</button>
+        <p class="muted">
+          Quick sprinkler head/drop labour allowance tool.
+        </p>
 
-        <div id="estimateResult" class="status">Quick estimate will appear here.</div>
+        <input
+          id="heads"
+          type="number"
+          placeholder="Number of sprinkler heads / drops"
+        />
+
+        <button onclick="calculateEstimate()">
+          Calculate Estimate
+        </button>
+
+        <div id="estimateResult" class="status">
+Quick estimate will appear here.
+        </div>
+
       </div>
 
       <div class="card">
+
         <h2>Project Notes</h2>
-        <p class="muted">Optional. Add details the PDF may not show clearly.</p>
 
-        <textarea id="aiInput" placeholder="Example: New install. Mostly BlazeMaster CPVC with some steel riser work. 1 fitter, approx 144 hours. Material list may be incomplete."></textarea>
+        <p class="muted">
+          Optional project details to help AI estimating.
+        </p>
 
-        <button onclick="runAI()">Analyze Notes Only</button>
+        <textarea
+          id="aiInput"
+          placeholder="Example: New install. Mostly BlazeMaster CPVC with some steel riser work. Approx 144 labour hours. Material list may be incomplete."
+        ></textarea>
+
+        <button onclick="runAI()">
+          Analyze Notes Only
+        </button>
+
       </div>
 
     </div>
@@ -301,24 +358,32 @@
     <div>
 
       <div class="card">
+
         <h2>Estimate Dashboard</h2>
 
         <div class="stat-grid">
+
           <div class="stat">
             <small>Uploaded PDFs</small>
             <strong id="pdfCount">0</strong>
           </div>
+
           <div class="stat">
             <small>Pages Scanned</small>
             <strong id="pageCount">0</strong>
           </div>
+
           <div class="stat">
             <small>AI Mode</small>
             <strong>Visual + Text</strong>
           </div>
+
         </div>
 
-        <div id="aiResult" class="results">AI estimate will appear here.</div>
+        <div id="aiResult" class="results">
+AI estimate will appear here.
+        </div>
+
       </div>
 
     </div>
@@ -328,53 +393,79 @@
 </div>
 
 <script>
-const AI_WORKER_URL = "https://fire-estimator-ai.seanmbarbour.workers.dev";
+const AI_WORKER_URL =
+"https://fire-estimator-ai.seanmbarbour.workers.dev";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+"https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
 
 let extractedPDFText = "";
 let drawingImages = [];
 let uploadedFiles = [];
 
 const MAX_PAGES_PER_FILE = 5;
-const IMAGE_SCALE = 1.35;
-const IMAGE_QUALITY = 0.75;
+const IMAGE_SCALE = 1.4;
+const IMAGE_QUALITY = 0.8;
 
-document.getElementById("pdfFiles").addEventListener("change", function () {
+document
+.getElementById("pdfFiles")
+.addEventListener("change", function(){
+
   uploadedFiles = Array.from(this.files || []);
+
   updateFileList();
 });
 
-function updateFileList() {
-  const fileList = document.getElementById("fileList");
-  const pdfCount = document.getElementById("pdfCount");
+function updateFileList(){
+
+  const fileList =
+    document.getElementById("fileList");
+
+  const pdfCount =
+    document.getElementById("pdfCount");
 
   fileList.innerHTML = "";
+
   pdfCount.textContent = uploadedFiles.length;
 
-  if (!uploadedFiles.length) {
-    document.getElementById("uploadStatus").textContent = "No drawings uploaded yet.";
+  if(!uploadedFiles.length){
+
+    document.getElementById("uploadStatus")
+    .textContent =
+    "No drawings uploaded yet.";
+
     return;
   }
 
   uploadedFiles.forEach(file => {
+
     const li = document.createElement("li");
+
     li.textContent = file.name;
+
     fileList.appendChild(li);
   });
 
-  document.getElementById("uploadStatus").textContent =
-    uploadedFiles.length + " PDF file(s) ready to analyze.";
+  document.getElementById("uploadStatus")
+  .textContent =
+  uploadedFiles.length +
+  " PDF file(s) ready for AI analysis.";
 }
 
-function calculateEstimate() {
-  const heads = Number(document.getElementById("heads").value || 0);
+function calculateEstimate(){
+
+  const heads =
+    Number(document.getElementById("heads").value || 0);
+
   const labourHours = heads;
+
   const elbows = heads * 3;
+
   const hangers = heads;
 
-  document.getElementById("estimateResult").textContent =
+  document.getElementById("estimateResult")
+  .textContent =
+
 `Heads / Drops: ${heads}
 
 Estimated Labour:
@@ -382,153 +473,244 @@ Estimated Labour:
 
 Basic Material Allowance:
 - ${heads} sprinkler heads
-- ${heads} 1" pipe/nipple allowances
-- ${elbows} 1" 90° elbows
-- ${hangers} hanger/rod assemblies
+- ${heads} pipe/nipple allowances
+- ${elbows} 90° elbows
+- ${hangers} hanger assemblies
 
 Note:
-This is a quick allowance only. Full material takeoff should come from drawing analysis.`;
+Quick allowance only.
+Use AI drawing analysis for full estimate.`;
 }
 
-async function runAI() {
-  const input = document.getElementById("aiInput").value;
-  const output = document.getElementById("aiResult");
+async function runAI(){
 
-  if (!input.trim()) {
-    output.textContent = "Please enter project notes first.";
+  const input =
+    document.getElementById("aiInput").value;
+
+  const output =
+    document.getElementById("aiResult");
+
+  if(!input.trim()){
+
+    output.textContent =
+    "Please enter project notes first.";
+
     return;
   }
 
-  output.textContent = "Running AI estimate from notes...";
+  output.textContent =
+  "Running AI estimate...";
 
-  try {
-    const response = await fetch(AI_WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: input, images: [] })
-    });
+  try{
+
+    const response = await fetch(
+      AI_WORKER_URL,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          text:input,
+          images:[]
+        })
+      }
+    );
 
     const data = await response.json();
-    output.textContent = data.result || JSON.stringify(data, null, 2);
 
-  } catch (error) {
-    output.textContent = "AI error: " + error.message;
+    output.textContent =
+      data.result ||
+      JSON.stringify(data,null,2);
+
+  }catch(error){
+
+    output.textContent =
+    "AI error: " + error.message;
   }
 }
 
-async function analyzeDrawingPDFs() {
-  const output = document.getElementById("aiResult");
-  const status = document.getElementById("uploadStatus");
+async function analyzeDrawingPDFs(){
 
-  if (!uploadedFiles.length) {
-    status.textContent = "Please upload at least one PDF first.";
+  const output =
+    document.getElementById("aiResult");
+
+  const status =
+    document.getElementById("uploadStatus");
+
+  if(!uploadedFiles.length){
+
+    status.textContent =
+    "Please upload at least one PDF first.";
+
     return;
   }
 
   extractedPDFText = "";
   drawingImages = [];
 
-  output.textContent = "Preparing drawings for AI visual analysis...";
-  status.textContent = "Reading PDFs and converting pages into images...";
+  output.textContent =
+  "Preparing drawings for AI analysis...";
 
-  try {
+  status.textContent =
+  "Converting PDF pages into drawing images...";
+
+  try{
+
     let totalPagesScanned = 0;
 
-    for (const file of uploadedFiles) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    for(const file of uploadedFiles){
+
+      const arrayBuffer =
+        await file.arrayBuffer();
+
+      const pdf =
+        await pdfjsLib
+        .getDocument({data:arrayBuffer})
+        .promise;
+
+      const pagesToProcess =
+        Math.min(pdf.numPages, MAX_PAGES_PER_FILE);
 
       extractedPDFText +=
-        "\n\n====================================\n" +
-        "FILE: " + file.name + "\n" +
-        "TOTAL PDF PAGES: " + pdf.numPages + "\n" +
-        "PAGES SENT FOR VISUAL AI REVIEW: " + Math.min(pdf.numPages, MAX_PAGES_PER_FILE) + "\n" +
-        "====================================\n";
+      "\nFILE: " + file.name + "\n";
 
-      const pagesToProcess = Math.min(pdf.numPages, MAX_PAGES_PER_FILE);
+      for(let pageNumber = 1;
+          pageNumber <= pagesToProcess;
+          pageNumber++){
 
-      for (let pageNumber = 1; pageNumber <= pagesToProcess; pageNumber++) {
         status.textContent =
-          "Processing " + file.name + " - page " + pageNumber + " of " + pagesToProcess + "...";
+        "Processing " +
+        file.name +
+        " | Page " +
+        pageNumber +
+        " of " +
+        pagesToProcess;
 
-        const page = await pdf.getPage(pageNumber);
+        const page =
+          await pdf.getPage(pageNumber);
 
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(" ");
+        const textContent =
+          await page.getTextContent();
+
+        const pageText =
+          textContent.items
+          .map(item => item.str)
+          .join(" ");
 
         extractedPDFText +=
-          "\n--- " + file.name + " | PAGE " + pageNumber + " TEXT ---\n" +
+          "\nPAGE " +
+          pageNumber +
+          ":\n" +
           pageText +
           "\n";
 
-        const viewport = page.getViewport({ scale: IMAGE_SCALE });
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
+        const viewport =
+          page.getViewport({
+            scale:IMAGE_SCALE
+          });
+
+        const canvas =
+          document.createElement("canvas");
+
+        const context =
+          canvas.getContext("2d");
 
         canvas.width = viewport.width;
         canvas.height = viewport.height;
 
         await page.render({
-          canvasContext: context,
-          viewport: viewport
+          canvasContext:context,
+          viewport:viewport
         }).promise;
 
-        const imageDataUrl = canvas.toDataURL("image/jpeg", IMAGE_QUALITY);
+        const imageDataUrl =
+          canvas.toDataURL(
+            "image/jpeg",
+            IMAGE_QUALITY
+          );
 
         drawingImages.push({
-          fileName: file.name,
-          pageNumber: pageNumber,
-          image: imageDataUrl
+          fileName:file.name,
+          pageNumber:pageNumber,
+          image:imageDataUrl
         });
 
         totalPagesScanned++;
-        document.getElementById("pageCount").textContent = totalPagesScanned;
+
+        document.getElementById("pageCount")
+        .textContent =
+        totalPagesScanned;
       }
     }
 
     status.textContent =
-      "Sending " + drawingImages.length + " drawing page image(s) plus hidden PDF text to AI...";
+    "Sending drawings to FireFlow AI...";
 
-    output.textContent = "AI is visually reviewing the drawings. This may take a bit for large files...";
+    output.textContent =
+    "AI is visually reviewing the sprinkler drawings...";
 
-    const projectNotes = document.getElementById("aiInput").value || "";
+    const projectNotes =
+      document.getElementById("aiInput").value || "";
 
-    const response = await fetch(AI_WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text:
-          "PROJECT NOTES:\n" + projectNotes +
-          "\n\nHIDDEN PDF TEXT EXTRACTED FROM DRAWINGS:\n" + extractedPDFText,
-        images: drawingImages
-      })
-    });
+    const response = await fetch(
+      AI_WORKER_URL,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          text:
+            "PROJECT NOTES:\n" +
+            projectNotes +
+            "\n\nPDF TEXT:\n" +
+            extractedPDFText,
+          images:drawingImages
+        })
+      }
+    );
 
     const data = await response.json();
 
-    output.textContent = data.result || JSON.stringify(data, null, 2);
+    output.textContent =
+      data.result ||
+      JSON.stringify(data,null,2);
 
     status.textContent =
-      "Analysis complete. Reviewed " + uploadedFiles.length + " PDF file(s) and " +
-      drawingImages.length + " page image(s).";
+    "Analysis complete.";
 
-  } catch (error) {
-    output.textContent = "Drawing analysis error: " + error.message;
-    status.textContent = "Error during drawing analysis.";
+  }catch(error){
+
+    output.textContent =
+    "Analysis error: " + error.message;
+
+    status.textContent =
+    "Error during analysis.";
   }
 }
 
-function clearProject() {
+function clearProject(){
+
   uploadedFiles = [];
   extractedPDFText = "";
   drawingImages = [];
 
   document.getElementById("pdfFiles").value = "";
+
   document.getElementById("fileList").innerHTML = "";
+
   document.getElementById("pdfCount").textContent = "0";
+
   document.getElementById("pageCount").textContent = "0";
-  document.getElementById("uploadStatus").textContent = "No drawings uploaded yet.";
-  document.getElementById("aiResult").textContent = "AI estimate will appear here.";
+
+  document.getElementById("uploadStatus")
+  .textContent =
+  "No drawings uploaded yet.";
+
+  document.getElementById("aiResult")
+  .textContent =
+  "AI estimate will appear here.";
 }
 </script>
 
