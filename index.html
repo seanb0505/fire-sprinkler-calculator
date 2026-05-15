@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>FireFlow AI - Fire Sprinkler Estimator</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -217,6 +218,12 @@
       filter: brightness(1.08);
     }
 
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .btn.secondary {
       background: rgba(148, 163, 184, 0.13);
       color: var(--text);
@@ -245,6 +252,7 @@
       white-space: pre-wrap;
       font-size: 14px;
       line-height: 1.5;
+      overflow-wrap: break-word;
     }
 
     .pill-row {
@@ -355,13 +363,15 @@
       color: #e0f2fe;
     }
 
-    .file-list {
+    .file-list,
+    .sheet-list {
       display: grid;
       gap: 8px;
       margin-top: 12px;
     }
 
-    .file-item {
+    .file-item,
+    .sheet-item {
       display: flex;
       justify-content: space-between;
       gap: 12px;
@@ -371,6 +381,10 @@
       border-radius: 14px;
       color: #cbd5e1;
       font-size: 14px;
+    }
+
+    .sheet-item {
+      align-items: center;
     }
 
     .small {
@@ -427,8 +441,10 @@
       transition: width 0.25s ease;
     }
 
-    .hidden {
-      display: none !important;
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
     footer {
@@ -452,6 +468,10 @@
       .span-4 {
         grid-column: span 12;
       }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -462,7 +482,9 @@
       <span class="logo-dot"></span>
       FireFlow AI
     </div>
+
     <h1>Fire Sprinkler Estimator</h1>
+
     <p class="subtitle">
       Upload sprinkler drawings, hydraulic calculations, PDFs, spreadsheets, and notes.
       FireFlow AI helps build material lists, labour summaries, onsite fabrication estimates, and prefab comparisons.
@@ -486,14 +508,16 @@
           <div class="card span-12">
             <h2>Project Dashboard</h2>
             <p>
-              Start with the AI Drawing Analyzer. The new version renders PDF pages into high-resolution images before sending them to your Cloudflare Worker.
+              Start with the AI Drawing Analyzer. This version can render first pages, many pages, all pages, or a custom PDF page range before sending sheets to your Cloudflare Worker.
             </p>
+
             <div class="pill-row">
-              <span class="pill">PDF image rendering</span>
+              <span class="pill">PDF page range control</span>
+              <span class="pill">Render all pages option</span>
+              <span class="pill">Rendered sheet preview</span>
               <span class="pill">Onsite fab tab</span>
               <span class="pill">Prefab tab</span>
               <span class="pill">Cleaner material tables</span>
-              <span class="pill">Worker connected</span>
             </div>
           </div>
 
@@ -513,18 +537,16 @@
           </div>
 
           <div class="card span-6">
-            <h3>What changed in this version</h3>
+            <h3>Why this update matters</h3>
             <p>
-              PDF files are now converted into clearer page images in the browser before analysis.
-              This helps the AI review the actual drawing sheets instead of only reading extracted text.
+              If the analyzer only saw the first few sheets, it could miss risers, schedules, full head counts, mains, branch lines, notes, and later FP pages. This version lets you send the important pages.
             </p>
           </div>
 
           <div class="card span-6">
-            <h3>Recommended next testing file</h3>
+            <h3>Best testing setting</h3>
             <p>
-              Use the same drawing package that previously caused the AI to say it could not zoom in.
-              After this update, the status should show rendered page images being sent to the Worker.
+              For a full drawing package, try custom range first. Example: if sprinkler sheets are pages 3 to 12, enter <strong>3-12</strong>. For smaller files, use all pages.
             </p>
           </div>
         </div>
@@ -545,40 +567,65 @@
               placeholder="https://fire-estimator-ai.yourname.workers.dev"
             />
 
-            <label for="projectType">Project Type</label>
-            <select id="projectType">
-              <option value="Unknown">Unknown / Let AI decide</option>
-              <option value="New install">New install</option>
-              <option value="Tenant improvement">Tenant improvement</option>
-              <option value="Retrofit">Retrofit</option>
-              <option value="Service work">Service work</option>
-              <option value="Monthly/annual testing">Monthly/annual testing</option>
-            </select>
+            <div class="two-col">
+              <div>
+                <label for="projectType">Project Type</label>
+                <select id="projectType">
+                  <option value="Unknown">Unknown / Let AI decide</option>
+                  <option value="New install">New install</option>
+                  <option value="Tenant improvement">Tenant improvement</option>
+                  <option value="Retrofit">Retrofit</option>
+                  <option value="Service work">Service work</option>
+                  <option value="Monthly/annual testing">Monthly/annual testing</option>
+                </select>
+              </div>
 
-            <label for="fabricationMode">Fabrication Mode</label>
-            <select id="fabricationMode">
-              <option value="compare">Compare onsite fabrication and prefab</option>
-              <option value="onsite">On-site fabrication only</option>
-              <option value="prefab">Prefab only</option>
-            </select>
+              <div>
+                <label for="fabricationMode">Fabrication Mode</label>
+                <select id="fabricationMode">
+                  <option value="compare">Compare onsite fabrication and prefab</option>
+                  <option value="onsite">On-site fabrication only</option>
+                  <option value="prefab">Prefab only</option>
+                </select>
+              </div>
+            </div>
 
-            <label for="pdfRenderScale">PDF Render Quality</label>
-            <select id="pdfRenderScale">
-              <option value="2">Standard high-resolution</option>
-              <option value="2.6" selected>Sharper drawing review</option>
-              <option value="3.2">Very sharp, slower upload</option>
-            </select>
+            <div class="two-col">
+              <div>
+                <label for="pdfRenderScale">PDF Render Quality</label>
+                <select id="pdfRenderScale">
+                  <option value="2">Standard high-resolution</option>
+                  <option value="2.6" selected>Sharper drawing review</option>
+                  <option value="3.2">Very sharp, slower upload</option>
+                </select>
+              </div>
 
-            <label for="maxPdfPages">Maximum PDF Pages to Render</label>
-            <select id="maxPdfPages">
-              <option value="4">First 4 pages</option>
-              <option value="8" selected>First 8 pages</option>
-              <option value="12">First 12 pages</option>
-              <option value="20">First 20 pages</option>
-            </select>
+              <div>
+                <label for="pdfPageMode">PDF Pages to Render</label>
+                <select id="pdfPageMode">
+                  <option value="8">First 8 pages</option>
+                  <option value="20" selected>First 20 pages</option>
+                  <option value="50">First 50 pages</option>
+                  <option value="all">All pages</option>
+                  <option value="custom">Custom page range</option>
+                </select>
+              </div>
+            </div>
+
+            <label for="customPageRange">Custom Page Range</label>
+            <input
+              id="customPageRange"
+              placeholder="Example: 1-6, 9, 12-18"
+            />
+
+            <div class="warning">
+              For large drawing packages, use a custom range for the sprinkler sheets.
+              Example: if FP drawings are on pages 4 to 16, enter <strong>4-16</strong>.
+              Sending every page can be slower and may cost more AI usage.
+            </div>
 
             <label for="instructions">Project Notes / Instructions</label>
-            <textarea id="instructions" placeholder="Example: 2 inch and 1-1/2 inch are grooved. 1 inch drops are threaded. Include onsite fab and prefab comparison."></textarea>
+            <textarea id="instructions" placeholder="Example: 2 inch and 1-1/2 inch are grooved. 1 inch drops are threaded. Compare onsite fab and prefab. Rough estimate spreadsheet is included as reference."></textarea>
 
             <label for="fileInput">Upload Files</label>
             <input
@@ -596,6 +643,7 @@
             <div class="file-list" id="fileList"></div>
 
             <div class="button-row">
+              <button class="btn" id="previewPagesBtn">Preview Rendered Pages</button>
               <button class="btn" id="analyzeBtn">Analyze Drawings</button>
               <button class="btn secondary" id="testWorkerBtn">Test Worker</button>
               <button class="btn danger" id="clearBtn">Clear</button>
@@ -619,10 +667,16 @@
               No files selected yet.
             </div>
 
+            <h3 style="margin-top: 18px;">Rendered Sheets</h3>
+            <div class="sheet-list" id="renderedSheetList">
+              <div class="small">No rendered pages yet.</div>
+            </div>
+
             <div class="success">
               This version sends:
               <br />• Original uploaded files
               <br />• Rendered PDF page images
+              <br />• Page range info
               <br />• Project type
               <br />• Fabrication mode
               <br />• Contractor notes
@@ -756,6 +810,7 @@
 
           <div class="card span-6">
             <h3>Location</h3>
+
             <label for="supplierLocation">Pricing Area</label>
             <input id="supplierLocation" placeholder="Example: Barrie, Ontario" />
 
@@ -824,9 +879,12 @@
 
           <div class="card span-6">
             <h3>Saved Settings</h3>
-            <button class="btn" id="saveSettingsBtn">Save Current Settings</button>
-            <button class="btn secondary" id="loadSettingsBtn">Load Saved Settings</button>
-            <button class="btn danger" id="clearSettingsBtn">Clear Saved Settings</button>
+
+            <div class="button-row">
+              <button class="btn" id="saveSettingsBtn">Save Current Settings</button>
+              <button class="btn secondary" id="loadSettingsBtn">Load Saved Settings</button>
+              <button class="btn danger" id="clearSettingsBtn">Clear Saved Settings</button>
+            </div>
           </div>
 
           <div class="card span-6">
@@ -853,6 +911,7 @@
     const state = {
       selectedFiles: [],
       renderedImages: [],
+      renderedSheetMeta: [],
       lastResult: ""
     };
 
@@ -863,10 +922,13 @@
       projectType: document.getElementById("projectType"),
       fabricationMode: document.getElementById("fabricationMode"),
       pdfRenderScale: document.getElementById("pdfRenderScale"),
-      maxPdfPages: document.getElementById("maxPdfPages"),
+      pdfPageMode: document.getElementById("pdfPageMode"),
+      customPageRange: document.getElementById("customPageRange"),
       instructions: document.getElementById("instructions"),
       fileInput: document.getElementById("fileInput"),
       fileList: document.getElementById("fileList"),
+      renderedSheetList: document.getElementById("renderedSheetList"),
+      previewPagesBtn: document.getElementById("previewPagesBtn"),
       analyzeBtn: document.getElementById("analyzeBtn"),
       testWorkerBtn: document.getElementById("testWorkerBtn"),
       clearBtn: document.getElementById("clearBtn"),
@@ -896,6 +958,7 @@
       bindAnalyzer();
       bindCalculators();
       updateDashboard();
+      updatePageRangeVisibility();
     }
 
     function bindNavigation() {
@@ -932,11 +995,22 @@
       els.fileInput.addEventListener("change", () => {
         state.selectedFiles = Array.from(els.fileInput.files || []);
         state.renderedImages = [];
+        state.renderedSheetMeta = [];
         renderFileList();
+        renderSheetList();
         updateDashboard();
-        setStatus("Files selected. Click Analyze Drawings to render PDFs and send to Worker.");
+        setStatus("Files selected. Click Preview Rendered Pages or Analyze Drawings.");
       });
 
+      els.pdfPageMode.addEventListener("change", () => {
+        updatePageRangeVisibility();
+        state.renderedImages = [];
+        state.renderedSheetMeta = [];
+        renderSheetList();
+        updateDashboard();
+      });
+
+      els.previewPagesBtn.addEventListener("click", previewRenderedPages);
       els.analyzeBtn.addEventListener("click", analyzeDrawings);
       els.testWorkerBtn.addEventListener("click", testWorker);
       els.clearBtn.addEventListener("click", clearAnalyzer);
@@ -950,6 +1024,18 @@
       document.getElementById("calcMaterialBtn").addEventListener("click", calculateMaterial);
       document.getElementById("calcLabourBtn").addEventListener("click", calculateLabour);
       document.getElementById("calcServiceBtn").addEventListener("click", calculateService);
+    }
+
+    function updatePageRangeVisibility() {
+      const mode = els.pdfPageMode.value;
+
+      if (mode === "custom") {
+        els.customPageRange.disabled = false;
+        els.customPageRange.placeholder = "Example: 1-6, 9, 12-18";
+      } else {
+        els.customPageRange.disabled = true;
+        els.customPageRange.placeholder = "Only used when Custom page range is selected";
+      }
     }
 
     function renderFileList() {
@@ -982,6 +1068,66 @@
           .join("\n");
     }
 
+    function renderSheetList() {
+      if (!state.renderedSheetMeta.length) {
+        els.renderedSheetList.innerHTML = '<div class="small">No rendered pages yet.</div>';
+        return;
+      }
+
+      els.renderedSheetList.innerHTML = state.renderedSheetMeta
+        .map((sheet) => {
+          return `
+            <div class="sheet-item">
+              <div>
+                <strong>${escapeHtml(sheet.fileName)}</strong>
+                <div class="small">Page ${sheet.pageNumber} of ${sheet.totalPages}</div>
+              </div>
+              <div class="small">${escapeHtml(sheet.imageName)}</div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    async function previewRenderedPages() {
+      if (!state.selectedFiles.length) {
+        setStatus("Please choose at least one PDF first.", "error");
+        return;
+      }
+
+      const pdfFiles = getPdfFiles();
+
+      if (!pdfFiles.length) {
+        setStatus("No PDF files selected. Preview only applies to PDF drawings.", "error");
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setProgress(5);
+        setStatus("Rendering PDF page preview...");
+
+        state.renderedImages = [];
+        state.renderedSheetMeta = [];
+
+        state.renderedImages = await renderPdfFilesToImages(pdfFiles);
+
+        renderSheetList();
+        updateDashboard("Previewed");
+
+        setStatus(
+          `Preview complete.\nRendered PDF page images: ${state.renderedImages.length}\nReview the Rendered Sheets list on the right before analyzing.`
+        );
+        setProgress(100);
+      } catch (error) {
+        console.error(error);
+        setStatus("Preview error:\n" + (error.message || String(error)), "error");
+        updateDashboard("Error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
     async function analyzeDrawings() {
       const workerUrl = normalizeUrl(els.workerUrl.value);
 
@@ -1002,15 +1148,14 @@
         setProgress(5);
         setStatus("Preparing upload...");
 
-        state.renderedImages = [];
+        const pdfFiles = getPdfFiles();
 
-        const pdfFiles = state.selectedFiles.filter((file) =>
-          file.name.toLowerCase().endsWith(".pdf")
-        );
-
-        if (pdfFiles.length) {
+        if (pdfFiles.length && !state.renderedImages.length) {
           setStatus("Rendering PDF pages into high-resolution images...");
+          state.renderedImages = [];
+          state.renderedSheetMeta = [];
           state.renderedImages = await renderPdfFilesToImages(pdfFiles);
+          renderSheetList();
         }
 
         setProgress(62);
@@ -1020,7 +1165,10 @@
         formData.append("aiMode", "drawing-analyzer");
         formData.append("projectType", els.projectType.value);
         formData.append("fabricationMode", els.fabricationMode.value);
-        formData.append("instructions", els.instructions.value || "");
+        formData.append("instructions", buildEnhancedInstructions());
+        formData.append("pdfPageMode", els.pdfPageMode.value);
+        formData.append("customPageRange", els.customPageRange.value || "");
+        formData.append("renderedSheetMeta", JSON.stringify(state.renderedSheetMeta));
 
         state.selectedFiles.forEach((file) => {
           formData.append("files", file, file.name);
@@ -1031,7 +1179,7 @@
         });
 
         setStatus(
-          `Sending ${state.selectedFiles.length} original file(s) and ${state.renderedImages.length} rendered PDF page image(s) to Worker...`
+          `Sending upload to Worker...\nOriginal files: ${state.selectedFiles.length}\nRendered PDF page images: ${state.renderedImages.length}`
         );
 
         setProgress(75);
@@ -1044,6 +1192,7 @@
         const text = await response.text();
 
         let data;
+
         try {
           data = JSON.parse(text);
         } catch (error) {
@@ -1059,6 +1208,7 @@
         state.lastResult = resultText;
 
         setProgress(100);
+
         setStatus(
           `Analysis complete.\n\nOriginal files: ${data.filesReceived ?? state.selectedFiles.length}\nRendered images: ${data.renderedImagesReceived ?? state.renderedImages.length}\nTotal reviewed: ${data.totalFilesReviewed ?? "unknown"}`
         );
@@ -1074,10 +1224,50 @@
       }
     }
 
+    function buildEnhancedInstructions() {
+      const userNotes = els.instructions.value || "";
+
+      const renderedPagesSummary = state.renderedSheetMeta.length
+        ? state.renderedSheetMeta
+            .map((sheet) => {
+              return `${sheet.fileName} page ${sheet.pageNumber} of ${sheet.totalPages}`;
+            })
+            .join("; ")
+        : "No rendered PDF pages.";
+
+      return `
+User notes:
+${userNotes || "No additional user notes provided."}
+
+Rendered PDF sheets sent to AI:
+${renderedPagesSummary}
+
+Important estimating instructions:
+- Use all rendered PDF page images as the primary drawing review source.
+- Do not only count hydraulic calculation design-area heads.
+- Build head count from full sprinkler layout sheets where visible.
+- Review all visible sprinkler sheets, riser details, notes, legends, and schedules.
+- Separate pipe, fittings, riser material, valves, hangers, heads, and accessories.
+- 2" and 1-1/2" steel should be treated as grooved unless the drawings say otherwise.
+- 1" drops should be treated as threaded unless the drawings say otherwise.
+- Surge restraints are for CPVC/plastic only, not steel.
+- If rough material lists or spreadsheets are uploaded, compare them against the drawing-derived estimate and identify likely missing/undercounted items.
+- Onsite fabrication has more field labour and no prefab fabrication cost.
+- Prefab has lower field install labour but should include shop fabrication/fabrication cost.
+- Keep the output short, structured, and practical for a sprinkler contractor.
+      `.trim();
+    }
+
+    function getPdfFiles() {
+      return state.selectedFiles.filter((file) =>
+        file.name.toLowerCase().endsWith(".pdf")
+      );
+    }
+
     async function renderPdfFilesToImages(pdfFiles) {
       const rendered = [];
       const scale = Number(els.pdfRenderScale.value || 2.6);
-      const maxPages = Number(els.maxPdfPages.value || 8);
+      const pageMode = els.pdfPageMode.value;
 
       if (!window.pdfjsLib) {
         setStatus("PDF.js did not load. PDFs will be uploaded, but pages cannot be rendered.", "error");
@@ -1085,15 +1275,34 @@
       }
 
       let completedPages = 0;
+      let totalPlannedPages = 0;
+
+      const pdfPlans = [];
 
       for (const pdfFile of pdfFiles) {
         const arrayBuffer = await pdfFile.arrayBuffer();
         const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
         const pdf = await loadingTask.promise;
+        const pages = getPagesToRender(pdf.numPages, pageMode, els.customPageRange.value);
 
-        const pagesToRender = Math.min(pdf.numPages, maxPages);
+        pdfPlans.push({
+          pdfFile,
+          pdf,
+          pages,
+          totalPages: pdf.numPages
+        });
 
-        for (let pageNumber = 1; pageNumber <= pagesToRender; pageNumber++) {
+        totalPlannedPages += pages.length;
+      }
+
+      if (!totalPlannedPages) {
+        throw new Error("No PDF pages selected to render. Check your page range.");
+      }
+
+      for (const plan of pdfPlans) {
+        const { pdfFile, pdf, pages, totalPages } = plan;
+
+        for (const pageNumber of pages) {
           const page = await pdf.getPage(pageNumber);
           const viewport = page.getViewport({ scale });
 
@@ -1117,18 +1326,95 @@
           });
 
           rendered.push(imageFile);
+
+          state.renderedSheetMeta.push({
+            fileName: pdfFile.name,
+            imageName,
+            pageNumber,
+            totalPages,
+            renderScale: scale
+          });
+
           completedPages++;
 
-          const roughProgress = Math.min(58, 10 + completedPages * 5);
-          setProgress(roughProgress);
+          const progress = 10 + Math.round((completedPages / totalPlannedPages) * 50);
+
+          setProgress(Math.min(60, progress));
+
           setStatus(
-            `Rendering PDF pages...\n${pdfFile.name}\nPage ${pageNumber} of ${pagesToRender}\nRendered images so far: ${rendered.length}`
+            `Rendering PDF pages...\nFile: ${pdfFile.name}\nPage: ${pageNumber} of ${totalPages}\nRendered: ${completedPages} of ${totalPlannedPages}`
           );
         }
       }
 
+      renderSheetList();
       updateDashboard();
+
       return rendered;
+    }
+
+    function getPagesToRender(totalPages, mode, customRange) {
+      if (mode === "all") {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
+      }
+
+      if (mode === "custom") {
+        return parsePageRange(customRange, totalPages);
+      }
+
+      const maxPages = Number(mode || 20);
+      const count = Math.min(totalPages, maxPages);
+
+      return Array.from({ length: count }, (_, index) => index + 1);
+    }
+
+    function parsePageRange(input, totalPages) {
+      const cleanInput = String(input || "").trim();
+
+      if (!cleanInput) {
+        throw new Error("Custom page range is empty. Example: 1-6, 9, 12-18");
+      }
+
+      const pages = new Set();
+      const parts = cleanInput.split(",");
+
+      for (const rawPart of parts) {
+        const part = rawPart.trim();
+
+        if (!part) continue;
+
+        if (part.includes("-")) {
+          const [startRaw, endRaw] = part.split("-").map((value) => value.trim());
+          const start = Number(startRaw);
+          const end = Number(endRaw);
+
+          if (!Number.isInteger(start) || !Number.isInteger(end)) {
+            throw new Error("Invalid page range. Use a format like 1-6, 9, 12-18.");
+          }
+
+          if (start < 1 || end < 1 || start > totalPages || end > totalPages || start > end) {
+            throw new Error(`Page range ${part} is outside the PDF page count of ${totalPages}.`);
+          }
+
+          for (let page = start; page <= end; page++) {
+            pages.add(page);
+          }
+        } else {
+          const page = Number(part);
+
+          if (!Number.isInteger(page)) {
+            throw new Error("Invalid page number. Use a format like 1-6, 9, 12-18.");
+          }
+
+          if (page < 1 || page > totalPages) {
+            throw new Error(`Page ${page} is outside the PDF page count of ${totalPages}.`);
+          }
+
+          pages.add(page);
+        }
+      }
+
+      return Array.from(pages).sort((a, b) => a - b);
     }
 
     function canvasToBlob(canvas, type, quality) {
@@ -1218,7 +1504,10 @@
       if (startIndex === -1) return "";
 
       const endIndex = text.indexOf(endHeading, startIndex + startHeading.length);
-      if (endIndex === -1) return text.slice(startIndex).trim();
+
+      if (endIndex === -1) {
+        return text.slice(startIndex).trim();
+      }
 
       return text.slice(startIndex, endIndex).trim();
     }
@@ -1259,22 +1548,27 @@
           i += 2;
 
           const rows = [];
+
           while (i < lines.length && isTableRow(lines[i])) {
             rows.push(splitTableRow(lines[i]));
             i++;
           }
 
           let table = "<table><thead><tr>";
+
           headers.forEach((header) => {
             table += `<th>${header}</th>`;
           });
+
           table += "</tr></thead><tbody>";
 
           rows.forEach((row) => {
             table += "<tr>";
+
             headers.forEach((_, index) => {
               table += `<td>${row[index] || ""}</td>`;
             });
+
             table += "</tr>";
           });
 
@@ -1405,12 +1699,14 @@ Notes:
         projectType: els.projectType.value,
         fabricationMode: els.fabricationMode.value,
         pdfRenderScale: els.pdfRenderScale.value,
-        maxPdfPages: els.maxPdfPages.value
+        pdfPageMode: els.pdfPageMode.value,
+        customPageRange: els.customPageRange.value
       };
 
       localStorage.setItem("fireflow_settings", JSON.stringify(settings));
 
       const settingsStatus = document.getElementById("settingsStatus");
+
       if (settingsStatus) {
         settingsStatus.textContent = "Settings saved.";
       }
@@ -1419,6 +1715,7 @@ Notes:
     function loadSettings() {
       try {
         const raw = localStorage.getItem("fireflow_settings");
+
         if (!raw) return;
 
         const settings = JSON.parse(raw);
@@ -1427,9 +1724,13 @@ Notes:
         if (settings.projectType) els.projectType.value = settings.projectType;
         if (settings.fabricationMode) els.fabricationMode.value = settings.fabricationMode;
         if (settings.pdfRenderScale) els.pdfRenderScale.value = settings.pdfRenderScale;
-        if (settings.maxPdfPages) els.maxPdfPages.value = settings.maxPdfPages;
+        if (settings.pdfPageMode) els.pdfPageMode.value = settings.pdfPageMode;
+        if (settings.customPageRange) els.customPageRange.value = settings.customPageRange;
+
+        updatePageRangeVisibility();
 
         const settingsStatus = document.getElementById("settingsStatus");
+
         if (settingsStatus) {
           settingsStatus.textContent = "Saved settings loaded.";
         }
@@ -1440,16 +1741,20 @@ Notes:
 
     function clearSettings() {
       localStorage.removeItem("fireflow_settings");
+
       document.getElementById("settingsStatus").textContent = "Saved settings cleared.";
     }
 
     function clearAnalyzer() {
       state.selectedFiles = [];
       state.renderedImages = [];
+      state.renderedSheetMeta = [];
       state.lastResult = "";
 
       els.fileInput.value = "";
       els.fileList.innerHTML = "";
+      renderSheetList();
+
       els.fullResult.textContent = "Results will appear here after analysis.";
       els.onsiteResult.textContent = "On-site fabrication summary will appear here.";
       els.prefabResult.textContent = "Prefab summary will appear here.";
@@ -1466,6 +1771,7 @@ Notes:
     function setLoading(isLoading) {
       els.loader.classList.toggle("active", isLoading);
       els.analyzeBtn.disabled = isLoading;
+      els.previewPagesBtn.disabled = isLoading;
       els.testWorkerBtn.disabled = isLoading;
     }
 
@@ -1488,12 +1794,17 @@ Notes:
     function updateDashboard(status) {
       els.dashFiles.textContent = state.selectedFiles.length;
       els.dashImages.textContent = state.renderedImages.length;
-      if (status) els.dashStatus.textContent = status;
+
+      if (status) {
+        els.dashStatus.textContent = status;
+      }
     }
 
     function normalizeUrl(url) {
       const trimmed = String(url || "").trim();
+
       if (!trimmed) return "";
+
       return trimmed.replace(/\/+$/, "");
     }
 
