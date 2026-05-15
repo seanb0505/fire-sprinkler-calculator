@@ -1582,6 +1582,14 @@
               <div class="panel-body">
                 <div class="field"><label>Saved Worker URL</label><input id="settingsWorkerUrl" placeholder="Paste Worker URL here"></div>
                 <div class="field"><label>Default labour rate</label><input value="115"></div>
+                <div class="field">
+                  <label>Default fabrication mode</label>
+                  <select id="settingsFabricationMode">
+                    <option value="On-site fabrication">On-site fabrication</option>
+                    <option value="Prefab">Prefab</option>
+                    <option value="Compare both">Compare both</option>
+                  </select>
+                </div>
                 <button class="btn red" onclick="saveSettings()">Save Settings</button>
               </div>
             </div>
@@ -1661,11 +1669,11 @@
         </div>
 
         <div class="upload-box">
-          <p style="margin-top:0;">Upload sprinkler drawings, hydraulic calculations, specs, notes, or images.</p>
-          <input id="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xlsx" />
+          <p style="margin-top:0;">Upload sprinkler drawings, hydraulic calculations, specs, notes, spreadsheets, or images.</p>
+          <input id="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xls,.xlsx" />
           <p class="upload-help">
             You can select multiple files at once with Ctrl/Shift, or choose one file at a time.
-            Each new selection will be added to the list instead of replacing the previous files.
+            Uploading the rough material spreadsheet with the drawings can help the AI compare against your onsite fabrication benchmark.
           </p>
           <div id="fileList" class="file-list"></div>
         </div>
@@ -1679,6 +1687,19 @@
             <option>Service / Repair</option>
             <option>Unknown</option>
           </select>
+        </div>
+
+        <div class="field">
+          <label>Fabrication Mode</label>
+          <select id="fabricationMode">
+            <option value="On-site fabrication">On-site fabrication</option>
+            <option value="Prefab">Prefab</option>
+            <option value="Compare both">Compare both</option>
+          </select>
+          <p class="upload-help">
+            On-site fabrication uses more field labour and no prefab cost. Prefab reduces field labour but adds fabrication cost.
+            Compare both will ask the AI to show both scenarios.
+          </p>
         </div>
 
         <div class="field">
@@ -1712,6 +1733,7 @@
     const workerUrl = document.getElementById("workerUrl");
     const instructions = document.getElementById("instructions");
     const projectType = document.getElementById("projectType");
+    const fabricationMode = document.getElementById("fabricationMode");
     const labourRate = document.getElementById("labourRate");
     const loading = document.getElementById("loading");
     const aiStatus = document.getElementById("aiStatus");
@@ -1729,6 +1751,13 @@
       workerUrl.value = savedWorkerUrl;
       const settingsWorkerUrl = document.getElementById("settingsWorkerUrl");
       if (settingsWorkerUrl) settingsWorkerUrl.value = savedWorkerUrl;
+    }
+
+    const savedFabricationMode = localStorage.getItem("fireflowFabricationMode");
+    if (savedFabricationMode) {
+      fabricationMode.value = savedFabricationMode;
+      const settingsFabricationMode = document.getElementById("settingsFabricationMode");
+      if (settingsFabricationMode) settingsFabricationMode.value = savedFabricationMode;
     }
 
     instructions.value = `Act as a professional fire sprinkler estimator.
@@ -1751,9 +1780,11 @@ Important rules:
 - Separate confirmed quantities from estimated quantities.
 - No surge restraints on steel pipe.
 - Surge restraints only apply to plastic/CPVC pipe.
-- 1 inch threaded drops should not receive grooved couplings.
+- For this warehouse-style job, only 1 inch should be threaded unless drawings say otherwise.
+- 1.5 inch and larger steel pipe/fittings should be grooved unless drawings say otherwise.
+- Do not add grooved couplings to 1 inch threaded drops.
 - Break down fittings by exact size whenever possible.
-- If a fitting cannot be confirmed, estimate based on visible pipe routing, branch turns, drops, riser details, and standard sprinkler installation practice.`;
+- Use the selected fabrication mode when estimating labour and material.`;
 
     document.querySelectorAll(".nav-item[data-page]").forEach(item => {
       item.addEventListener("click", function(event) {
@@ -1826,6 +1857,8 @@ Important rules:
         <span>Location: Ontario, Canada</span>
         <span>|</span>
         <span>Type: ${page === "service" ? "Service / Testing" : "New Construction"}</span>
+        <span>|</span>
+        <span>Fab Mode: ${escapeHtml(fabricationMode.value)}</span>
       `;
     }
 
@@ -1945,9 +1978,11 @@ Important rules:
       }
 
       localStorage.setItem("fireflowWorkerUrl", url);
+      localStorage.setItem("fireflowFabricationMode", fabricationMode.value);
 
       const formData = new FormData();
       formData.append("projectType", projectType.value);
+      formData.append("fabricationMode", fabricationMode.value);
       formData.append("labourRate", labourRate.value || "115");
       formData.append("instructions", instructions.value || "");
 
@@ -2178,10 +2213,18 @@ Important rules:
 
     function saveSettings() {
       const settingsWorkerUrl = document.getElementById("settingsWorkerUrl");
+      const settingsFabricationMode = document.getElementById("settingsFabricationMode");
+
       if (settingsWorkerUrl && settingsWorkerUrl.value.trim()) {
         localStorage.setItem("fireflowWorkerUrl", settingsWorkerUrl.value.trim());
         workerUrl.value = settingsWorkerUrl.value.trim();
       }
+
+      if (settingsFabricationMode) {
+        localStorage.setItem("fireflowFabricationMode", settingsFabricationMode.value);
+        fabricationMode.value = settingsFabricationMode.value;
+      }
+
       alert("Settings saved.");
     }
 
