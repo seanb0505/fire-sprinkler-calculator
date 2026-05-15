@@ -11,7 +11,7 @@
     :root {
       --bg: #07111f;
       --panel: #0f1b2d;
-      --panel-2: #13233a;
+      --panel2: #13233a;
       --card: #101d31;
       --border: rgba(148, 163, 184, 0.22);
       --text: #f8fafc;
@@ -20,7 +20,6 @@
       --green: #22c55e;
       --orange: #f59e0b;
       --red: #ef4444;
-      --purple: #a78bfa;
       --shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
     }
 
@@ -151,6 +150,7 @@
     .span-8 { grid-column: span 8; }
     .span-6 { grid-column: span 6; }
     .span-4 { grid-column: span 4; }
+    .span-3 { grid-column: span 3; }
 
     h2 {
       margin: 0 0 14px;
@@ -217,6 +217,12 @@
       filter: brightness(1.08);
     }
 
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .btn.secondary {
       background: rgba(148, 163, 184, 0.13);
       color: var(--text);
@@ -245,6 +251,7 @@
       white-space: pre-wrap;
       font-size: 14px;
       line-height: 1.5;
+      overflow-wrap: break-word;
     }
 
     .pill-row {
@@ -321,18 +328,6 @@
 
     .result-panel.active {
       display: block;
-    }
-
-    .result-panel h1,
-    .result-panel h2,
-    .result-panel h3 {
-      margin-top: 18px;
-    }
-
-    .result-panel h1:first-child,
-    .result-panel h2:first-child,
-    .result-panel h3:first-child {
-      margin-top: 0;
     }
 
     .result-panel table {
@@ -427,10 +422,6 @@
       transition: width 0.25s ease;
     }
 
-    .hidden {
-      display: none !important;
-    }
-
     footer {
       color: var(--muted);
       text-align: center;
@@ -449,7 +440,8 @@
 
       .span-8,
       .span-6,
-      .span-4 {
+      .span-4,
+      .span-3 {
         grid-column: span 12;
       }
     }
@@ -462,10 +454,12 @@
       <span class="logo-dot"></span>
       FireFlow AI
     </div>
+
     <h1>Fire Sprinkler Estimator</h1>
+
     <p class="subtitle">
-      Upload sprinkler drawings, hydraulic calculations, PDFs, spreadsheets, and notes.
-      FireFlow AI helps build material lists, labour summaries, onsite fabrication estimates, and prefab comparisons.
+      Contractor dashboard for sprinkler estimating, AI drawing analysis, material breakdowns,
+      labour hours, supplier pricing, and service/testing quotes.
     </p>
   </header>
 
@@ -484,47 +478,55 @@
       <section id="dashboard" class="section active">
         <div class="grid">
           <div class="card span-12">
-            <h2>Project Dashboard</h2>
+            <h2>FireFlow AI Dashboard</h2>
             <p>
-              Start with the AI Drawing Analyzer. The new version renders PDF pages into high-resolution images before sending them to your Cloudflare Worker.
+              Manage fire sprinkler estimates from one place. Start with the AI Drawing Analyzer,
+              then review material, labour, fabrication, pricing, and service/testing sections.
             </p>
+
             <div class="pill-row">
-              <span class="pill">PDF image rendering</span>
-              <span class="pill">Onsite fab tab</span>
-              <span class="pill">Prefab tab</span>
-              <span class="pill">Cleaner material tables</span>
-              <span class="pill">Worker connected</span>
+              <span class="pill">AI drawing takeoff</span>
+              <span class="pill">Onsite fabrication</span>
+              <span class="pill">Prefab comparison</span>
+              <span class="pill">Material breakdowns</span>
+              <span class="pill">Labour estimating</span>
+              <span class="pill">Service & testing</span>
             </div>
           </div>
 
-          <div class="metric span-4">
+          <div class="metric span-3">
             <div class="value" id="dashFiles">0</div>
             <div class="label">Uploaded files this session</div>
           </div>
 
-          <div class="metric span-4">
+          <div class="metric span-3">
             <div class="value" id="dashImages">0</div>
             <div class="label">Rendered PDF page images</div>
           </div>
 
-          <div class="metric span-4">
+          <div class="metric span-3">
             <div class="value" id="dashStatus">Idle</div>
             <div class="label">AI analyzer status</div>
           </div>
 
+          <div class="metric span-3">
+            <div class="value">Ready</div>
+            <div class="label">Service/testing module</div>
+          </div>
+
           <div class="card span-6">
-            <h3>What changed in this version</h3>
+            <h3>Next best step</h3>
             <p>
-              PDF files are now converted into clearer page images in the browser before analysis.
-              This helps the AI review the actual drawing sheets instead of only reading extracted text.
+              Reconnect your Cloudflare Worker URL, upload the same drawing package, and test the analyzer.
+              Keep the PDF page limit at 20 for now so it sees more sheets without changing the whole website.
             </p>
           </div>
 
           <div class="card span-6">
-            <h3>Recommended next testing file</h3>
+            <h3>Current focus</h3>
             <p>
-              Use the same drawing package that previously caused the AI to say it could not zoom in.
-              After this update, the status should show rendered page images being sent to the Worker.
+              Improve analyzer accuracy for material takeoff, head counts, pipe sizes, fittings,
+              riser material, onsite fabrication, prefab, and labour logic.
             </p>
           </div>
         </div>
@@ -572,13 +574,13 @@
             <label for="maxPdfPages">Maximum PDF Pages to Render</label>
             <select id="maxPdfPages">
               <option value="4">First 4 pages</option>
-              <option value="8" selected>First 8 pages</option>
+              <option value="8">First 8 pages</option>
               <option value="12">First 12 pages</option>
-              <option value="20">First 20 pages</option>
+              <option value="20" selected>First 20 pages</option>
             </select>
 
             <label for="instructions">Project Notes / Instructions</label>
-            <textarea id="instructions" placeholder="Example: 2 inch and 1-1/2 inch are grooved. 1 inch drops are threaded. Include onsite fab and prefab comparison."></textarea>
+            <textarea id="instructions" placeholder="Example: 2 inch and 1-1/2 inch are grooved. 1 inch drops are threaded. Compare onsite fab and prefab. Rough material spreadsheet is included as reference."></textarea>
 
             <label for="fileInput">Upload Files</label>
             <input
@@ -590,7 +592,7 @@
 
             <div class="warning">
               Tip: You can select multiple files at once. On Windows, use Ctrl-click or Shift-click if needed.
-              PDF drawings will be rendered into images before analysis.
+              PDF drawings are rendered into page images before being sent to the Worker.
             </div>
 
             <div class="file-list" id="fileList"></div>
@@ -615,6 +617,7 @@
 
           <div class="card span-4">
             <h3>Analyzer Checks</h3>
+
             <div class="status-box" id="debugBox">
               No files selected yet.
             </div>
@@ -673,7 +676,7 @@
           <div class="card span-12">
             <h2>Material Calculator</h2>
             <p>
-              Quick calculator for small jobs, drops, relocates, and add-on work. This is separate from the AI drawing analyzer.
+              Quick calculator for drops, relocates, small jobs, and add-on work.
             </p>
           </div>
 
@@ -714,7 +717,7 @@
           <div class="card span-12">
             <h2>Labour Estimator</h2>
             <p>
-              Basic labour logic. You can adjust this later as FireFlow AI learns better production rates.
+              Basic labour logic for heads, drops, onsite fabrication, and prefab comparison.
             </p>
           </div>
 
@@ -750,12 +753,13 @@
           <div class="card span-12">
             <h2>Supplier Pricing</h2>
             <p>
-              Future feature: connect local supplier pricing by location. For now, this section is a placeholder for material price tables.
+              Future feature: local supplier pricing by location, material type, manufacturer, and project region.
             </p>
           </div>
 
           <div class="card span-6">
-            <h3>Location</h3>
+            <h3>Pricing Source</h3>
+
             <label for="supplierLocation">Pricing Area</label>
             <input id="supplierLocation" placeholder="Example: Barrie, Ontario" />
 
@@ -779,8 +783,29 @@
           <div class="card span-12">
             <h2>Service & Testing</h2>
             <p>
-              Future service module for monthly, quarterly, semi-annual, annual inspections, deficiency repairs, and quote reports.
+              Build quick quotes for inspections, testing, service calls, repairs, and deficiency work.
+              Customers can edit the generated quote before sending.
             </p>
+          </div>
+
+          <div class="metric span-3">
+            <div class="value">Monthly</div>
+            <div class="label">Inspection option</div>
+          </div>
+
+          <div class="metric span-3">
+            <div class="value">Annual</div>
+            <div class="label">Testing option</div>
+          </div>
+
+          <div class="metric span-3">
+            <div class="value">Repairs</div>
+            <div class="label">Deficiency work</div>
+          </div>
+
+          <div class="metric span-3">
+            <div class="value">Quote</div>
+            <div class="label">Editable result</div>
           </div>
 
           <div class="card span-6">
@@ -788,11 +813,14 @@
 
             <label for="serviceType">Service Type</label>
             <select id="serviceType">
-              <option>Annual sprinkler inspection</option>
-              <option>Monthly inspection</option>
-              <option>Quarterly inspection</option>
+              <option>Monthly sprinkler inspection</option>
+              <option>Quarterly sprinkler inspection</option>
+              <option>Semi-annual sprinkler inspection</option>
+              <option>Annual sprinkler inspection/testing</option>
+              <option>5-year internal pipe inspection</option>
               <option>Deficiency repair</option>
-              <option>Emergency service</option>
+              <option>Emergency service call</option>
+              <option>Small sprinkler relocation</option>
             </select>
 
             <label for="serviceHours">Estimated Hours</label>
@@ -801,14 +829,28 @@
             <label for="serviceRate">Hourly Rate</label>
             <input id="serviceRate" type="number" min="0" step="1" value="125" />
 
-            <button class="btn" style="margin-top: 16px;" id="calcServiceBtn">Calculate Service Quote</button>
+            <label for="serviceMaterial">Material Allowance</label>
+            <input id="serviceMaterial" type="number" min="0" step="1" value="0" />
+
+            <label for="serviceNotes">Service Notes</label>
+            <textarea id="serviceNotes" placeholder="Example: Includes inspection of wet sprinkler system, control valves, flow switch, tamper switches, gauges, and report."></textarea>
+
+            <button class="btn" style="margin-top: 16px;" id="calcServiceBtn">Generate Service Quote</button>
           </div>
 
           <div class="card span-6">
-            <h3>Service Result</h3>
+            <h3>Service Quote Result</h3>
             <div class="status-box" id="serviceResult">
-              Enter service details and calculate.
+              Enter service details and generate a quote.
             </div>
+          </div>
+
+          <div class="card span-12">
+            <h3>Future AI Service Report</h3>
+            <p>
+              Later this section can generate inspection reports, deficiency summaries, customer-facing quotes,
+              repair recommendations, and recurring testing schedules.
+            </p>
           </div>
         </div>
       </section>
@@ -824,9 +866,12 @@
 
           <div class="card span-6">
             <h3>Saved Settings</h3>
-            <button class="btn" id="saveSettingsBtn">Save Current Settings</button>
-            <button class="btn secondary" id="loadSettingsBtn">Load Saved Settings</button>
-            <button class="btn danger" id="clearSettingsBtn">Clear Saved Settings</button>
+
+            <div class="button-row">
+              <button class="btn" id="saveSettingsBtn">Save Current Settings</button>
+              <button class="btn secondary" id="loadSettingsBtn">Load Saved Settings</button>
+              <button class="btn danger" id="clearSettingsBtn">Clear Saved Settings</button>
+            </div>
           </div>
 
           <div class="card span-6">
@@ -841,7 +886,7 @@
   </div>
 
   <footer>
-    FireFlow AI prototype — contractor estimating assistant.
+    FireFlow AI prototype — fire sprinkler contractor estimating assistant.
   </footer>
 
   <script>
@@ -1020,7 +1065,7 @@
         formData.append("aiMode", "drawing-analyzer");
         formData.append("projectType", els.projectType.value);
         formData.append("fabricationMode", els.fabricationMode.value);
-        formData.append("instructions", els.instructions.value || "");
+        formData.append("instructions", buildInstructions());
 
         state.selectedFiles.forEach((file) => {
           formData.append("files", file, file.name);
@@ -1031,7 +1076,7 @@
         });
 
         setStatus(
-          `Sending ${state.selectedFiles.length} original file(s) and ${state.renderedImages.length} rendered PDF page image(s) to Worker...`
+          `Sending upload to Worker...\nOriginal files: ${state.selectedFiles.length}\nRendered PDF page images: ${state.renderedImages.length}`
         );
 
         setProgress(75);
@@ -1044,6 +1089,7 @@
         const text = await response.text();
 
         let data;
+
         try {
           data = JSON.parse(text);
         } catch (error) {
@@ -1059,6 +1105,7 @@
         state.lastResult = resultText;
 
         setProgress(100);
+
         setStatus(
           `Analysis complete.\n\nOriginal files: ${data.filesReceived ?? state.selectedFiles.length}\nRendered images: ${data.renderedImagesReceived ?? state.renderedImages.length}\nTotal reviewed: ${data.totalFilesReviewed ?? "unknown"}`
         );
@@ -1074,10 +1121,33 @@
       }
     }
 
+    function buildInstructions() {
+      const userNotes = els.instructions.value || "";
+
+      return `
+User notes:
+${userNotes || "No additional user notes provided."}
+
+Important FireFlow AI estimating instructions:
+- Use rendered PDF page images as the main drawing review source.
+- Do not say you cannot zoom in.
+- If something is unclear, say "unclear from provided image" instead of guessing.
+- Do not only count hydraulic calculation design-area heads.
+- Build head count from sprinkler layout sheets where visible.
+- Separate pipe, fittings, riser material, valves, hangers, heads, and accessories.
+- 2" and 1-1/2" steel should be treated as grooved unless drawings say otherwise.
+- 1" drops should be treated as threaded unless drawings say otherwise.
+- Surge restraints are for CPVC/plastic only, not steel.
+- Onsite fabrication has more field labour and no prefab fabrication cost.
+- Prefab has lower field install labour but includes shop fabrication/fabrication cost.
+- Keep the output short, structured, and practical for a sprinkler contractor.
+      `.trim();
+    }
+
     async function renderPdfFilesToImages(pdfFiles) {
       const rendered = [];
       const scale = Number(els.pdfRenderScale.value || 2.6);
-      const maxPages = Number(els.maxPdfPages.value || 8);
+      const maxPages = Number(els.maxPdfPages.value || 20);
 
       if (!window.pdfjsLib) {
         setStatus("PDF.js did not load. PDFs will be uploaded, but pages cannot be rendered.", "error");
@@ -1119,8 +1189,9 @@
           rendered.push(imageFile);
           completedPages++;
 
-          const roughProgress = Math.min(58, 10 + completedPages * 5);
+          const roughProgress = Math.min(58, 10 + completedPages * 3);
           setProgress(roughProgress);
+
           setStatus(
             `Rendering PDF pages...\n${pdfFile.name}\nPage ${pageNumber} of ${pagesToRender}\nRendered images so far: ${rendered.length}`
           );
@@ -1227,7 +1298,6 @@
       if (!markdown) return "";
 
       let html = escapeHtml(markdown);
-
       html = convertMarkdownTables(html);
 
       html = html
@@ -1377,25 +1447,35 @@ Notes:
       const type = document.getElementById("serviceType").value;
       const hours = Number(document.getElementById("serviceHours").value || 0);
       const rate = Number(document.getElementById("serviceRate").value || 0);
-      const total = hours * rate;
+      const material = Number(document.getElementById("serviceMaterial").value || 0);
+      const notes = document.getElementById("serviceNotes").value || "No extra notes entered.";
+
+      const labourTotal = hours * rate;
+      const subtotal = labourTotal + material;
 
       document.getElementById("serviceResult").textContent = `
-Service quote:
+Service / Testing Quote
 
-Type:
+Service type:
 - ${type}
 
 Labour:
-- ${hours.toFixed(1)} hours
+- ${hours.toFixed(1)} hours @ $${rate.toFixed(2)} / hour
+- Labour total: $${labourTotal.toFixed(2)}
 
-Rate:
-- $${rate.toFixed(2)} / hour
+Material allowance:
+- $${material.toFixed(2)}
 
-Estimated labour total:
-- $${total.toFixed(2)}
+Estimated subtotal:
+- $${subtotal.toFixed(2)}
 
 Notes:
-- Material, permit fees, lift rental, fire watch, and after-hours premiums are not included unless added separately.
+${notes}
+
+Exclusions / reminders:
+- Taxes not included.
+- Permit fees, lift rental, fire watch, after-hours premiums, and major parts are extra unless included above.
+- Customer can edit this quote before sending.
       `.trim();
     }
 
@@ -1411,9 +1491,7 @@ Notes:
       localStorage.setItem("fireflow_settings", JSON.stringify(settings));
 
       const settingsStatus = document.getElementById("settingsStatus");
-      if (settingsStatus) {
-        settingsStatus.textContent = "Settings saved.";
-      }
+      if (settingsStatus) settingsStatus.textContent = "Settings saved.";
     }
 
     function loadSettings() {
@@ -1430,9 +1508,7 @@ Notes:
         if (settings.maxPdfPages) els.maxPdfPages.value = settings.maxPdfPages;
 
         const settingsStatus = document.getElementById("settingsStatus");
-        if (settingsStatus) {
-          settingsStatus.textContent = "Saved settings loaded.";
-        }
+        if (settingsStatus) settingsStatus.textContent = "Saved settings loaded.";
       } catch (error) {
         console.warn("Could not load settings", error);
       }
@@ -1488,7 +1564,10 @@ Notes:
     function updateDashboard(status) {
       els.dashFiles.textContent = state.selectedFiles.length;
       els.dashImages.textContent = state.renderedImages.length;
-      if (status) els.dashStatus.textContent = status;
+
+      if (status) {
+        els.dashStatus.textContent = status;
+      }
     }
 
     function normalizeUrl(url) {
