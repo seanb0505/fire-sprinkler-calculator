@@ -1050,7 +1050,7 @@ FireFlow AI website instructions:
         extractSection(result, "## 6. Fittings Breakdown", "## 7. Riser"),
         extractSection(result, "## 7. Riser", "## 8. Hangers"),
         extractSection(result, "## 8. Hangers", "## 9. On-Site Fabrication Estimate")
-      ].filter(Boolean).join("\\n\\n");
+      ].filter(Boolean).join("\n\n");
 
       document.getElementById("materialResult").innerHTML =
         markdownToHtml(materialSections) || "<p>Material sections were not found. See Full Estimate.</p>";
@@ -1058,7 +1058,7 @@ FireFlow AI website instructions:
       const laborSections = [
         extractSection(result, "## 9. On-Site Fabrication Estimate", "## 10. Prefab Estimate"),
         extractSection(result, "## 10. Prefab Estimate", "## 11. Missing")
-      ].filter(Boolean).join("\\n\\n");
+      ].filter(Boolean).join("\n\n");
 
       document.getElementById("laborResult").innerHTML =
         markdownToHtml(laborSections) || "<p>Labor sections were not found. See Full Estimate.</p>";
@@ -1081,11 +1081,11 @@ FireFlow AI website instructions:
         .replace(/^# (.*)$/gm, "<h1>$1</h1>")
         .replace(/^## (.*)$/gm, "<h2>$1</h2>")
         .replace(/^### (.*)$/gm, "<h3>$1</h3>")
-        .replace(/\\*\\*(.*?)\\*\\*/g, "<strong>$1</strong>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/^- (.*)$/gm, "<li>$1</li>")
         .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
-        .replace(/\\n{2,}/g, "<br><br>")
-        .replace(/\\n/g, "<br>");
+        .replace(/\n{2,}/g, "<br><br>")
+        .replace(/\n/g, "<br>");
 
       html = html.replace(/<\/ul><br><br><ul>/g, "");
       html = html.replace(/<\/li><br><li>/g, "</li><li>");
@@ -1094,7 +1094,7 @@ FireFlow AI website instructions:
     }
 
     function convertMarkdownTables(text) {
-      const lines = text.split("\\n");
+      const lines = text.split("\n");
       const output = [];
       let i = 0;
 
@@ -1129,13 +1129,13 @@ FireFlow AI website instructions:
         }
       }
 
-      return output.join("\\n");
+      return output.join("\n");
     }
 
-    function isTableRow(line) { return /^\\s*\\|.*\\|\\s*$/.test(line); }
-    function isSeparatorRow(line) { return /^\\s*\\|?[\\s:-]+\\|[\\s|:-]*\\|?\\s*$/.test(line); }
+    function isTableRow(line) { return /^\s*\|.*\|\s*$/.test(line); }
+    function isSeparatorRow(line) { return /^\s*\|?[\s:-]+\|[\s|:-]*\|?\s*$/.test(line); }
     function splitTableRow(line) {
-      return line.trim().replace(/^\\|/, "").replace(/\\|$/, "").split("|").map(cell => cell.trim());
+      return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(cell => cell.trim());
     }
 
     function calculateMaterial() {
