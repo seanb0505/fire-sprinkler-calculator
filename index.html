@@ -901,6 +901,13 @@
       margin-bottom: 14px;
     }
 
+    .upload-help {
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 10px 0 0;
+    }
+
     .file-list {
       display: grid;
       gap: 8px;
@@ -910,6 +917,7 @@
     .file-chip {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 10px;
       padding: 10px;
       border: 1px solid var(--border);
@@ -917,6 +925,21 @@
       border-radius: 5px;
       font-size: 13px;
       color: #cbd5e1;
+    }
+
+    .file-chip span:first-child {
+      overflow-wrap: anywhere;
+    }
+
+    .remove-file {
+      border: 1px solid rgba(239,68,68,0.4);
+      background: rgba(239,68,68,0.12);
+      color: #fecaca;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      flex: 0 0 auto;
     }
 
     .loading {
@@ -1587,6 +1610,10 @@
         <div class="upload-box">
           <p style="margin-top:0;">Upload sprinkler drawings, hydraulic calculations, specs, notes, or images.</p>
           <input id="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xlsx" />
+          <p class="upload-help">
+            You can select multiple files at once with Ctrl/Shift, or choose one file at a time.
+            Each new selection will be added to the list instead of replacing the previous files.
+          </p>
           <div id="fileList" class="file-list"></div>
         </div>
 
@@ -1683,7 +1710,21 @@ Important rules:
     });
 
     fileInput.addEventListener("change", function(event) {
-      selectedFiles = Array.from(event.target.files || []);
+      const newFiles = Array.from(event.target.files || []);
+
+      newFiles.forEach(newFile => {
+        const alreadyAdded = selectedFiles.some(existingFile =>
+          existingFile.name === newFile.name &&
+          existingFile.size === newFile.size &&
+          existingFile.lastModified === newFile.lastModified
+        );
+
+        if (!alreadyAdded) {
+          selectedFiles.push(newFile);
+        }
+      });
+
+      fileInput.value = "";
       renderFiles();
     });
 
@@ -1693,13 +1734,21 @@ Important rules:
       selectedFiles.forEach((file, index) => {
         const div = document.createElement("div");
         div.className = "file-chip";
-        div.innerHTML = `<span>${index + 1}. ${escapeHtml(file.name)}</span><span>${formatSize(file.size)}</span>`;
+        div.innerHTML = `
+          <span>${index + 1}. ${escapeHtml(file.name)} · ${formatSize(file.size)}</span>
+          <button class="remove-file" type="button" onclick="removeFile(${index})">Remove</button>
+        `;
         fileList.appendChild(div);
       });
 
       fileStatus.textContent = selectedFiles.length
         ? `${selectedFiles.length} file${selectedFiles.length === 1 ? "" : "s"} loaded`
         : "No files selected";
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      renderFiles();
     }
 
     function clearFiles() {
@@ -1764,7 +1813,7 @@ Important rules:
 
       loading.style.display = "flex";
       aiStatus.textContent = "Analyzing...";
-      workerStatus.textContent = "Sending files to Worker";
+      workerStatus.textContent = `Sending ${selectedFiles.length} file${selectedFiles.length === 1 ? "" : "s"} to Worker`;
 
       try {
         const response = await fetch(url, {
