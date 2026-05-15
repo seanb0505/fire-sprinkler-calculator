@@ -8,15 +8,11 @@
   <style>
     :root {
       --bg: #080d11;
-      --bg2: #0d141a;
       --panel: #11181f;
-      --panel2: #151f27;
-      --panel3: #0d1217;
       --border: #26323d;
       --border2: #33414e;
       --red: #dc2626;
       --red2: #ef4444;
-      --red3: #991b1b;
       --green: #22c55e;
       --yellow: #facc15;
       --blue: #38bdf8;
@@ -24,7 +20,6 @@
       --purple: #a855f7;
       --text: #f8fafc;
       --muted: #94a3b8;
-      --muted2: #64748b;
       --shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
       --radius: 8px;
     }
@@ -43,6 +38,10 @@
       font-family: Arial, Helvetica, sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+    }
+
+    body.modal-open {
+      overflow: hidden;
     }
 
     button,
@@ -829,15 +828,19 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      overflow: hidden;
     }
 
     .modal {
       width: min(760px, 100%);
+      max-height: 90vh;
       background: #0d141a;
       border: 1px solid var(--border2);
       border-radius: 10px;
       box-shadow: var(--shadow);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .modal-header {
@@ -846,6 +849,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex: 0 0 auto;
     }
 
     .modal-header h3 {
@@ -854,6 +858,9 @@
 
     .modal-body {
       padding: 18px;
+      overflow-y: auto;
+      max-height: calc(90vh - 67px);
+      overscroll-behavior: contain;
     }
 
     .field {
@@ -1031,6 +1038,18 @@
       th,
       td {
         white-space: normal;
+      }
+
+      .modal-backdrop {
+        padding: 10px;
+      }
+
+      .modal {
+        max-height: 94vh;
+      }
+
+      .modal-body {
+        max-height: calc(94vh - 67px);
       }
     }
   </style>
@@ -1271,36 +1290,6 @@
                           <tr><td>FDC</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
                           <tr><td>Waterflow Switch</td><td>2</td><td>EA</td><td class="confidence">97%</td></tr>
                           <tr><td>Inspector Test & Drain</td><td>1</td><td>EA</td><td class="confidence">95%</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="mini-panel">
-                      <div class="mini-title">THREADED FITTINGS</div>
-                      <table>
-                        <thead>
-                          <tr><th>Item</th><th>Size/Type</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>90° Elbow</td><td>1"</td><td>86</td><td>EA</td><td class="confidence">95%</td></tr>
-                          <tr><td>Tee</td><td>1"</td><td>34</td><td>EA</td><td class="confidence">89%</td></tr>
-                          <tr><td>Coupling</td><td>1"</td><td>12</td><td>EA</td><td class="confidence">88%</td></tr>
-                          <tr><td>Bushing</td><td>1" x ½"</td><td>14</td><td>EA</td><td class="confidence">67%</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="mini-panel">
-                      <div class="mini-title">HANGERS & SUPPORTS</div>
-                      <table>
-                        <thead>
-                          <tr><th>Assembly</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>Pipe Hanger</td><td>156</td><td>EA</td><td>75%</td></tr>
-                          <tr><td>Trapeze Assembly</td><td>28</td><td>EA</td><td>70%</td></tr>
-                          <tr><td>Beam Clamp</td><td>42</td><td>EA</td><td>68%</td></tr>
-                          <tr><td>Threaded Rod</td><td>198</td><td>FT</td><td>72%</td></tr>
                         </tbody>
                       </table>
                     </div>
@@ -1699,10 +1688,12 @@ Important rules:
 
     function openModal() {
       modal.style.display = "flex";
+      document.body.classList.add("modal-open");
     }
 
     function closeModal() {
       modal.style.display = "none";
+      document.body.classList.remove("modal-open");
     }
 
     modal.addEventListener("click", function(event) {
