@@ -3,26 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FireFlow AI Estimator</title>
+  <title>FireFlow AI - Fire Sprinkler Estimator</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
     :root {
-      --bg: #080d11;
-      --panel: #11181f;
-      --panel2: #151f27;
-      --border: #26323d;
-      --border2: #33414e;
-      --red: #dc2626;
-      --red2: #ef4444;
-      --green: #22c55e;
-      --yellow: #facc15;
-      --blue: #38bdf8;
-      --orange: #f97316;
-      --purple: #a855f7;
+      --bg: #07111f;
+      --panel: #0f1b2d;
+      --panel-2: #13233a;
+      --card: #101d31;
+      --border: rgba(148, 163, 184, 0.22);
       --text: #f8fafc;
       --muted: #94a3b8;
-      --shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
-      --radius: 8px;
+      --blue: #38bdf8;
+      --green: #22c55e;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --purple: #a78bfa;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
     }
 
     * {
@@ -31,2216 +30,1495 @@
 
     body {
       margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(220, 38, 38, 0.12), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.07), transparent 40%),
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 34%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.10), transparent 28%),
         var(--bg);
       color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
     }
 
-    body.modal-open {
-      overflow: hidden;
-    }
-
-    button,
-    input,
-    textarea,
-    select {
-      font-family: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .app {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      background: linear-gradient(180deg, #0c1117, #081016);
-      border-right: 1px solid var(--border);
-      padding: 18px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      padding: 0 8px 20px;
+    header {
+      padding: 42px 20px 24px;
+      text-align: center;
       border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--blue);
+      background: rgba(15, 27, 45, 0.75);
+      font-weight: 700;
       margin-bottom: 18px;
     }
 
-    .logo-icon {
-      width: 46px;
-      height: 46px;
-      border: 3px solid var(--red);
-      border-radius: 11px;
-      display: grid;
-      place-items: center;
-      color: var(--red2);
-      font-size: 24px;
-      font-weight: 900;
-      position: relative;
-      transform: rotate(45deg);
+    .logo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.7);
     }
 
-    .logo-icon span {
-      transform: rotate(-45deg);
-      display: block;
+    h1 {
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: 1.02;
+      margin: 0;
+      letter-spacing: -1.5px;
     }
 
-    .logo-text strong {
-      display: block;
-      font-size: 26px;
-      letter-spacing: 3px;
-      line-height: 1;
-    }
-
-    .logo-text strong .red {
-      color: var(--red2);
-    }
-
-    .logo-text small {
-      color: #cbd5e1;
-      letter-spacing: 5px;
-      font-size: 11px;
-      margin-top: 6px;
-      display: block;
-    }
-
-    .nav {
-      display: grid;
-      gap: 7px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--text);
-      text-decoration: none;
-      padding: 13px 14px;
-      border-radius: 6px;
-      font-size: 15px;
-      border: 1px solid transparent;
-    }
-
-    .nav-item.active {
-      background: linear-gradient(135deg, var(--red), #b91c1c);
-      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
-    }
-
-    .nav-item:hover:not(.active) {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: var(--border);
-    }
-
-    .status-card {
-      margin-top: 24px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
-
-    .status-card h4 {
-      margin: 0 0 14px;
-      font-size: 13px;
-      letter-spacing: 0.03em;
-    }
-
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .subtitle {
+      max-width: 850px;
+      margin: 18px auto 0;
       color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 9px;
+      font-size: 18px;
+      line-height: 1.5;
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--muted);
-      flex: 0 0 auto;
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 18px;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 22px;
     }
 
-    .dot.green { background: var(--green); }
-    .dot.red { background: var(--red); }
-    .dot.blue { background: var(--blue); }
-    .dot.orange { background: var(--orange); }
-    .dot.purple { background: var(--purple); }
-
-    .credit-bar {
-      height: 7px;
-      background: #1f2937;
-      border-radius: 999px;
-      overflow: hidden;
-      margin: 14px 0 8px;
-    }
-
-    .credit-bar span {
-      display: block;
-      width: 92%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--red), var(--red2));
-    }
-
-    .upgrade {
-      width: 100%;
-      border: 0;
-      background: #1f2937;
-      color: white;
-      padding: 12px;
-      border-radius: 5px;
-      margin-top: 12px;
-      font-weight: 700;
-    }
-
-    .main {
-      min-width: 0;
-    }
-
-    .topbar {
-      min-height: 86px;
-      background: rgba(8, 13, 17, 0.88);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 28px;
-      backdrop-filter: blur(20px);
+    .sidebar {
       position: sticky;
-      top: 0;
-      z-index: 10;
-      gap: 18px;
+      top: 16px;
+      align-self: start;
+      background: rgba(15, 27, 45, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
     }
 
-    .topbar-title h1 {
-      margin: 0;
-      font-size: 24px;
-      line-height: 1.1;
+    .nav-btn {
+      width: 100%;
+      text-align: left;
+      padding: 13px 14px;
+      margin: 5px 0;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
     }
 
-    .topbar-title p {
-      margin: 5px 0 0;
-      color: #e2e8f0;
-      font-size: 16px;
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.28);
+      color: var(--text);
     }
 
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      color: white;
-      font-size: 14px;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--red);
-      color: white;
-      border-radius: 999px;
-      min-width: 24px;
-      height: 24px;
-      padding: 0 7px;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .avatar {
-      width: 38px;
-      height: 38px;
-      background: var(--red);
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-    }
-
-    .project-header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 18px;
-      padding: 20px 28px 16px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(13, 20, 26, 0.78);
-    }
-
-    .project-info {
-      display: flex;
-      align-items: center;
-      gap: 18px;
+    main {
       min-width: 0;
     }
 
-    .drawing-thumb {
-      width: 80px;
-      height: 80px;
-      border-radius: 4px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.9), rgba(203,213,225,0.85));
-      border: 1px solid var(--border2);
-      position: relative;
-      overflow: hidden;
-      flex: 0 0 auto;
+    .section {
+      display: none;
     }
 
-    .drawing-thumb::before,
-    .drawing-thumb::after {
-      content: "";
-      position: absolute;
-      inset: 13px;
-      border: 1px solid #334155;
+    .section.active {
+      display: block;
     }
 
-    .drawing-thumb::after {
-      inset: 24px 16px;
-      border-color: #ef4444;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
     }
 
-    .project-info h2 {
-      margin: 0;
-      font-size: 21px;
-      letter-spacing: 0.04em;
+    .card {
+      background: rgba(15, 27, 45, 0.86);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow);
     }
 
-    .active-pill {
-      background: var(--red);
-      color: white;
-      font-size: 11px;
-      padding: 4px 7px;
-      border-radius: 3px;
-      margin-left: 8px;
-      vertical-align: middle;
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 28px;
+      letter-spacing: -0.5px;
     }
 
-    .project-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 13px;
+    h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    label {
+      display: block;
       color: #cbd5e1;
-      margin-top: 9px;
+      font-weight: 700;
       font-size: 14px;
+      margin: 14px 0 7px;
     }
 
-    .project-buttons {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #081423;
+      color: var(--text);
+      padding: 12px 13px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(56, 189, 248, 0.65);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+    }
+
+    textarea {
+      min-height: 105px;
+      resize: vertical;
     }
 
     .btn {
-      border: 1px solid var(--border2);
-      background: #0b1117;
-      color: white;
-      padding: 12px 19px;
-      border-radius: 5px;
-      font-weight: 700;
-      font-size: 14px;
+      border: 0;
+      border-radius: 15px;
+      padding: 13px 18px;
+      color: #03111f;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      cursor: pointer;
+      transition: 0.2s ease;
     }
 
     .btn:hover {
-      border-color: var(--red2);
+      transform: translateY(-1px);
+      filter: brightness(1.08);
     }
 
-    .btn.red {
-      background: linear-gradient(135deg, var(--red), #b91c1c);
-      border-color: var(--red);
+    .btn.secondary {
+      background: rgba(148, 163, 184, 0.13);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn.danger {
+      background: rgba(239, 68, 68, 0.16);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .status-box {
+      background: #081423;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      color: var(--muted);
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.11);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .metric {
+      background: rgba(19, 35, 58, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .metric .value {
+      font-size: 30px;
+      font-weight: 900;
+      margin-bottom: 5px;
+      color: var(--blue);
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 14px;
     }
 
     .tabs {
       display: flex;
-      gap: 0;
-      padding: 0 28px;
-      background: #0e151b;
-      border-bottom: 1px solid var(--border);
-      overflow-x: auto;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
     }
 
-    .tab {
-      color: #cbd5e1;
-      padding: 16px 24px;
-      font-size: 13px;
-      border-bottom: 2px solid transparent;
-      white-space: nowrap;
+    .tab-btn {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--muted);
+      font-weight: 800;
       cursor: pointer;
     }
 
-    .tab.active {
-      color: var(--red2);
-      border-color: var(--red2);
+    .tab-btn.active {
+      color: #03111f;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      border-color: transparent;
     }
 
-    .content {
-      display: grid;
-      grid-template-columns: 1fr 420px;
-      gap: 18px;
-      padding: 16px 18px 26px;
-    }
-
-    .left-grid {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 14px;
-      min-width: 0;
-    }
-
-    .panel {
-      background: rgba(17, 24, 31, 0.92);
+    .result-panel {
+      display: none;
+      background: #081423;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      min-width: 0;
+      border-radius: 18px;
+      padding: 18px;
+      max-height: 760px;
+      overflow: auto;
     }
 
-    .panel-header {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+    .result-panel.active {
+      display: block;
     }
 
-    .panel-header h3 {
-      margin: 0;
-      font-size: 14px;
-      letter-spacing: 0.02em;
+    .result-panel h1,
+    .result-panel h2,
+    .result-panel h3 {
+      margin-top: 18px;
     }
 
-    .panel-header small {
-      color: var(--muted);
+    .result-panel h1:first-child,
+    .result-panel h2:first-child,
+    .result-panel h3:first-child {
+      margin-top: 0;
     }
 
-    .panel-body {
-      padding: 14px;
-    }
-
-    .drawing-select {
-      width: 100%;
-      background: #0b1117;
-      border: 1px solid var(--border);
-      color: white;
-      padding: 12px;
-      border-radius: 5px;
-      margin-bottom: 12px;
-      outline: none;
-    }
-
-    .drawing-view {
-      background: #f8fafc;
-      height: 250px;
-      border-radius: 3px;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--border2);
-    }
-
-    .plan-lines {
-      position: absolute;
-      inset: 13px;
-      background:
-        linear-gradient(90deg, transparent 96%, rgba(15,23,42,0.25) 97%),
-        linear-gradient(0deg, transparent 96%, rgba(15,23,42,0.25) 97%);
-      background-size: 32px 32px;
-      opacity: 0.7;
-    }
-
-    .pipe-red,
-    .pipe-green,
-    .pipe-blue {
-      position: absolute;
-      height: 3px;
-      border-radius: 999px;
-    }
-
-    .pipe-red { background: #dc2626; }
-    .pipe-green { background: #16a34a; }
-    .pipe-blue { background: #0284c7; }
-
-    .sprinkler {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #dc2626;
-      border-radius: 999px;
-      box-shadow: 0 0 0 2px rgba(220,38,38,0.2);
-    }
-
-    .tool-row {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 7px;
-      margin-top: 12px;
-    }
-
-    .tool-btn {
-      background: #0b1117;
-      border: 1px solid var(--border);
-      color: white;
-      height: 36px;
-      border-radius: 5px;
-    }
-
-    .layer-list {
-      display: grid;
-      gap: 9px;
-    }
-
-    .layer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: white;
-      font-size: 13px;
-    }
-
-    .layer label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .check {
-      width: 16px;
-      height: 16px;
-      border: 1px solid var(--red2);
-      display: grid;
-      place-items: center;
-      border-radius: 3px;
-      color: white;
-      font-size: 11px;
-    }
-
-    .analysis-controls {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      flex-wrap: wrap;
-    }
-
-    .small-btn {
-      background: #0b1117;
-      color: white;
-      border: 1px solid var(--border2);
-      border-radius: 5px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .small-btn.active {
-      background: var(--red);
-      border-color: var(--red);
-    }
-
-    .filter-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .filter-tabs button {
-      background: #0b1117;
-      color: white;
-      border: 1px solid var(--border);
-      padding: 9px 16px;
-      border-radius: 5px;
-      font-size: 12px;
-    }
-
-    .filter-tabs button.active {
-      background: var(--red);
-      border-color: var(--red);
-    }
-
-    .materials-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .mini-panel {
-      border: 1px solid var(--border);
-      background: rgba(8, 13, 17, 0.55);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .mini-title {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 800;
-      color: white;
-      background: rgba(255,255,255,0.025);
-    }
-
-    table {
+    .result-panel table {
       width: 100%;
       border-collapse: collapse;
-    }
-
-    th,
-    td {
-      padding: 8px 9px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      font-size: 12px;
-      text-align: left;
-      white-space: nowrap;
-      vertical-align: top;
-    }
-
-    th {
-      color: #cbd5e1;
-      font-size: 10px;
-      text-transform: uppercase;
-      background: rgba(255,255,255,0.025);
-    }
-
-    td {
-      color: #e2e8f0;
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .confidence {
-      color: var(--green);
-    }
-
-    .summary-strip {
-      margin-top: 13px;
-      border: 1px solid rgba(34,197,94,0.45);
-      background: rgba(34,197,94,0.07);
-      border-radius: 6px;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      align-items: center;
-      padding: 12px;
-      gap: 12px;
-    }
-
-    .strip-item {
-      color: var(--muted);
-      font-size: 12px;
-      border-right: 1px solid var(--border);
-      padding-right: 12px;
-    }
-
-    .strip-item:last-child {
-      border-right: 0;
-    }
-
-    .strip-item strong {
-      display: block;
-      color: white;
-      font-size: 18px;
-      margin-top: 2px;
-    }
-
-    .assembly-row {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 9px;
-    }
-
-    .assembly-card {
-      border: 1px solid var(--border);
-      background: rgba(8,13,17,0.65);
-      border-radius: 7px;
-      padding: 10px;
-      min-height: 96px;
-      position: relative;
-    }
-
-    .assembly-card .icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #cbd5e1, #64748b);
-      margin-bottom: 8px;
-      position: relative;
-    }
-
-    .assembly-card .icon::after {
-      content: "";
-      width: 8px;
-      height: 24px;
-      background: var(--red);
-      position: absolute;
-      left: 15px;
-      top: 8px;
-      border-radius: 999px;
-    }
-
-    .assembly-card strong {
-      font-size: 12px;
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .assembly-card small {
-      color: var(--muted);
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    .qty {
-      display: inline-block;
-      background: rgba(220,38,38,0.75);
-      color: white;
-      padding: 4px 7px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .right-col {
-      display: grid;
-      gap: 12px;
-      align-content: start;
-    }
-
-    .project-summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-    }
-
-    .summary-box {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.04);
-      padding: 12px;
-      text-align: center;
-      border-radius: 4px;
-    }
-
-    .summary-box strong {
-      display: block;
-      font-size: 19px;
-    }
-
-    .summary-box span {
-      color: #cbd5e1;
-      font-size: 10px;
-      text-transform: uppercase;
-    }
-
-    .estimate-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      color: #e2e8f0;
+      margin: 12px 0 18px;
       font-size: 14px;
-      gap: 12px;
     }
 
-    .estimate-total {
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
-      padding-top: 13px;
-      font-size: 17px;
-      font-weight: 800;
+    .result-panel th,
+    .result-panel td {
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 9px;
+      vertical-align: top;
+      text-align: left;
     }
 
-    .estimate-total span:last-child {
-      color: var(--red2);
-      font-size: 20px;
-    }
-
-    .full-width {
-      width: 100%;
-    }
-
-    .supplier-table td,
-    .supplier-table th {
-      text-align: center;
-      white-space: normal;
-    }
-
-    .supplier-table th.active-supplier {
-      background: rgba(220,38,38,0.8);
-      color: white;
-    }
-
-    .confidence-row {
-      display: grid;
-      grid-template-columns: 120px 1fr 40px;
-      gap: 8px;
-      align-items: center;
-      font-size: 13px;
-      margin: 11px 0;
-      color: #e2e8f0;
-    }
-
-    .bar {
-      height: 7px;
-      background: #1f2937;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .bar span {
-      display: block;
-      height: 100%;
-      border-radius: 999px;
-      background: var(--green);
-    }
-
-    .bar.yellow span {
-      background: var(--yellow);
-    }
-
-    .revision {
-      display: grid;
-      grid-template-columns: 14px 1fr;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-    }
-
-    .revision:last-child {
-      border-bottom: 0;
-    }
-
-    .revision strong {
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .revision span {
-      color: var(--muted);
-    }
-
-    .page-section {
-      display: none;
-    }
-
-    .page-section.active {
-      display: block;
-    }
-
-    .formatted-takeoff {
-      color: #e2e8f0;
-      line-height: 1.55;
-      font-size: 13px;
-    }
-
-    .formatted-takeoff h1,
-    .formatted-takeoff h2,
-    .formatted-takeoff h3 {
-      color: white;
-      margin: 18px 0 10px;
-      line-height: 1.2;
-    }
-
-    .formatted-takeoff h1 {
-      font-size: 24px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
-    }
-
-    .formatted-takeoff h2 {
-      font-size: 17px;
-      background: rgba(220,38,38,0.16);
-      border: 1px solid rgba(220,38,38,0.3);
-      padding: 10px 12px;
-      border-radius: 6px;
-    }
-
-    .formatted-takeoff h3 {
-      font-size: 15px;
-      color: #fecaca;
-    }
-
-    .formatted-takeoff p {
-      margin: 8px 0;
-    }
-
-    .formatted-takeoff ul {
-      margin: 8px 0 12px 20px;
-      padding: 0;
-    }
-
-    .formatted-takeoff li {
-      margin: 4px 0;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      margin: 10px 0 16px;
-      background: rgba(8, 13, 17, 0.55);
-    }
-
-    .table-wrap table {
-      min-width: 620px;
-    }
-
-    .raw-output {
-      display: none;
-      white-space: pre-wrap;
-      background: #080d11;
-      border: 1px solid var(--border);
-      padding: 14px;
-      border-radius: 7px;
-      color: #cbd5e1;
-      max-height: 420px;
-      overflow: auto;
-      margin-top: 12px;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.72);
-      z-index: 50;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      overflow: hidden;
-    }
-
-    .modal {
-      width: min(760px, 100%);
-      max-height: 90vh;
-      background: #0d141a;
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-header {
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex: 0 0 auto;
-    }
-
-    .modal-header h3 {
-      margin: 0;
-    }
-
-    .modal-body {
-      padding: 18px;
-      overflow-y: auto;
-      max-height: calc(90vh - 67px);
-      overscroll-behavior: contain;
-    }
-
-    .field {
-      margin-bottom: 14px;
-    }
-
-    .field label {
-      display: block;
-      margin-bottom: 7px;
-      font-size: 13px;
-      color: #cbd5e1;
-      font-weight: 700;
-    }
-
-    input,
-    textarea,
-    select {
-      width: 100%;
-      background: #080d11;
-      border: 1px solid var(--border2);
-      color: white;
-      border-radius: 5px;
-      padding: 12px;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 130px;
-      resize: vertical;
-      line-height: 1.5;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: var(--red2);
-    }
-
-    .upload-box {
-      border: 1px dashed var(--border2);
-      background: rgba(255,255,255,0.03);
-      border-radius: 7px;
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 14px;
-    }
-
-    .upload-help {
-      color: #94a3b8;
-      font-size: 13px;
-      line-height: 1.45;
-      margin: 10px 0 0;
+    .result-panel th {
+      background: rgba(56, 189, 248, 0.11);
+      color: #e0f2fe;
     }
 
     .file-list {
       display: grid;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
-    .file-chip {
+    .file-item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
+      gap: 12px;
+      padding: 11px 12px;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.03);
-      border-radius: 5px;
+      background: rgba(8, 20, 35, 0.85);
+      border-radius: 14px;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .small {
+      color: var(--muted);
       font-size: 13px;
-      color: #cbd5e1;
     }
 
-    .file-chip span:first-child {
-      overflow-wrap: anywhere;
+    .warning {
+      color: #fed7aa;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.32);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.45;
     }
 
-    .remove-file {
-      border: 1px solid rgba(239,68,68,0.4);
-      background: rgba(239,68,68,0.12);
-      color: #fecaca;
-      padding: 5px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      flex: 0 0 auto;
+    .success {
+      color: #bbf7d0;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.32);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.45;
     }
 
-    .loading {
+    .loader {
       display: none;
-      align-items: center;
-      gap: 10px;
       margin-top: 14px;
-      color: #cbd5e1;
+      color: var(--blue);
+      font-weight: 800;
     }
 
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.2);
-      border-top-color: var(--red2);
+    .loader.active {
+      display: block;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: rgba(148, 163, 184, 0.13);
       border-radius: 999px;
-      animation: spin 0.8s linear infinite;
+      overflow: hidden;
+      margin-top: 10px;
+      border: 1px solid var(--border);
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      transition: width 0.25s ease;
     }
 
-    @media (max-width: 1450px) {
-      .content {
-        grid-template-columns: 1fr;
-      }
-
-      .right-col {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+    .hidden {
+      display: none !important;
     }
 
-    @media (max-width: 1100px) {
-      .app {
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 30px 20px 46px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
-        position: relative;
-        height: auto;
+        position: static;
       }
 
-      .left-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .materials-grid,
-      .assembly-row,
-      .summary-strip,
-      .right-col {
-        grid-template-columns: 1fr;
-      }
-
-      .project-header {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        height: auto;
-        padding: 18px;
-        align-items: flex-start;
-        gap: 15px;
-        flex-direction: column;
-      }
-    }
-
-    @media (max-width: 700px) {
-      .project-buttons,
-      .topbar-actions {
-        flex-wrap: wrap;
-      }
-
-      th,
-      td {
-        white-space: normal;
-      }
-
-      .modal-backdrop {
-        padding: 10px;
-      }
-
-      .modal {
-        max-height: 94vh;
-      }
-
-      .modal-body {
-        max-height: calc(94vh - 67px);
+      .span-8,
+      .span-6,
+      .span-4 {
+        grid-column: span 12;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
+  <header>
+    <div class="brand">
+      <span class="logo-dot"></span>
+      FireFlow AI
+    </div>
+    <h1>Fire Sprinkler Estimator</h1>
+    <p class="subtitle">
+      Upload sprinkler drawings, hydraulic calculations, PDFs, spreadsheets, and notes.
+      FireFlow AI helps build material lists, labour summaries, onsite fabrication estimates, and prefab comparisons.
+    </p>
+  </header>
+
+  <div class="layout">
     <aside class="sidebar">
-      <div class="logo">
-        <div class="logo-icon"><span>🔥</span></div>
-        <div class="logo-text">
-          <strong><span class="red">FIRE</span>FLOW</strong>
-          <small>AI ESTIMATOR</small>
-        </div>
-      </div>
-
-      <nav class="nav">
-        <a href="#" class="nav-item active" data-page="dashboard">🏠 Dashboard</a>
-        <a href="#" class="nav-item" data-page="projects">📁 Projects</a>
-        <a href="#" class="nav-item" onclick="openModal(); return false;">⬆️ Upload Drawings</a>
-        <a href="#" class="nav-item" data-page="analyzer">🧠 AI Analyzer</a>
-        <a href="#" class="nav-item" data-page="materials">📋 Material Estimate</a>
-        <a href="#" class="nav-item" data-page="labor">👷 Labor Estimate</a>
-        <a href="#" class="nav-item" data-page="assemblies">🔩 Assemblies</a>
-        <a href="#" class="nav-item" data-page="revisions">🕘 Revisions</a>
-        <a href="#" class="nav-item" data-page="reports">📄 Reports</a>
-        <a href="#" class="nav-item" data-page="service">🧯 Service & Testing</a>
-        <a href="#" class="nav-item" data-page="suppliers">🔗 Suppliers & Pricing</a>
-        <a href="#" class="nav-item" data-page="settings">⚙️ Settings</a>
-      </nav>
-
-      <div class="status-card">
-        <h4>AI STATUS</h4>
-        <div class="status-row"><span class="dot green"></span><span id="aiStatus">Ready</span></div>
-        <div class="status-row" id="fileStatus">No files selected</div>
-        <div class="status-row" id="workerStatus">Worker not tested</div>
-
-        <div style="height: 12px;"></div>
-
-        <div style="color:#cbd5e1; font-size:13px;">10,000 / 10,000 credits used</div>
-        <div class="credit-bar"><span></span></div>
-        <div style="color:#94a3b8; font-size:12px;">Resets in 12 days</div>
-
-        <button class="upgrade">Upgrade Plan</button>
-      </div>
+      <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+      <button class="nav-btn" data-section="analyzer">AI Drawing Analyzer</button>
+      <button class="nav-btn" data-section="materials">Material Calculator</button>
+      <button class="nav-btn" data-section="labour">Labour Estimator</button>
+      <button class="nav-btn" data-section="pricing">Supplier Pricing</button>
+      <button class="nav-btn" data-section="service">Service & Testing</button>
+      <button class="nav-btn" data-section="settings">Settings</button>
     </aside>
 
-    <main class="main">
-      <header class="topbar">
-        <div class="topbar-title">
-          <h1 id="pageTitle">AI-Powered Fire Sprinkler Estimating</h1>
-          <p id="pageSubtitle">Upload. Analyze. Estimate. Win More Jobs.</p>
-        </div>
-
-        <div class="topbar-actions">
-          <span>🗓️ Projects</span>
-          <span>🔔 Notifications <span class="badge">3</span></span>
-          <span class="avatar">SB</span>
-          <span>Sean⌄</span>
-        </div>
-      </header>
-
-      <section class="project-header">
-        <div class="project-info">
-          <div class="drawing-thumb"></div>
-          <div>
-            <h2 id="projectHeaderTitle">INDUSTRIAL WAREHOUSE <span class="active-pill">ACTIVE</span></h2>
-            <div class="project-meta" id="projectHeaderMeta">
-              <span>Project ID: FF-2024-1001</span>
-              <span>|</span>
-              <span>Created: May 20, 2024</span>
-              <span>|</span>
-              <span>Location: Ontario, Canada</span>
-              <span>|</span>
-              <span>Type: New Construction</span>
+    <main>
+      <section id="dashboard" class="section active">
+        <div class="grid">
+          <div class="card span-12">
+            <h2>Project Dashboard</h2>
+            <p>
+              Start with the AI Drawing Analyzer. The new version renders PDF pages into high-resolution images before sending them to your Cloudflare Worker.
+            </p>
+            <div class="pill-row">
+              <span class="pill">PDF image rendering</span>
+              <span class="pill">Onsite fab tab</span>
+              <span class="pill">Prefab tab</span>
+              <span class="pill">Cleaner material tables</span>
+              <span class="pill">Worker connected</span>
             </div>
           </div>
-        </div>
 
-        <div class="project-buttons">
-          <button class="btn" onclick="showPage('projects')">Edit Project</button>
-          <button class="btn" onclick="openModal()">Upload Revision</button>
-          <button class="btn red" onclick="openModal()">New Estimate</button>
+          <div class="metric span-4">
+            <div class="value" id="dashFiles">0</div>
+            <div class="label">Uploaded files this session</div>
+          </div>
+
+          <div class="metric span-4">
+            <div class="value" id="dashImages">0</div>
+            <div class="label">Rendered PDF page images</div>
+          </div>
+
+          <div class="metric span-4">
+            <div class="value" id="dashStatus">Idle</div>
+            <div class="label">AI analyzer status</div>
+          </div>
+
+          <div class="card span-6">
+            <h3>What changed in this version</h3>
+            <p>
+              PDF files are now converted into clearer page images in the browser before analysis.
+              This helps the AI review the actual drawing sheets instead of only reading extracted text.
+            </p>
+          </div>
+
+          <div class="card span-6">
+            <h3>Recommended next testing file</h3>
+            <p>
+              Use the same drawing package that previously caused the AI to say it could not zoom in.
+              After this update, the status should show rendered page images being sent to the Worker.
+            </p>
+          </div>
         </div>
       </section>
 
-      <nav class="tabs" id="mainTabs">
-        <div class="tab active" data-page="dashboard">DASHBOARD</div>
-        <div class="tab" data-page="analyzer">AI ANALYSIS</div>
-        <div class="tab" data-page="materials">MATERIALS</div>
-        <div class="tab" data-page="labor">LABOR</div>
-        <div class="tab" data-page="suppliers">SUPPLIERS</div>
-        <div class="tab" data-page="revisions">REVISION HISTORY</div>
-      </nav>
+      <section id="analyzer" class="section">
+        <div class="grid">
+          <div class="card span-8">
+            <h2>AI Drawing Analyzer</h2>
+            <p>
+              Upload sprinkler drawings, hydraulic calculations, PDFs, images, spreadsheets, or rough material lists.
+            </p>
 
-      <section class="content" id="mainContent">
-        <div>
-          <div id="page_dashboard" class="page-section active">
-            <div class="left-grid">
-              <div>
-                <div class="panel">
-                  <div class="panel-body">
-                    <select class="drawing-select">
-                      <option>FP1 - MAIN FLOOR PLAN</option>
-                      <option>FP2 - SECOND FLOOR PLAN</option>
-                      <option>Riser Detail</option>
-                      <option>Hydraulic Calculations</option>
-                    </select>
+            <label for="workerUrl">Cloudflare Worker URL</label>
+            <input
+              id="workerUrl"
+              type="url"
+              placeholder="https://fire-estimator-ai.yourname.workers.dev"
+            />
 
-                    <div class="drawing-view">
-                      <div class="plan-lines"></div>
-                      <div class="pipe-red" style="left:42px;top:75px;width:190px;"></div>
-                      <div class="pipe-red" style="left:95px;top:75px;width:3px;height:125px;"></div>
-                      <div class="pipe-green" style="left:35px;top:135px;width:245px;"></div>
-                      <div class="pipe-green" style="left:180px;top:50px;width:3px;height:160px;"></div>
-                      <div class="pipe-blue" style="left:62px;top:190px;width:200px;"></div>
+            <label for="projectType">Project Type</label>
+            <select id="projectType">
+              <option value="Unknown">Unknown / Let AI decide</option>
+              <option value="New install">New install</option>
+              <option value="Tenant improvement">Tenant improvement</option>
+              <option value="Retrofit">Retrofit</option>
+              <option value="Service work">Service work</option>
+              <option value="Monthly/annual testing">Monthly/annual testing</option>
+            </select>
 
-                      <span class="sprinkler" style="left:53px;top:70px;"></span>
-                      <span class="sprinkler" style="left:92px;top:70px;"></span>
-                      <span class="sprinkler" style="left:142px;top:70px;"></span>
-                      <span class="sprinkler" style="left:206px;top:70px;"></span>
-                      <span class="sprinkler" style="left:61px;top:132px;"></span>
-                      <span class="sprinkler" style="left:126px;top:132px;"></span>
-                      <span class="sprinkler" style="left:180px;top:132px;"></span>
-                      <span class="sprinkler" style="left:245px;top:132px;"></span>
-                      <span class="sprinkler" style="left:91px;top:194px;"></span>
-                      <span class="sprinkler" style="left:176px;top:194px;"></span>
-                      <span class="sprinkler" style="left:240px;top:194px;"></span>
-                    </div>
+            <label for="fabricationMode">Fabrication Mode</label>
+            <select id="fabricationMode">
+              <option value="compare">Compare onsite fabrication and prefab</option>
+              <option value="onsite">On-site fabrication only</option>
+              <option value="prefab">Prefab only</option>
+            </select>
 
-                    <div class="tool-row">
-                      <button class="tool-btn">⌕</button>
-                      <button class="tool-btn">＋</button>
-                      <button class="tool-btn">－</button>
-                      <button class="tool-btn">⛓</button>
-                      <button class="tool-btn">⤢</button>
-                      <button class="tool-btn">◫</button>
-                    </div>
-                  </div>
-                </div>
+            <label for="pdfRenderScale">PDF Render Quality</label>
+            <select id="pdfRenderScale">
+              <option value="2">Standard high-resolution</option>
+              <option value="2.6" selected>Sharper drawing review</option>
+              <option value="3.2">Very sharp, slower upload</option>
+            </select>
 
-                <div class="panel" style="margin-top:14px;">
-                  <div class="panel-header">
-                    <h3>LAYERS</h3>
-                    <small>Working mockup</small>
-                  </div>
-                  <div class="panel-body">
-                    <div class="layer-list">
-                      <div class="layer"><label><span class="check">✓</span> Sprinkler Heads</label><span class="dot red"></span></div>
-                      <div class="layer"><label><span class="check">✓</span> Pipe Wet</label><span class="dot green"></span></div>
-                      <div class="layer"><label><span class="check">✓</span> Pipe Dry</label><span class="dot blue"></span></div>
-                      <div class="layer"><label><span class="check">✓</span> Fittings</label><span class="dot orange"></span></div>
-                      <div class="layer"><label><span class="check">✓</span> Valves</label><span class="dot purple"></span></div>
-                      <div class="layer"><label><span class="check">✓</span> Hangers</label><span class="dot" style="background:#fbbf24;"></span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <label for="maxPdfPages">Maximum PDF Pages to Render</label>
+            <select id="maxPdfPages">
+              <option value="4">First 4 pages</option>
+              <option value="8" selected>First 8 pages</option>
+              <option value="12">First 12 pages</option>
+              <option value="20">First 20 pages</option>
+            </select>
 
-              <div class="panel">
-                <div class="panel-header">
-                  <h3>AI ANALYSIS RESULTS - DETAILED MATERIAL BREAKDOWN</h3>
-                  <div class="analysis-controls">
-                    <button class="small-btn" onclick="showPage('materials')">Edit Quantities</button>
-                    <button class="small-btn" onclick="downloadResults()">Export</button>
-                    <button class="small-btn" onclick="copyResults()">Copy</button>
-                  </div>
-                </div>
+            <label for="instructions">Project Notes / Instructions</label>
+            <textarea id="instructions" placeholder="Example: 2 inch and 1-1/2 inch are grooved. 1 inch drops are threaded. Include onsite fab and prefab comparison."></textarea>
 
-                <div class="panel-body">
-                  <div class="filter-tabs" id="materialFilters">
-                    <button class="active" data-filter="all">All Materials</button>
-                    <button data-filter="pipe">Pipe</button>
-                    <button data-filter="fittings">Fittings</button>
-                    <button data-filter="hangers">Hangers</button>
-                    <button data-filter="heads">Heads</button>
-                    <button data-filter="valves">Valves</button>
-                    <button data-filter="assemblies">Assemblies</button>
-                  </div>
+            <label for="fileInput">Upload Files</label>
+            <input
+              id="fileInput"
+              type="file"
+              multiple
+              accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.json,.xlsx,.xls,.docx"
+            />
 
-                  <div id="analysisContent">
-                    <div class="materials-grid">
-                      <div class="mini-panel material-card" data-type="pipe">
-                        <div class="mini-title">PIPE</div>
-                        <table>
-                          <thead>
-                            <tr><th>Size</th><th>Type</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                          </thead>
-                          <tbody>
-                            <tr><td>2"</td><td>Sch 10 Grooved</td><td>180</td><td>FT</td><td class="confidence">92%</td></tr>
-                            <tr><td>1½"</td><td>Sch 10 Grooved</td><td>620</td><td>FT</td><td class="confidence">94%</td></tr>
-                            <tr><td>1"</td><td>Sch 40 Threaded</td><td>240</td><td>FT</td><td class="confidence">89%</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
+            <div class="warning">
+              Tip: You can select multiple files at once. On Windows, use Ctrl-click or Shift-click if needed.
+              PDF drawings will be rendered into images before analysis.
+            </div>
 
-                      <div class="mini-panel material-card" data-type="heads assemblies">
-                        <div class="mini-title">SPRINKLER ASSEMBLIES</div>
-                        <table>
-                          <thead>
-                            <tr><th>Assembly</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                          </thead>
-                          <tbody>
-                            <tr><td>Concealed Pendant Assembly</td><td>80</td><td>EA</td><td class="confidence">98%</td></tr>
-                            <tr><td>Upright Assembly</td><td>24</td><td>EA</td><td class="confidence">97%</td></tr>
-                            <tr><td>Sidewall Assembly</td><td>6</td><td>EA</td><td class="confidence">96%</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
+            <div class="file-list" id="fileList"></div>
 
-                      <div class="mini-panel material-card" data-type="fittings">
-                        <div class="mini-title">GROOVED FITTINGS</div>
-                        <table>
-                          <thead>
-                            <tr><th>Item</th><th>Size</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                          </thead>
-                          <tbody>
-                            <tr><td>Coupling</td><td>2"</td><td>26</td><td>EA</td><td class="confidence">93%</td></tr>
-                            <tr><td>90° Elbow</td><td>2"</td><td>12</td><td>EA</td><td class="confidence">92%</td></tr>
-                            <tr><td>Tee</td><td>2"</td><td>6</td><td>EA</td><td class="confidence">91%</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
+            <div class="button-row">
+              <button class="btn" id="analyzeBtn">Analyze Drawings</button>
+              <button class="btn secondary" id="testWorkerBtn">Test Worker</button>
+              <button class="btn danger" id="clearBtn">Clear</button>
+            </div>
 
-                      <div class="mini-panel material-card" data-type="valves">
-                        <div class="mini-title">VALVES & SPECIALTIES</div>
-                        <table>
-                          <thead>
-                            <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                          </thead>
-                          <tbody>
-                            <tr><td>DCVA</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
-                            <tr><td>FDC</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
-                            <tr><td>Waterflow Switch</td><td>2</td><td>EA</td><td class="confidence">97%</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="summary-strip">
-                    <div class="strip-item">Total Items <strong id="totalItems">247</strong></div>
-                    <div class="strip-item">Total Pipe <strong id="totalPipe">1,245 FT</strong></div>
-                    <div class="strip-item">Sprinkler Heads <strong id="totalHeads">364</strong></div>
-                    <div class="strip-item">AI Confidence <strong id="totalConfidence">89%</strong></div>
-                    <button class="btn" onclick="openModal()">Re-analyze Drawings</button>
-                  </div>
-                </div>
+            <div class="loader" id="loader">
+              Preparing files and analyzing drawings...
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
               </div>
             </div>
 
-            <div class="panel" style="margin-top:14px;">
-              <div class="panel-header">
-                <h3>TOP ASSEMBLIES DETECTED</h3>
-                <small style="color:var(--red2); cursor:pointer;" onclick="showPage('assemblies')">View All Assemblies</small>
-              </div>
-
-              <div class="panel-body">
-                <div class="assembly-row">
-                  <div class="assembly-card"><div class="icon"></div><strong>Concealed Pendant</strong><small>K-5.6</small><span class="qty">QTY: 80</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>Upright Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 24</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>Sidewall Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 6</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>Dry Pendant</strong><small>K-5.6</small><span class="qty">QTY: 2</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>FDC Assembly</strong><small>6" Storz</small><span class="qty">QTY: 1</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>DCVA Assembly</strong><small>6"</small><span class="qty">QTY: 1</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="raw-output" id="rawOutput"></div>
-          </div>
-
-          <div id="page_analyzer" class="page-section">
-            <div class="panel">
-              <div class="panel-header">
-                <h3>AI ANALYZER TAKEOFF VIEW</h3>
-                <div class="analysis-controls">
-                  <button class="small-btn" onclick="openModal()">Upload / Analyze</button>
-                  <button class="small-btn" onclick="copyResults()">Copy Results</button>
-                  <button class="small-btn" onclick="downloadResults()">Download TXT</button>
-                </div>
-              </div>
-              <div class="panel-body">
-                <div id="formattedTakeoff" class="formatted-takeoff">
-                  <div class="mini-panel">
-                    <div class="mini-title">NO AI TAKEOFF LOADED YET</div>
-                    <div style="padding:14px; color:#cbd5e1;">
-                      Upload drawings and run the analyzer. The AI result will be formatted here into readable sections and tables.
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div class="status-box" id="statusBox" style="margin-top: 14px;">
+              AI status is idle.
             </div>
           </div>
 
-          <div id="page_materials" class="page-section">
-            <div class="panel">
-              <div class="panel-header">
-                <h3>MATERIAL ESTIMATE</h3>
-                <button class="small-btn" onclick="openModal()">Re-analyze Drawings</button>
-              </div>
-              <div class="panel-body">
-                <div class="materials-grid">
-                  <div class="mini-panel">
-                    <div class="mini-title">PIPE BY SIZE</div>
-                    <table><thead><tr><th>Size</th><th>Material</th><th>Connection</th><th>Qty</th></tr></thead><tbody><tr><td>2"</td><td>Steel Sch 10</td><td>Grooved</td><td>180 ft</td></tr><tr><td>1½"</td><td>Steel Sch 10</td><td>Grooved</td><td>620 ft</td></tr><tr><td>1"</td><td>Steel Sch 40</td><td>Threaded</td><td>240 ft</td></tr></tbody></table>
-                  </div>
-                  <div class="mini-panel">
-                    <div class="mini-title">FITTINGS BY SIZE</div>
-                    <table><thead><tr><th>Item</th><th>Size</th><th>Connection</th><th>Qty</th></tr></thead><tbody><tr><td>Coupling</td><td>2"</td><td>Grooved</td><td>26</td></tr><tr><td>90° Elbow</td><td>2"</td><td>Grooved</td><td>12</td></tr><tr><td>90° Elbow</td><td>1"</td><td>Threaded</td><td>86</td></tr></tbody></table>
-                  </div>
-                  <div class="mini-panel">
-                    <div class="mini-title">RISER / VALVE ROOM</div>
-                    <table><thead><tr><th>Item</th><th>Size</th><th>Qty</th><th>Notes</th></tr></thead><tbody><tr><td>DCVA</td><td>4"</td><td>1</td><td>Confirm from riser detail</td></tr><tr><td>Waterflow switch</td><td>4"</td><td>1</td><td>Confirm model</td></tr><tr><td>Test and drain</td><td>1"</td><td>1</td><td>Allowance</td></tr></tbody></table>
-                  </div>
-                  <div class="mini-panel">
-                    <div class="mini-title">HANGERS / SUPPORTS</div>
-                    <table><thead><tr><th>Item</th><th>Size</th><th>Qty</th><th>Confidence</th></tr></thead><tbody><tr><td>Swivel ring hanger</td><td>1"-2"</td><td>156</td><td>Estimated</td></tr><tr><td>Beam clamp</td><td>3/8"</td><td>156</td><td>Estimated</td></tr><tr><td>Rod</td><td>3/8"</td><td>198 ft</td><td>Estimated</td></tr></tbody></table>
-                  </div>
-                </div>
-              </div>
+          <div class="card span-4">
+            <h3>Analyzer Checks</h3>
+            <div class="status-box" id="debugBox">
+              No files selected yet.
+            </div>
+
+            <div class="success">
+              This version sends:
+              <br />• Original uploaded files
+              <br />• Rendered PDF page images
+              <br />• Project type
+              <br />• Fabrication mode
+              <br />• Contractor notes
             </div>
           </div>
 
-          <div id="page_labor" class="page-section">
-            <div class="panel">
-              <div class="panel-header">
-                <h3>LABOR ESTIMATE</h3>
-                <button class="small-btn" onclick="openModal()">Update From Drawings</button>
-              </div>
-              <div class="panel-body">
-                <div class="mini-panel">
-                  <div class="mini-title">LABOUR BY TASK</div>
-                  <table>
-                    <thead><tr><th>Task</th><th>Fitter Hours</th><th>Helper Hours</th><th>Total</th><th>Notes</th></tr></thead>
-                    <tbody>
-                      <tr><td>Layout / coordination</td><td>16</td><td>8</td><td>24</td><td>Site verification</td></tr>
-                      <tr><td>Hangers / supports</td><td>40</td><td>20</td><td>60</td><td>Based on hanger count</td></tr>
-                      <tr><td>Main piping</td><td>60</td><td>30</td><td>90</td><td>Prefab reduces field time</td></tr>
-                      <tr><td>Branchline piping</td><td>50</td><td>25</td><td>75</td><td>Field install allowance</td></tr>
-                      <tr><td>Drops / heads</td><td>30</td><td>15</td><td>45</td><td>Head count based</td></tr>
-                      <tr><td>Testing / closeout</td><td>23</td><td>9</td><td>32</td><td>Flushing, deficiencies, closeout</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="card span-12">
+            <h2>AI Drawing Results</h2>
 
-          <div id="page_assemblies" class="page-section">
-            <div class="panel">
-              <div class="panel-header"><h3>ASSEMBLIES</h3></div>
-              <div class="panel-body">
-                <div class="assembly-row">
-                  <div class="assembly-card"><div class="icon"></div><strong>Pendant Drop Assembly</strong><small>Head, escutcheon, nipple, 90s</small><span class="qty">Editable</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>Upright Assembly</strong><small>Head and branch connection</small><span class="qty">Editable</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>Riser Assembly</strong><small>Backflow, valves, drain, flow switch</small><span class="qty">Editable</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>FDC Assembly</strong><small>FDC, check, ball drip, signage</small><span class="qty">Editable</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>Hanger Assembly</strong><small>Clamp, rod, ring</small><span class="qty">Editable</span></div>
-                  <div class="assembly-card"><div class="icon"></div><strong>CPVC Restraint Assembly</strong><small>Only for plastic pipe</small><span class="qty">Rule</span></div>
-                </div>
-              </div>
+            <div class="tabs">
+              <button class="tab-btn active" data-result-tab="fullResult">Full Estimate</button>
+              <button class="tab-btn" data-result-tab="onsiteResult">Onsite Fab</button>
+              <button class="tab-btn" data-result-tab="prefabResult">Prefab</button>
+              <button class="tab-btn" data-result-tab="materialResult">Material</button>
+              <button class="tab-btn" data-result-tab="labourResult">Labour</button>
+              <button class="tab-btn" data-result-tab="rawResult">Raw</button>
             </div>
-          </div>
 
-          <div id="page_revisions" class="page-section">
-            <div class="panel">
-              <div class="panel-header"><h3>REVISION HISTORY</h3><button class="small-btn" onclick="openModal()">Upload Revision</button></div>
-              <div class="panel-body">
-                <div class="revision"><span class="dot purple"></span><div><strong>Rev 2</strong><span>Added office area, 14 heads</span></div></div>
-                <div class="revision"><span class="dot blue"></span><div><strong>Rev 1</strong><span>Riser location changed</span></div></div>
-                <div class="revision"><span class="dot green"></span><div><strong>Rev 0</strong><span>Issued for construction</span></div></div>
-              </div>
+            <div id="fullResult" class="result-panel active">
+              Results will appear here after analysis.
             </div>
-          </div>
 
-          <div id="page_reports" class="page-section">
-            <div class="panel">
-              <div class="panel-header"><h3>REPORTS</h3><button class="small-btn" onclick="downloadResults()">Download Current Takeoff</button></div>
-              <div class="panel-body">
-                <div class="materials-grid">
-                  <div class="mini-panel"><div class="mini-title">CONTRACTOR TAKEOFF REPORT</div><div style="padding:14px;color:#cbd5e1;">Generate a customer-ready material and labour estimate from the AI takeoff.</div></div>
-                  <div class="mini-panel"><div class="mini-title">SERVICE REPORT</div><div style="padding:14px;color:#cbd5e1;">Generate inspection and deficiency reports from the Service & Testing module.</div></div>
-                </div>
-              </div>
+            <div id="onsiteResult" class="result-panel">
+              On-site fabrication summary will appear here.
             </div>
-          </div>
 
-          <div id="page_projects" class="page-section">
-            <div class="panel">
-              <div class="panel-header"><h3>PROJECTS</h3><button class="small-btn" onclick="openModal()">New Project Estimate</button></div>
-              <div class="panel-body">
-                <div class="mini-panel">
-                  <div class="mini-title">PROJECT LIST</div>
-                  <table><thead><tr><th>Project</th><th>Status</th><th>Type</th><th>Last Updated</th></tr></thead><tbody><tr><td>Industrial Warehouse</td><td>Active</td><td>New Construction</td><td>Today</td></tr><tr><td>Service Call Template</td><td>Draft</td><td>Service</td><td>Today</td></tr></tbody></table>
-                </div>
-              </div>
+            <div id="prefabResult" class="result-panel">
+              Prefab summary will appear here.
             </div>
-          </div>
 
-          <div id="page_service" class="page-section">
-            <div class="panel">
-              <div class="panel-header">
-                <h3>🧯 SERVICE & TESTING DASHBOARD</h3>
-                <div class="analysis-controls">
-                  <button class="small-btn">Create Quote</button>
-                  <button class="small-btn">Generate Report</button>
-                  <button class="small-btn">Export PDF</button>
-                </div>
-              </div>
-              <div class="panel-body">
-                <div class="materials-grid">
-                  <div class="mini-panel">
-                    <div class="mini-title">INSPECTION / TESTING</div>
-                    <table><thead><tr><th>Service Type</th><th>Frequency</th><th>Hours</th><th>Status</th></tr></thead><tbody><tr><td>Monthly Inspection</td><td>Monthly</td><td>1.5</td><td class="confidence">Ready</td></tr><tr><td>Quarterly Inspection</td><td>Quarterly</td><td>3.0</td><td class="confidence">Ready</td></tr><tr><td>Annual Wet System Test</td><td>Annual</td><td>5.0</td><td class="confidence">Ready</td></tr><tr><td>Backflow Test</td><td>Annual</td><td>2.0</td><td class="confidence">Ready</td></tr></tbody></table>
-                  </div>
-                  <div class="mini-panel">
-                    <div class="mini-title">DEFICIENCY QUOTE BUILDER</div>
-                    <table><thead><tr><th>Deficiency</th><th>Material</th><th>Labour</th><th>Status</th></tr></thead><tbody><tr><td>Painted sprinkler head</td><td>Head + escutcheon</td><td>1.0 hr</td><td>Editable</td></tr><tr><td>Missing escutcheon</td><td>Escutcheon</td><td>0.5 hr</td><td>Editable</td></tr><tr><td>Leaking drain valve</td><td>Valve allowance</td><td>2.0 hr</td><td>Editable</td></tr><tr><td>Replace gauge</td><td>Gauge</td><td>0.5 hr</td><td>Editable</td></tr></tbody></table>
-                  </div>
-                  <div class="mini-panel">
-                    <div class="mini-title">DEVICE COUNTS</div>
-                    <table><thead><tr><th>Device</th><th>Qty</th><th>Test</th><th>Notes</th></tr></thead><tbody><tr><td>Wet riser</td><td>1</td><td>Annual</td><td>Main drain, flow, alarm</td></tr><tr><td>Backflow</td><td>1</td><td>Annual</td><td>Report required</td></tr><tr><td>FDC</td><td>1</td><td>Visual</td><td>Caps, chains, signage</td></tr><tr><td>Sprinkler heads</td><td>Auto-detect</td><td>Visual</td><td>Paint, damage, loading</td></tr></tbody></table>
-                  </div>
-                  <div class="mini-panel">
-                    <div class="mini-title">SERVICE ESTIMATE SUMMARY</div>
-                    <table><thead><tr><th>Line Item</th><th>Value</th></tr></thead><tbody><tr><td>Service hours</td><td>8.5 hrs</td></tr><tr><td>Repair hours</td><td>4.5 hrs</td></tr><tr><td>Material allowance</td><td>$650</td></tr><tr><td><strong>Estimated total</strong></td><td><strong>$2,145</strong></td></tr></tbody></table>
-                  </div>
-                </div>
-              </div>
+            <div id="materialResult" class="result-panel">
+              Material breakdown will appear here.
             </div>
-          </div>
 
-          <div id="page_suppliers" class="page-section">
-            <div class="panel">
-              <div class="panel-header"><h3>SUPPLIERS & PRICING</h3></div>
-              <div class="panel-body">
-                <table class="supplier-table">
-                  <thead><tr><th></th><th class="active-supplier">VICTAULIC<br><small>Preferred</small></th><th>ANVIL<br><small>Standard</small></th><th>WOLSELEY<br><small>Alternate</small></th></tr></thead>
-                  <tbody><tr><td>Material</td><td>$47,850</td><td>$51,620</td><td>$45,780</td></tr><tr><td>Shipping</td><td>$1,250</td><td>$1,450</td><td>$1,190</td></tr><tr><td>Tax</td><td>$6,370</td><td>$6,860</td><td>$6,080</td></tr><tr><td><strong>Total</strong></td><td><strong>$55,470</strong></td><td><strong>$59,930</strong></td><td><strong>$53,050</strong></td></tr></tbody>
-                </table>
-              </div>
+            <div id="labourResult" class="result-panel">
+              Labour breakdown will appear here.
             </div>
-          </div>
 
-          <div id="page_settings" class="page-section">
-            <div class="panel">
-              <div class="panel-header"><h3>SETTINGS</h3></div>
-              <div class="panel-body">
-                <div class="field"><label>Saved Worker URL</label><input id="settingsWorkerUrl" placeholder="Paste Worker URL here"></div>
-                <div class="field"><label>Default labour rate</label><input value="115"></div>
-                <div class="field">
-                  <label>Default fabrication mode</label>
-                  <select id="settingsFabricationMode">
-                    <option value="On-site fabrication">On-site fabrication</option>
-                    <option value="Prefab">Prefab</option>
-                    <option value="Compare both">Compare both</option>
-                  </select>
-                </div>
-                <button class="btn red" onclick="saveSettings()">Save Settings</button>
-              </div>
+            <div id="rawResult" class="result-panel">
+              Raw response will appear here.
             </div>
           </div>
         </div>
+      </section>
 
-        <aside class="right-col">
-          <div class="panel">
-            <div class="panel-header">
-              <h3>PROJECT SUMMARY</h3>
-            </div>
-            <div class="panel-body">
-              <div class="project-summary-grid">
-                <div class="summary-box"><strong>42,350</strong><span>SQ FT</span></div>
-                <div class="summary-box"><strong>OH2</strong><span>Hazard</span></div>
-                <div class="summary-box"><strong>2</strong><span>Risers</span></div>
-                <div class="summary-box"><strong id="summaryHeads">364</strong><span>Sprinkler Heads</span></div>
-                <div class="summary-box"><strong id="summaryPipe">1,245 FT</strong><span>Pipe Length</span></div>
-                <div class="summary-box"><strong id="summaryConfidence">89%</strong><span>AI Confidence</span></div>
-              </div>
-            </div>
+      <section id="materials" class="section">
+        <div class="grid">
+          <div class="card span-12">
+            <h2>Material Calculator</h2>
+            <p>
+              Quick calculator for small jobs, drops, relocates, and add-on work. This is separate from the AI drawing analyzer.
+            </p>
           </div>
 
-          <div class="panel">
-            <div class="panel-header">
-              <h3>ESTIMATE SUMMARY</h3>
-            </div>
-            <div class="panel-body">
-              <div class="estimate-row"><span>Material Cost</span><span id="materialCost">$47,850.00</span></div>
-              <div class="estimate-row"><span>Labor Cost</span><span id="laborCost">$28,650.00</span></div>
-              <div class="estimate-row"><span>Equipment Cost</span><span>$2,450.00</span></div>
-              <div class="estimate-row estimate-total"><span>Total Cost</span><span id="totalCost">$78,950.00</span></div>
-              <button class="btn red full-width" style="margin-top:12px;" onclick="showPage('materials')">View Full Estimate</button>
-            </div>
+          <div class="card span-6">
+            <h3>Drop / Relocate Calculator</h3>
+
+            <label for="headQty">Number of Heads</label>
+            <input id="headQty" type="number" min="0" value="10" />
+
+            <label for="dropPipeSize">Drop Pipe Size</label>
+            <select id="dropPipeSize">
+              <option value="1">1 inch threaded</option>
+              <option value="1.25">1-1/4 inch</option>
+              <option value="1.5">1-1/2 inch</option>
+              <option value="2">2 inch</option>
+            </select>
+
+            <label for="workType">Work Type</label>
+            <select id="workType">
+              <option value="new">New heads with mechanical tee</option>
+              <option value="relocate">Relocate heads, no mechanical tee</option>
+            </select>
+
+            <button class="btn" style="margin-top: 16px;" id="calcMaterialBtn">Calculate Material</button>
           </div>
 
-          <div class="panel">
-            <div class="panel-header">
-              <h3>AI CONFIDENCE</h3>
+          <div class="card span-6">
+            <h3>Material Result</h3>
+            <div class="status-box" id="materialCalcResult">
+              Enter head quantity and calculate.
             </div>
-            <div class="panel-body">
-              <div class="confidence-row"><span>Pipe Length</span><div class="bar"><span style="width:92%;"></span></div><span>92%</span></div>
-              <div class="confidence-row"><span>Sprinkler Heads</span><div class="bar"><span style="width:98%;"></span></div><span>98%</span></div>
-              <div class="confidence-row"><span>Fittings</span><div class="bar"><span style="width:91%;"></span></div><span>91%</span></div>
-              <div class="confidence-row"><span>Hangers</span><div class="bar yellow"><span style="width:72%;"></span></div><span>72%</span></div>
-              <div class="confidence-row"><span>Valves</span><div class="bar"><span style="width:95%;"></span></div><span>95%</span></div>
-            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="labour" class="section">
+        <div class="grid">
+          <div class="card span-12">
+            <h2>Labour Estimator</h2>
+            <p>
+              Basic labour logic. You can adjust this later as FireFlow AI learns better production rates.
+            </p>
           </div>
 
-          <div class="panel">
-            <div class="panel-header">
-              <h3>RECENT REVISIONS</h3>
-              <small style="color:var(--red2); cursor:pointer;" onclick="showPage('revisions')">View All</small>
-            </div>
-            <div class="panel-body">
-              <div class="revision"><span class="dot purple"></span><div><strong>Rev 2</strong><span>May 20, 2024<br>Added office area, 14 heads</span></div></div>
-              <div class="revision"><span class="dot blue"></span><div><strong>Rev 1</strong><span>May 15, 2024<br>Riser location changed</span></div></div>
-              <div class="revision"><span class="dot green"></span><div><strong>Rev 0</strong><span>May 10, 2024<br>Issued for construction</span></div></div>
+          <div class="card span-6">
+            <h3>Labour Inputs</h3>
+
+            <label for="labourHeads">Heads / Drops</label>
+            <input id="labourHeads" type="number" min="0" value="20" />
+
+            <label for="hoursPerHead">Hours Per Head</label>
+            <input id="hoursPerHead" type="number" min="0" step="0.1" value="1" />
+
+            <label for="fabTypeLabour">Fabrication Type</label>
+            <select id="fabTypeLabour">
+              <option value="onsite">Onsite fabrication</option>
+              <option value="prefab">Prefab</option>
+            </select>
+
+            <button class="btn" style="margin-top: 16px;" id="calcLabourBtn">Calculate Labour</button>
+          </div>
+
+          <div class="card span-6">
+            <h3>Labour Result</h3>
+            <div class="status-box" id="labourCalcResult">
+              Enter labour inputs and calculate.
             </div>
           </div>
-        </aside>
+        </div>
+      </section>
+
+      <section id="pricing" class="section">
+        <div class="grid">
+          <div class="card span-12">
+            <h2>Supplier Pricing</h2>
+            <p>
+              Future feature: connect local supplier pricing by location. For now, this section is a placeholder for material price tables.
+            </p>
+          </div>
+
+          <div class="card span-6">
+            <h3>Location</h3>
+            <label for="supplierLocation">Pricing Area</label>
+            <input id="supplierLocation" placeholder="Example: Barrie, Ontario" />
+
+            <label for="supplierName">Supplier</label>
+            <input id="supplierName" placeholder="Example: Local sprinkler supplier" />
+
+            <button class="btn" style="margin-top: 16px;">Save Pricing Source</button>
+          </div>
+
+          <div class="card span-6">
+            <h3>Pricing Notes</h3>
+            <div class="status-box">
+              Supplier pricing is not live yet. Later this can connect to saved price tables, supplier uploads, or supplier API data.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="service" class="section">
+        <div class="grid">
+          <div class="card span-12">
+            <h2>Service & Testing</h2>
+            <p>
+              Future service module for monthly, quarterly, semi-annual, annual inspections, deficiency repairs, and quote reports.
+            </p>
+          </div>
+
+          <div class="card span-6">
+            <h3>Service Quote Builder</h3>
+
+            <label for="serviceType">Service Type</label>
+            <select id="serviceType">
+              <option>Annual sprinkler inspection</option>
+              <option>Monthly inspection</option>
+              <option>Quarterly inspection</option>
+              <option>Deficiency repair</option>
+              <option>Emergency service</option>
+            </select>
+
+            <label for="serviceHours">Estimated Hours</label>
+            <input id="serviceHours" type="number" min="0" step="0.5" value="4" />
+
+            <label for="serviceRate">Hourly Rate</label>
+            <input id="serviceRate" type="number" min="0" step="1" value="125" />
+
+            <button class="btn" style="margin-top: 16px;" id="calcServiceBtn">Calculate Service Quote</button>
+          </div>
+
+          <div class="card span-6">
+            <h3>Service Result</h3>
+            <div class="status-box" id="serviceResult">
+              Enter service details and calculate.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="section">
+        <div class="grid">
+          <div class="card span-12">
+            <h2>Settings</h2>
+            <p>
+              Save your Worker URL and analyzer defaults in this browser.
+            </p>
+          </div>
+
+          <div class="card span-6">
+            <h3>Saved Settings</h3>
+            <button class="btn" id="saveSettingsBtn">Save Current Settings</button>
+            <button class="btn secondary" id="loadSettingsBtn">Load Saved Settings</button>
+            <button class="btn danger" id="clearSettingsBtn">Clear Saved Settings</button>
+          </div>
+
+          <div class="card span-6">
+            <h3>Status</h3>
+            <div class="status-box" id="settingsStatus">
+              Settings are stored only in this browser.
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   </div>
 
-  <div class="modal-backdrop" id="modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Upload Drawings / Run AI Analysis</h3>
-        <button class="small-btn" onclick="closeModal()">Close</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="field">
-          <label>Cloudflare Worker URL</label>
-          <input id="workerUrl" placeholder="https://fire-estimator-ai.yourname.workers.dev" />
-        </div>
-
-        <div class="upload-box">
-          <p style="margin-top:0;">Upload sprinkler drawings, hydraulic calculations, specs, notes, spreadsheets, or images.</p>
-          <input id="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xls,.xlsx" />
-          <p class="upload-help">
-            You can select multiple files at once with Ctrl/Shift, or choose one file at a time.
-            Uploading the rough material spreadsheet with the drawings can help the AI compare against your onsite fabrication benchmark.
-          </p>
-          <div id="fileList" class="file-list"></div>
-        </div>
-
-        <div class="field">
-          <label>Project Type</label>
-          <select id="projectType">
-            <option>New Construction</option>
-            <option>Tenant Improvement</option>
-            <option>Retrofit</option>
-            <option>Service / Repair</option>
-            <option>Unknown</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Fabrication Mode</label>
-          <select id="fabricationMode">
-            <option value="On-site fabrication">On-site fabrication</option>
-            <option value="Prefab">Prefab</option>
-            <option value="Compare both">Compare both</option>
-          </select>
-          <p class="upload-help">
-            On-site fabrication uses more field labour and no prefab cost. Prefab reduces field labour but adds fabrication cost.
-            Compare both will ask the AI to show both scenarios.
-          </p>
-        </div>
-
-        <div class="field">
-          <label>Labour Rate</label>
-          <input id="labourRate" type="number" value="115" />
-        </div>
-
-        <div class="field">
-          <label>Instructions to AI</label>
-          <textarea id="instructions"></textarea>
-        </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn" onclick="testWorker()">Test Worker</button>
-          <button class="btn red" onclick="analyzeDrawings()">Analyze Drawings</button>
-          <button class="btn" onclick="clearFiles()">Clear Files</button>
-        </div>
-
-        <div class="loading" id="loading">
-          <div class="spinner"></div>
-          <span>Analyzing drawings...</span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <footer>
+    FireFlow AI prototype — contractor estimating assistant.
+  </footer>
 
   <script>
-    const modal = document.getElementById("modal");
-    const fileInput = document.getElementById("fileInput");
-    const fileList = document.getElementById("fileList");
-    const workerUrl = document.getElementById("workerUrl");
-    const instructions = document.getElementById("instructions");
-    const projectType = document.getElementById("projectType");
-    const fabricationMode = document.getElementById("fabricationMode");
-    const labourRate = document.getElementById("labourRate");
-    const loading = document.getElementById("loading");
-    const aiStatus = document.getElementById("aiStatus");
-    const fileStatus = document.getElementById("fileStatus");
-    const workerStatus = document.getElementById("workerStatus");
-    const rawOutput = document.getElementById("rawOutput");
-    const analysisContent = document.getElementById("analysisContent");
-    const formattedTakeoff = document.getElementById("formattedTakeoff");
-
-    let selectedFiles = [];
-    let latestResultText = "";
-
-    const savedWorkerUrl = localStorage.getItem("fireflowWorkerUrl");
-    if (savedWorkerUrl) {
-      workerUrl.value = savedWorkerUrl;
-      const settingsWorkerUrl = document.getElementById("settingsWorkerUrl");
-      if (settingsWorkerUrl) settingsWorkerUrl.value = savedWorkerUrl;
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
 
-    const savedFabricationMode = localStorage.getItem("fireflowFabricationMode");
-    if (savedFabricationMode) {
-      fabricationMode.value = savedFabricationMode;
-      const settingsFabricationMode = document.getElementById("settingsFabricationMode");
-      if (settingsFabricationMode) settingsFabricationMode.value = savedFabricationMode;
+    const state = {
+      selectedFiles: [],
+      renderedImages: [],
+      lastResult: ""
+    };
+
+    const els = {
+      navButtons: document.querySelectorAll(".nav-btn"),
+      sections: document.querySelectorAll(".section"),
+      workerUrl: document.getElementById("workerUrl"),
+      projectType: document.getElementById("projectType"),
+      fabricationMode: document.getElementById("fabricationMode"),
+      pdfRenderScale: document.getElementById("pdfRenderScale"),
+      maxPdfPages: document.getElementById("maxPdfPages"),
+      instructions: document.getElementById("instructions"),
+      fileInput: document.getElementById("fileInput"),
+      fileList: document.getElementById("fileList"),
+      analyzeBtn: document.getElementById("analyzeBtn"),
+      testWorkerBtn: document.getElementById("testWorkerBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      statusBox: document.getElementById("statusBox"),
+      debugBox: document.getElementById("debugBox"),
+      loader: document.getElementById("loader"),
+      progressFill: document.getElementById("progressFill"),
+      dashFiles: document.getElementById("dashFiles"),
+      dashImages: document.getElementById("dashImages"),
+      dashStatus: document.getElementById("dashStatus"),
+      resultTabs: document.querySelectorAll(".tab-btn"),
+      resultPanels: document.querySelectorAll(".result-panel"),
+      fullResult: document.getElementById("fullResult"),
+      onsiteResult: document.getElementById("onsiteResult"),
+      prefabResult: document.getElementById("prefabResult"),
+      materialResult: document.getElementById("materialResult"),
+      labourResult: document.getElementById("labourResult"),
+      rawResult: document.getElementById("rawResult")
+    };
+
+    initialize();
+
+    function initialize() {
+      loadSettings();
+      bindNavigation();
+      bindResultTabs();
+      bindAnalyzer();
+      bindCalculators();
+      updateDashboard();
     }
 
-    instructions.value = `Act as a professional fire sprinkler estimator.
+    function bindNavigation() {
+      els.navButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.section;
 
-Return a clean contractor material takeoff. Break material into:
-- Pipe by size, schedule, material, connection, footage, and order lengths
-- Sprinkler heads by type, floor, area, temperature, K-factor if visible
-- Threaded fittings by size
-- Grooved fittings by size
-- Mechanical tees and outlets by main x outlet size
-- Riser material
-- FDC material
-- Hangers and supports
-- Labour by task
-- Supplier pricing allowance
-- Accuracy confidence
+          els.navButtons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
 
-Important rules:
-- Count all heads on all drawings, not just hydraulic calculation design area.
-- Separate confirmed quantities from estimated quantities.
-- No surge restraints on steel pipe.
-- Surge restraints only apply to plastic/CPVC pipe.
-- For this warehouse-style job, only 1 inch should be threaded unless drawings say otherwise.
-- 1.5 inch and larger steel pipe/fittings should be grooved unless drawings say otherwise.
-- Do not add grooved couplings to 1 inch threaded drops.
-- Break down fittings by exact size whenever possible.
-- Use the selected fabrication mode when estimating labour and material.`;
-
-    document.querySelectorAll(".nav-item[data-page]").forEach(item => {
-      item.addEventListener("click", function(event) {
-        event.preventDefault();
-        showPage(this.dataset.page);
-      });
-    });
-
-    document.querySelectorAll(".tab[data-page]").forEach(item => {
-      item.addEventListener("click", function() {
-        showPage(this.dataset.page);
-      });
-    });
-
-    document.querySelectorAll("#materialFilters button").forEach(button => {
-      button.addEventListener("click", function() {
-        document.querySelectorAll("#materialFilters button").forEach(btn => btn.classList.remove("active"));
-        this.classList.add("active");
-        filterMaterials(this.dataset.filter);
-      });
-    });
-
-    function showPage(page) {
-      document.querySelectorAll(".page-section").forEach(section => section.classList.remove("active"));
-
-      const target = document.getElementById(`page_${page}`);
-      if (target) target.classList.add("active");
-
-      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-      const nav = document.querySelector(`.nav-item[data-page="${page}"]`);
-      if (nav) nav.classList.add("active");
-
-      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
-      const tab = document.querySelector(`.tab[data-page="${page}"]`);
-      if (tab) tab.classList.add("active");
-
-      updateHeaderForPage(page);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function updateHeaderForPage(page) {
-      const pageTitle = document.getElementById("pageTitle");
-      const pageSubtitle = document.getElementById("pageSubtitle");
-      const projectHeaderTitle = document.getElementById("projectHeaderTitle");
-      const projectHeaderMeta = document.getElementById("projectHeaderMeta");
-
-      const titles = {
-        dashboard: ["AI-Powered Fire Sprinkler Estimating", "Upload. Analyze. Estimate. Win More Jobs.", "INDUSTRIAL WAREHOUSE"],
-        projects: ["Projects", "Manage estimates, revisions, and active jobs.", "PROJECT DASHBOARD"],
-        analyzer: ["AI Drawing Analyzer", "Review formatted AI takeoffs and drawing analysis.", "AI ANALYZER"],
-        materials: ["Material Estimate", "Pipe, fittings, heads, risers, FDC, and support material.", "MATERIAL ESTIMATE"],
-        labor: ["Labor Estimate", "Fitter/helper hours, prefab assumptions, and task breakdowns.", "LABOR ESTIMATE"],
-        assemblies: ["Assemblies", "Reusable sprinkler assemblies and estimating rules.", "ASSEMBLIES"],
-        revisions: ["Revision History", "Track drawing revisions and estimate changes.", "REVISION HISTORY"],
-        reports: ["Reports", "Generate contractor takeoffs and customer reports.", "REPORTS"],
-        service: ["Service, Testing & Deficiency Quoting", "Generate inspection quotes, service reports, and deficiency pricing.", "SERVICE & TESTING MODULE"],
-        suppliers: ["Suppliers & Pricing", "Compare material pricing and supplier options.", "SUPPLIER PRICING"],
-        settings: ["Settings", "Configure worker URL, pricing, and estimating defaults.", "SETTINGS"]
-      };
-
-      const current = titles[page] || titles.dashboard;
-
-      pageTitle.textContent = current[0];
-      pageSubtitle.textContent = current[1];
-      projectHeaderTitle.innerHTML = `${current[2]} <span class="active-pill">${page === "service" ? "MOCKUP" : "ACTIVE"}</span>`;
-
-      projectHeaderMeta.innerHTML = `
-        <span>Project ID: FF-2024-1001</span>
-        <span>|</span>
-        <span>Location: Ontario, Canada</span>
-        <span>|</span>
-        <span>Type: ${page === "service" ? "Service / Testing" : "New Construction"}</span>
-        <span>|</span>
-        <span>Fab Mode: ${escapeHtml(fabricationMode.value)}</span>
-      `;
-    }
-
-    function filterMaterials(filter) {
-      document.querySelectorAll(".material-card").forEach(card => {
-        if (filter === "all") {
-          card.style.display = "";
-          return;
-        }
-
-        const types = card.dataset.type || "";
-        card.style.display = types.includes(filter) ? "" : "none";
+          els.sections.forEach((section) => {
+            section.classList.toggle("active", section.id === target);
+          });
+        });
       });
     }
 
-    function openModal() {
-      modal.style.display = "flex";
-      document.body.classList.add("modal-open");
+    function bindResultTabs() {
+      els.resultTabs.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.resultTab;
+
+          els.resultTabs.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          els.resultPanels.forEach((panel) => {
+            panel.classList.toggle("active", panel.id === target);
+          });
+        });
+      });
     }
 
-    function closeModal() {
-      modal.style.display = "none";
-      document.body.classList.remove("modal-open");
-    }
-
-    modal.addEventListener("click", function(event) {
-      if (event.target === modal) closeModal();
-    });
-
-    fileInput.addEventListener("change", function(event) {
-      const newFiles = Array.from(event.target.files || []);
-
-      newFiles.forEach(newFile => {
-        const alreadyAdded = selectedFiles.some(existingFile =>
-          existingFile.name === newFile.name &&
-          existingFile.size === newFile.size &&
-          existingFile.lastModified === newFile.lastModified
-        );
-
-        if (!alreadyAdded) selectedFiles.push(newFile);
+    function bindAnalyzer() {
+      els.fileInput.addEventListener("change", () => {
+        state.selectedFiles = Array.from(els.fileInput.files || []);
+        state.renderedImages = [];
+        renderFileList();
+        updateDashboard();
+        setStatus("Files selected. Click Analyze Drawings to render PDFs and send to Worker.");
       });
 
-      fileInput.value = "";
-      renderFiles();
-    });
+      els.analyzeBtn.addEventListener("click", analyzeDrawings);
+      els.testWorkerBtn.addEventListener("click", testWorker);
+      els.clearBtn.addEventListener("click", clearAnalyzer);
 
-    function renderFiles() {
-      fileList.innerHTML = "";
-
-      selectedFiles.forEach((file, index) => {
-        const div = document.createElement("div");
-        div.className = "file-chip";
-        div.innerHTML = `
-          <span>${index + 1}. ${escapeHtml(file.name)} · ${formatSize(file.size)}</span>
-          <button class="remove-file" type="button" onclick="removeFile(${index})">Remove</button>
-        `;
-        fileList.appendChild(div);
-      });
-
-      fileStatus.textContent = selectedFiles.length
-        ? `${selectedFiles.length} file${selectedFiles.length === 1 ? "" : "s"} loaded`
-        : "No files selected";
+      document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
+      document.getElementById("loadSettingsBtn").addEventListener("click", loadSettings);
+      document.getElementById("clearSettingsBtn").addEventListener("click", clearSettings);
     }
 
-    function removeFile(index) {
-      selectedFiles.splice(index, 1);
-      renderFiles();
+    function bindCalculators() {
+      document.getElementById("calcMaterialBtn").addEventListener("click", calculateMaterial);
+      document.getElementById("calcLabourBtn").addEventListener("click", calculateLabour);
+      document.getElementById("calcServiceBtn").addEventListener("click", calculateService);
     }
 
-    function clearFiles() {
-      selectedFiles = [];
-      fileInput.value = "";
-      renderFiles();
-    }
-
-    function formatSize(bytes) {
-      if (!bytes && bytes !== 0) return "";
-      const mb = bytes / 1024 / 1024;
-      if (mb >= 1) return `${mb.toFixed(2)} MB`;
-      return `${Math.round(bytes / 1024)} KB`;
-    }
-
-    async function testWorker() {
-      const url = workerUrl.value.trim();
-
-      if (!url) {
-        alert("Enter your Cloudflare Worker URL first.");
+    function renderFileList() {
+      if (!state.selectedFiles.length) {
+        els.fileList.innerHTML = "";
+        els.debugBox.textContent = "No files selected yet.";
         return;
       }
 
-      try {
-        workerStatus.textContent = "Testing Worker...";
-        const response = await fetch(url);
-        const text = await response.text();
+      els.fileList.innerHTML = state.selectedFiles
+        .map((file) => {
+          return `
+            <div class="file-item">
+              <div>
+                <strong>${escapeHtml(file.name)}</strong>
+                <div class="small">${escapeHtml(file.type || "unknown type")}</div>
+              </div>
+              <div class="small">${formatBytes(file.size)}</div>
+            </div>
+          `;
+        })
+        .join("");
 
-        if (!response.ok) throw new Error(text);
-
-        workerStatus.textContent = "Worker connected";
-        alert("Worker connected.");
-      } catch (error) {
-        workerStatus.textContent = "Worker error";
-        alert("Worker test failed: " + error.message);
-      }
+      els.debugBox.textContent =
+        "Selected files:\n" +
+        state.selectedFiles
+          .map((file, index) => {
+            return `${index + 1}. ${file.name} (${formatBytes(file.size)})`;
+          })
+          .join("\n");
     }
 
     async function analyzeDrawings() {
-      const url = workerUrl.value.trim();
+      const workerUrl = normalizeUrl(els.workerUrl.value);
 
-      if (!url) {
-        alert("Enter your Cloudflare Worker URL first.");
+      if (!workerUrl) {
+        setStatus("Please enter your Cloudflare Worker URL first.", "error");
         return;
       }
 
-      if (!selectedFiles.length) {
-        alert("Upload one or more files first.");
+      if (!state.selectedFiles.length) {
+        setStatus("Please choose at least one file first.", "error");
         return;
       }
 
-      localStorage.setItem("fireflowWorkerUrl", url);
-      localStorage.setItem("fireflowFabricationMode", fabricationMode.value);
-
-      const formData = new FormData();
-      formData.append("projectType", projectType.value);
-      formData.append("fabricationMode", fabricationMode.value);
-      formData.append("labourRate", labourRate.value || "115");
-      formData.append("instructions", instructions.value || "");
-
-      selectedFiles.forEach(file => {
-        formData.append("files", file, file.name);
-      });
-
-      loading.style.display = "flex";
-      aiStatus.textContent = "Analyzing...";
-      workerStatus.textContent = `Sending ${selectedFiles.length} file${selectedFiles.length === 1 ? "" : "s"} to Worker`;
+      saveSettings();
 
       try {
-        const response = await fetch(url, {
+        setLoading(true);
+        setProgress(5);
+        setStatus("Preparing upload...");
+
+        state.renderedImages = [];
+
+        const pdfFiles = state.selectedFiles.filter((file) =>
+          file.name.toLowerCase().endsWith(".pdf")
+        );
+
+        if (pdfFiles.length) {
+          setStatus("Rendering PDF pages into high-resolution images...");
+          state.renderedImages = await renderPdfFilesToImages(pdfFiles);
+        }
+
+        setProgress(62);
+
+        const formData = new FormData();
+
+        formData.append("aiMode", "drawing-analyzer");
+        formData.append("projectType", els.projectType.value);
+        formData.append("fabricationMode", els.fabricationMode.value);
+        formData.append("instructions", els.instructions.value || "");
+
+        state.selectedFiles.forEach((file) => {
+          formData.append("files", file, file.name);
+        });
+
+        state.renderedImages.forEach((imageFile) => {
+          formData.append("renderedImages", imageFile, imageFile.name);
+        });
+
+        setStatus(
+          `Sending ${state.selectedFiles.length} original file(s) and ${state.renderedImages.length} rendered PDF page image(s) to Worker...`
+        );
+
+        setProgress(75);
+
+        const response = await fetch(workerUrl, {
           method: "POST",
           body: formData
         });
 
-        const contentType = response.headers.get("content-type") || "";
-        let resultText = "";
+        const text = await response.text();
 
-        if (contentType.includes("application/json")) {
-          const json = await response.json();
-          resultText =
-            json.result ||
-            json.analysis ||
-            json.message ||
-            json.text ||
-            JSON.stringify(json, null, 2);
-        } else {
-          resultText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (error) {
+          throw new Error("Worker returned non-JSON response:\n" + text);
         }
 
         if (!response.ok) {
-          throw new Error(resultText || "Worker returned an error.");
+          throw new Error(data.error || data.details || "Worker request failed.");
         }
 
-        latestResultText = resultText;
-        rawOutput.style.display = "block";
-        rawOutput.textContent = resultText;
+        const resultText = data.result || data.output || data.message || JSON.stringify(data, null, 2);
 
-        const formattedHtml = markdownToHtml(resultText);
-        analysisContent.innerHTML = aiResultToDashboard(formattedHtml);
-        formattedTakeoff.innerHTML = formattedHtml;
+        state.lastResult = resultText;
 
-        aiStatus.textContent = "Completed";
-        workerStatus.textContent = "Worker connected";
-        closeModal();
-        showPage("analyzer");
+        setProgress(100);
+        setStatus(
+          `Analysis complete.\n\nOriginal files: ${data.filesReceived ?? state.selectedFiles.length}\nRendered images: ${data.renderedImagesReceived ?? state.renderedImages.length}\nTotal reviewed: ${data.totalFilesReviewed ?? "unknown"}`
+        );
+
+        displayResults(resultText, data);
+        updateDashboard("Done");
       } catch (error) {
-        aiStatus.textContent = "Error";
-        workerStatus.textContent = "Worker error";
-        alert("Analysis failed: " + error.message);
+        console.error(error);
+        setStatus("Analyzer error:\n" + (error.message || String(error)), "error");
+        updateDashboard("Error");
       } finally {
-        loading.style.display = "none";
+        setLoading(false);
       }
     }
 
-    function aiResultToDashboard(formattedHtml) {
-      return `
-        <div class="mini-panel" style="margin-bottom:12px;">
-          <div class="mini-title">AI RESULT RECEIVED</div>
-          <div style="padding:12px; color:#cbd5e1; line-height:1.55; font-size:13px;">
-            The AI takeoff is now formatted below into readable sections and tables.
-          </div>
-        </div>
+    async function renderPdfFilesToImages(pdfFiles) {
+      const rendered = [];
+      const scale = Number(els.pdfRenderScale.value || 2.6);
+      const maxPages = Number(els.maxPdfPages.value || 8);
 
-        <div class="formatted-takeoff">${formattedHtml}</div>
-      `;
+      if (!window.pdfjsLib) {
+        setStatus("PDF.js did not load. PDFs will be uploaded, but pages cannot be rendered.", "error");
+        return rendered;
+      }
+
+      let completedPages = 0;
+
+      for (const pdfFile of pdfFiles) {
+        const arrayBuffer = await pdfFile.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+
+        const pagesToRender = Math.min(pdf.numPages, maxPages);
+
+        for (let pageNumber = 1; pageNumber <= pagesToRender; pageNumber++) {
+          const page = await pdf.getPage(pageNumber);
+          const viewport = page.getViewport({ scale });
+
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d", { willReadFrequently: false });
+
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+
+          await page.render({
+            canvasContext: context,
+            viewport
+          }).promise;
+
+          const blob = await canvasToBlob(canvas, "image/jpeg", 0.88);
+          const safeName = pdfFile.name.replace(/\.pdf$/i, "").replace(/[^\w.-]+/g, "_");
+          const imageName = `${safeName}_page_${pageNumber}.jpg`;
+
+          const imageFile = new File([blob], imageName, {
+            type: "image/jpeg"
+          });
+
+          rendered.push(imageFile);
+          completedPages++;
+
+          const roughProgress = Math.min(58, 10 + completedPages * 5);
+          setProgress(roughProgress);
+          setStatus(
+            `Rendering PDF pages...\n${pdfFile.name}\nPage ${pageNumber} of ${pagesToRender}\nRendered images so far: ${rendered.length}`
+          );
+        }
+      }
+
+      updateDashboard();
+      return rendered;
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error("Could not convert PDF page to image."));
+        }, type, quality);
+      });
+    }
+
+    async function testWorker() {
+      const workerUrl = normalizeUrl(els.workerUrl.value);
+
+      if (!workerUrl) {
+        setStatus("Enter your Cloudflare Worker URL first.", "error");
+        return;
+      }
+
+      saveSettings();
+
+      try {
+        setLoading(true);
+        setStatus("Testing Worker connection...");
+        setProgress(35);
+
+        const response = await fetch(workerUrl, {
+          method: "GET"
+        });
+
+        const text = await response.text();
+
+        setProgress(100);
+
+        if (!response.ok) {
+          throw new Error(text);
+        }
+
+        setStatus("Worker test result:\n" + text);
+        updateDashboard("Ready");
+      } catch (error) {
+        setStatus("Worker test failed:\n" + (error.message || String(error)), "error");
+        updateDashboard("Error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function displayResults(resultText, rawData) {
+      const html = markdownToHtml(resultText);
+
+      els.fullResult.innerHTML = html;
+      els.rawResult.textContent = JSON.stringify(rawData, null, 2);
+
+      els.onsiteResult.innerHTML =
+        markdownToHtml(extractSection(resultText, "## 8. On-Site Fabrication Estimate", "## 9. Prefab Estimate")) ||
+        "<p>On-site fabrication section was not found in the AI response.</p>";
+
+      els.prefabResult.innerHTML =
+        markdownToHtml(extractSection(resultText, "## 9. Prefab Estimate", "## 10. Missing or Unclear Items")) ||
+        "<p>Prefab section was not found in the AI response.</p>";
+
+      const materialSections = [
+        extractSection(resultText, "## 3. Sprinkler Head Count", "## 4. Pipe Breakdown"),
+        extractSection(resultText, "## 4. Pipe Breakdown", "## 5. Fittings Breakdown"),
+        extractSection(resultText, "## 5. Fittings Breakdown", "## 6. Riser / Valve / Test Material"),
+        extractSection(resultText, "## 6. Riser / Valve / Test Material", "## 7. Hangers, Supports, and Accessories"),
+        extractSection(resultText, "## 7. Hangers, Supports, and Accessories", "## 8. On-Site Fabrication Estimate")
+      ].filter(Boolean).join("\n\n");
+
+      els.materialResult.innerHTML =
+        markdownToHtml(materialSections) ||
+        "<p>Material sections were not found in the AI response.</p>";
+
+      const labourSections = [
+        extractSection(resultText, "## 8. On-Site Fabrication Estimate", "## 9. Prefab Estimate"),
+        extractSection(resultText, "## 9. Prefab Estimate", "## 10. Missing or Unclear Items")
+      ].filter(Boolean).join("\n\n");
+
+      els.labourResult.innerHTML =
+        markdownToHtml(labourSections) ||
+        "<p>Labour sections were not found in the AI response.</p>";
+    }
+
+    function extractSection(text, startHeading, endHeading) {
+      const startIndex = text.indexOf(startHeading);
+      if (startIndex === -1) return "";
+
+      const endIndex = text.indexOf(endHeading, startIndex + startHeading.length);
+      if (endIndex === -1) return text.slice(startIndex).trim();
+
+      return text.slice(startIndex, endIndex).trim();
     }
 
     function markdownToHtml(markdown) {
-      if (!markdown) return "<p>No AI result returned.</p>";
+      if (!markdown) return "";
 
-      const lines = markdown.replace(/\r\n/g, "\n").split("\n");
-      let html = "";
-      let paragraph = [];
-      let listOpen = false;
+      let html = escapeHtml(markdown);
 
-      function flushParagraph() {
-        if (paragraph.length) {
-          html += `<p>${inlineFormat(escapeHtml(paragraph.join(" ")))}</p>`;
-          paragraph = [];
-        }
-      }
+      html = convertMarkdownTables(html);
 
-      function closeList() {
-        if (listOpen) {
-          html += "</ul>";
-          listOpen = false;
-        }
-      }
+      html = html
+        .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+        .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+        .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/^- (.*)$/gm, "<li>$1</li>")
+        .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
+        .replace(/\n{2,}/g, "<br><br>")
+        .replace(/\n/g, "<br>");
 
-      for (let i = 0; i < lines.length; i++) {
+      html = html.replace(/<\/ul><br><br><ul>/g, "");
+      html = html.replace(/<\/li><br><li>/g, "</li><li>");
+
+      return html;
+    }
+
+    function convertMarkdownTables(text) {
+      const lines = text.split("\n");
+      const output = [];
+      let i = 0;
+
+      while (i < lines.length) {
         const line = lines[i];
-        const trimmed = line.trim();
 
-        if (!trimmed) {
-          flushParagraph();
-          closeList();
-          continue;
-        }
+        if (isTableRow(line) && i + 1 < lines.length && isSeparatorRow(lines[i + 1])) {
+          const headers = splitTableRow(line);
+          i += 2;
 
-        if (isTableStart(lines, i)) {
-          flushParagraph();
-          closeList();
-
-          const tableLines = [];
-          while (i < lines.length && lines[i].trim().startsWith("|")) {
-            tableLines.push(lines[i].trim());
+          const rows = [];
+          while (i < lines.length && isTableRow(lines[i])) {
+            rows.push(splitTableRow(lines[i]));
             i++;
           }
-          i--;
 
-          html += renderTable(tableLines);
-          continue;
+          let table = "<table><thead><tr>";
+          headers.forEach((header) => {
+            table += `<th>${header}</th>`;
+          });
+          table += "</tr></thead><tbody>";
+
+          rows.forEach((row) => {
+            table += "<tr>";
+            headers.forEach((_, index) => {
+              table += `<td>${row[index] || ""}</td>`;
+            });
+            table += "</tr>";
+          });
+
+          table += "</tbody></table>";
+          output.push(table);
+        } else {
+          output.push(line);
+          i++;
         }
-
-        if (trimmed.startsWith("### ")) {
-          flushParagraph();
-          closeList();
-          html += `<h3>${inlineFormat(escapeHtml(trimmed.slice(4)))}</h3>`;
-          continue;
-        }
-
-        if (trimmed.startsWith("## ")) {
-          flushParagraph();
-          closeList();
-          html += `<h2>${inlineFormat(escapeHtml(trimmed.slice(3)))}</h2>`;
-          continue;
-        }
-
-        if (trimmed.startsWith("# ")) {
-          flushParagraph();
-          closeList();
-          html += `<h1>${inlineFormat(escapeHtml(trimmed.slice(2)))}</h1>`;
-          continue;
-        }
-
-        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-          flushParagraph();
-
-          if (!listOpen) {
-            html += "<ul>";
-            listOpen = true;
-          }
-
-          html += `<li>${inlineFormat(escapeHtml(trimmed.slice(2)))}</li>`;
-          continue;
-        }
-
-        paragraph.push(trimmed);
       }
 
-      flushParagraph();
-      closeList();
-
-      return html;
+      return output.join("\n");
     }
 
-    function isTableStart(lines, index) {
-      const current = lines[index]?.trim() || "";
-      const next = lines[index + 1]?.trim() || "";
-      return current.startsWith("|") && current.endsWith("|") && next.startsWith("|") && next.includes("---");
+    function isTableRow(line) {
+      return /^\s*\|.*\|\s*$/.test(line);
     }
 
-    function renderTable(tableLines) {
-      if (tableLines.length < 2) return "";
-
-      const headers = splitTableRow(tableLines[0]);
-      const bodyRows = tableLines.slice(2);
-
-      let html = `<div class="table-wrap"><table><thead><tr>`;
-      headers.forEach(header => {
-        html += `<th>${inlineFormat(escapeHtml(header))}</th>`;
-      });
-      html += `</tr></thead><tbody>`;
-
-      bodyRows.forEach(row => {
-        const cells = splitTableRow(row);
-        html += "<tr>";
-        cells.forEach(cell => {
-          html += `<td>${inlineFormat(escapeHtml(cell))}</td>`;
-        });
-        html += "</tr>";
-      });
-
-      html += `</tbody></table></div>`;
-      return html;
+    function isSeparatorRow(line) {
+      return /^\s*\|?[\s:-]+\|[\s|:-]*\|?\s*$/.test(line);
     }
 
-    function splitTableRow(row) {
-      return row
+    function splitTableRow(line) {
+      return line
+        .trim()
         .replace(/^\|/, "")
         .replace(/\|$/, "")
         .split("|")
-        .map(cell => cell.trim());
+        .map((cell) => cell.trim());
     }
 
-    function copyResults() {
-      if (!latestResultText) {
-        alert("No AI result to copy yet.");
-        return;
-      }
+    function calculateMaterial() {
+      const heads = Number(document.getElementById("headQty").value || 0);
+      const size = document.getElementById("dropPipeSize").value;
+      const workType = document.getElementById("workType").value;
 
-      navigator.clipboard.writeText(latestResultText)
-        .then(() => alert("Results copied."))
-        .catch(() => alert("Could not copy results."));
+      const elbows = heads * 3;
+      const nipples = heads;
+      const hangers = heads;
+      const rods = heads;
+      const mechanicalTees = workType === "new" ? heads : 0;
+
+      const result = `
+Material estimate for ${heads} head(s):
+
+Pipe/drop size:
+- ${size}" threaded drop material
+
+Drop assemblies:
+- ${elbows} x ${size}" threaded 90 elbows
+- ${nipples} x ${size}" x 2" nipples
+- ${hangers} x hangers
+- ${rods} x rod assemblies
+- ${mechanicalTees} x mechanical tees
+
+Notes:
+- Relocates do not include mechanical tees by default.
+- New heads include mechanical tees by default.
+- 1" drop pipe is treated as threaded.
+      `.trim();
+
+      document.getElementById("materialCalcResult").textContent = result;
     }
 
-    function downloadResults() {
-      if (!latestResultText) {
-        alert("No results to export yet.");
-        return;
+    function calculateLabour() {
+      const heads = Number(document.getElementById("labourHeads").value || 0);
+      const hoursPerHead = Number(document.getElementById("hoursPerHead").value || 0);
+      const fabType = document.getElementById("fabTypeLabour").value;
+
+      let baseHours = heads * hoursPerHead;
+      let adjustedHours = baseHours;
+      let notes = "Onsite fabrication uses standard field labour.";
+
+      if (fabType === "prefab") {
+        adjustedHours = baseHours * 0.72;
+        notes = "Prefab reduces field install hours but should include shop fabrication cost separately.";
       }
 
-      const blob = new Blob([latestResultText], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      document.getElementById("labourCalcResult").textContent = `
+Labour estimate:
 
-      link.href = url;
-      link.download = "fireflow-ai-estimate.txt";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+Heads/drops:
+- ${heads}
 
-      URL.revokeObjectURL(url);
+Base labour:
+- ${baseHours.toFixed(1)} hours
+
+Fabrication type:
+- ${fabType}
+
+Adjusted field labour:
+- ${adjustedHours.toFixed(1)} hours
+
+Notes:
+- ${notes}
+      `.trim();
+    }
+
+    function calculateService() {
+      const type = document.getElementById("serviceType").value;
+      const hours = Number(document.getElementById("serviceHours").value || 0);
+      const rate = Number(document.getElementById("serviceRate").value || 0);
+      const total = hours * rate;
+
+      document.getElementById("serviceResult").textContent = `
+Service quote:
+
+Type:
+- ${type}
+
+Labour:
+- ${hours.toFixed(1)} hours
+
+Rate:
+- $${rate.toFixed(2)} / hour
+
+Estimated labour total:
+- $${total.toFixed(2)}
+
+Notes:
+- Material, permit fees, lift rental, fire watch, and after-hours premiums are not included unless added separately.
+      `.trim();
     }
 
     function saveSettings() {
-      const settingsWorkerUrl = document.getElementById("settingsWorkerUrl");
-      const settingsFabricationMode = document.getElementById("settingsFabricationMode");
+      const settings = {
+        workerUrl: els.workerUrl.value,
+        projectType: els.projectType.value,
+        fabricationMode: els.fabricationMode.value,
+        pdfRenderScale: els.pdfRenderScale.value,
+        maxPdfPages: els.maxPdfPages.value
+      };
 
-      if (settingsWorkerUrl && settingsWorkerUrl.value.trim()) {
-        localStorage.setItem("fireflowWorkerUrl", settingsWorkerUrl.value.trim());
-        workerUrl.value = settingsWorkerUrl.value.trim();
+      localStorage.setItem("fireflow_settings", JSON.stringify(settings));
+
+      const settingsStatus = document.getElementById("settingsStatus");
+      if (settingsStatus) {
+        settingsStatus.textContent = "Settings saved.";
+      }
+    }
+
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem("fireflow_settings");
+        if (!raw) return;
+
+        const settings = JSON.parse(raw);
+
+        if (settings.workerUrl) els.workerUrl.value = settings.workerUrl;
+        if (settings.projectType) els.projectType.value = settings.projectType;
+        if (settings.fabricationMode) els.fabricationMode.value = settings.fabricationMode;
+        if (settings.pdfRenderScale) els.pdfRenderScale.value = settings.pdfRenderScale;
+        if (settings.maxPdfPages) els.maxPdfPages.value = settings.maxPdfPages;
+
+        const settingsStatus = document.getElementById("settingsStatus");
+        if (settingsStatus) {
+          settingsStatus.textContent = "Saved settings loaded.";
+        }
+      } catch (error) {
+        console.warn("Could not load settings", error);
+      }
+    }
+
+    function clearSettings() {
+      localStorage.removeItem("fireflow_settings");
+      document.getElementById("settingsStatus").textContent = "Saved settings cleared.";
+    }
+
+    function clearAnalyzer() {
+      state.selectedFiles = [];
+      state.renderedImages = [];
+      state.lastResult = "";
+
+      els.fileInput.value = "";
+      els.fileList.innerHTML = "";
+      els.fullResult.textContent = "Results will appear here after analysis.";
+      els.onsiteResult.textContent = "On-site fabrication summary will appear here.";
+      els.prefabResult.textContent = "Prefab summary will appear here.";
+      els.materialResult.textContent = "Material breakdown will appear here.";
+      els.labourResult.textContent = "Labour breakdown will appear here.";
+      els.rawResult.textContent = "Raw response will appear here.";
+      els.debugBox.textContent = "No files selected yet.";
+
+      setStatus("AI status is idle.");
+      setProgress(0);
+      updateDashboard("Idle");
+    }
+
+    function setLoading(isLoading) {
+      els.loader.classList.toggle("active", isLoading);
+      els.analyzeBtn.disabled = isLoading;
+      els.testWorkerBtn.disabled = isLoading;
+    }
+
+    function setProgress(percent) {
+      els.progressFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+    }
+
+    function setStatus(message, type) {
+      els.statusBox.textContent = message;
+
+      if (type === "error") {
+        els.statusBox.style.borderColor = "rgba(239, 68, 68, 0.55)";
+        els.statusBox.style.color = "#fecaca";
+      } else {
+        els.statusBox.style.borderColor = "rgba(148, 163, 184, 0.22)";
+        els.statusBox.style.color = "#94a3b8";
+      }
+    }
+
+    function updateDashboard(status) {
+      els.dashFiles.textContent = state.selectedFiles.length;
+      els.dashImages.textContent = state.renderedImages.length;
+      if (status) els.dashStatus.textContent = status;
+    }
+
+    function normalizeUrl(url) {
+      const trimmed = String(url || "").trim();
+      if (!trimmed) return "";
+      return trimmed.replace(/\/+$/, "");
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return "0 B";
+
+      const units = ["B", "KB", "MB", "GB"];
+      let size = bytes;
+      let unitIndex = 0;
+
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
       }
 
-      if (settingsFabricationMode) {
-        localStorage.setItem("fireflowFabricationMode", settingsFabricationMode.value);
-        fabricationMode.value = settingsFabricationMode.value;
-      }
-
-      alert("Settings saved.");
+      return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
     }
 
     function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function inlineFormat(text) {
-      return text
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/`(.*?)`/g, "<code>$1</code>");
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
   </script>
 </body>
