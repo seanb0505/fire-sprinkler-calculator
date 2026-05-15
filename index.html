@@ -62,8 +62,6 @@
       min-height: 100vh;
     }
 
-    /* SIDEBAR */
-
     .sidebar {
       background: linear-gradient(180deg, #0c1117, #081016);
       border-right: 1px solid var(--border);
@@ -176,6 +174,7 @@
       height: 10px;
       border-radius: 999px;
       background: var(--muted);
+      flex: 0 0 auto;
     }
 
     .dot.green { background: var(--green); }
@@ -209,8 +208,6 @@
       margin-top: 12px;
       font-weight: 700;
     }
-
-    /* MAIN */
 
     .main {
       min-width: 0;
@@ -370,6 +367,7 @@
       padding: 0 28px;
       background: #0e151b;
       border-bottom: 1px solid var(--border);
+      overflow-x: auto;
     }
 
     .tab {
@@ -377,6 +375,7 @@
       padding: 16px 24px;
       font-size: 13px;
       border-bottom: 2px solid transparent;
+      white-space: nowrap;
     }
 
     .tab.active {
@@ -428,8 +427,6 @@
     .panel-body {
       padding: 14px;
     }
-
-    /* DRAWING VIEWER */
 
     .drawing-select {
       width: 100%;
@@ -526,8 +523,6 @@
       color: white;
       font-size: 11px;
     }
-
-    /* ANALYSIS */
 
     .analysis-controls {
       display: flex;
@@ -707,8 +702,6 @@
       font-weight: 800;
     }
 
-    /* RIGHT COLUMN */
-
     .right-col {
       display: grid;
       gap: 12px;
@@ -746,6 +739,7 @@
       padding: 8px 0;
       color: #e2e8f0;
       font-size: 14px;
+      gap: 12px;
     }
 
     .estimate-total {
@@ -825,8 +819,6 @@
     .revision span {
       color: var(--muted);
     }
-
-    /* MODAL */
 
     .modal-backdrop {
       display: none;
@@ -963,8 +955,6 @@
       line-height: 1.5;
     }
 
-    /* RESPONSIVE */
-
     @media (max-width: 1450px) {
       .content {
         grid-template-columns: 1fr;
@@ -1015,12 +1005,9 @@
         flex-wrap: wrap;
       }
 
-      .tabs {
-        overflow-x: auto;
-      }
-
-      .tab {
-        white-space: nowrap;
+      th,
+      td {
+        white-space: normal;
       }
     }
   </style>
@@ -1038,7 +1025,7 @@
       </div>
 
       <nav class="nav">
-        <a href="#" class="nav-item active">🏠 Dashboard</a>
+        <a href="#" class="nav-item active" onclick="showDashboard(); return false;">🏠 Dashboard</a>
         <a href="#" class="nav-item">📁 Projects</a>
         <a href="#" class="nav-item" onclick="openModal(); return false;">⬆️ Upload Drawings</a>
         <a href="#" class="nav-item">🧠 AI Analyzer</a>
@@ -1047,6 +1034,7 @@
         <a href="#" class="nav-item">🔩 Assemblies</a>
         <a href="#" class="nav-item">🕘 Revisions</a>
         <a href="#" class="nav-item">📄 Reports</a>
+        <a href="#" class="nav-item" onclick="showServiceTesting(); return false;">🧯 Service & Testing</a>
         <a href="#" class="nav-item">🔗 Suppliers & Pricing</a>
         <a href="#" class="nav-item">⚙️ Settings</a>
       </nav>
@@ -1070,8 +1058,8 @@
     <main class="main">
       <header class="topbar">
         <div class="topbar-title">
-          <h1>AI-Powered Fire Sprinkler Estimating</h1>
-          <p>Upload. Analyze. Estimate. Win More Jobs.</p>
+          <h1 id="pageTitle">AI-Powered Fire Sprinkler Estimating</h1>
+          <p id="pageSubtitle">Upload. Analyze. Estimate. Win More Jobs.</p>
         </div>
 
         <div class="topbar-actions">
@@ -1086,8 +1074,8 @@
         <div class="project-info">
           <div class="drawing-thumb"></div>
           <div>
-            <h2>INDUSTRIAL WAREHOUSE <span class="active-pill">ACTIVE</span></h2>
-            <div class="project-meta">
+            <h2 id="projectHeaderTitle">INDUSTRIAL WAREHOUSE <span class="active-pill">ACTIVE</span></h2>
+            <div class="project-meta" id="projectHeaderMeta">
               <span>Project ID: FF-2024-1001</span>
               <span>|</span>
               <span>Created: May 20, 2024</span>
@@ -1106,7 +1094,7 @@
         </div>
       </section>
 
-      <nav class="tabs">
+      <nav class="tabs" id="mainTabs">
         <div class="tab">DRAWINGS</div>
         <div class="tab active">AI ANALYSIS</div>
         <div class="tab">MATERIALS</div>
@@ -1115,7 +1103,7 @@
         <div class="tab">REVISION HISTORY</div>
       </nav>
 
-      <section class="content">
+      <section class="content" id="dashboardPage">
         <div>
           <div class="left-grid">
             <div>
@@ -1169,8 +1157,8 @@
                 <div class="panel-body">
                   <div class="layer-list">
                     <div class="layer"><label><span class="check">✓</span> Sprinkler Heads</label><span class="dot red"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Pipe (Wet)</label><span class="dot green"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Pipe (Dry)</label><span class="dot blue"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Pipe Wet</label><span class="dot green"></span></div>
+                    <div class="layer"><label><span class="check">✓</span> Pipe Dry</label><span class="dot blue"></span></div>
                     <div class="layer"><label><span class="check">✓</span> Fittings</label><span class="dot orange"></span></div>
                     <div class="layer"><label><span class="check">✓</span> Valves</label><span class="dot purple"></span></div>
                     <div class="layer"><label><span class="check">✓</span> Hangers</label><span class="dot" style="background:#fbbf24;"></span></div>
@@ -1414,6 +1402,172 @@
           </div>
         </aside>
       </section>
+
+      <section class="content" id="serviceTestingPage" style="display:none;">
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <h3>🧯 SERVICE & TESTING DASHBOARD</h3>
+              <div class="analysis-controls">
+                <button class="small-btn">Create Quote</button>
+                <button class="small-btn">Generate Report</button>
+                <button class="small-btn">Export PDF</button>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <div class="materials-grid">
+                <div class="mini-panel">
+                  <div class="mini-title">INSPECTION / TESTING</div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Service Type</th>
+                        <th>Frequency</th>
+                        <th>Estimated Hours</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Monthly Inspection</td><td>Monthly</td><td>1.5</td><td class="confidence">Ready</td></tr>
+                      <tr><td>Quarterly Inspection</td><td>Quarterly</td><td>3.0</td><td class="confidence">Ready</td></tr>
+                      <tr><td>Annual Wet System Test</td><td>Annual</td><td>5.0</td><td class="confidence">Ready</td></tr>
+                      <tr><td>Backflow Test</td><td>Annual</td><td>2.0</td><td class="confidence">Ready</td></tr>
+                      <tr><td>Fire Pump Run Test</td><td>Monthly / Annual</td><td>2.5</td><td class="confidence">Ready</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="mini-panel">
+                  <div class="mini-title">DEFICIENCY QUOTE BUILDER</div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Deficiency</th>
+                        <th>Material</th>
+                        <th>Labour</th>
+                        <th>Quote Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Replace painted sprinkler head</td><td>1 head + escutcheon</td><td>1.0 hr</td><td>Editable</td></tr>
+                      <tr><td>Replace missing escutcheon</td><td>1 escutcheon</td><td>0.5 hr</td><td>Editable</td></tr>
+                      <tr><td>Repair leaking drain valve</td><td>Valve / trim allowance</td><td>2.0 hr</td><td>Editable</td></tr>
+                      <tr><td>Replace pressure gauge</td><td>1 gauge</td><td>0.5 hr</td><td>Editable</td></tr>
+                      <tr><td>Add missing signage</td><td>Signage allowance</td><td>0.5 hr</td><td>Editable</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="mini-panel">
+                  <div class="mini-title">DEVICE COUNTS</div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Device / Item</th>
+                        <th>Qty</th>
+                        <th>Test Type</th>
+                        <th>Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Wet sprinkler riser</td><td>1</td><td>Annual</td><td>Main drain, flow, alarm</td></tr>
+                      <tr><td>Backflow preventer</td><td>1</td><td>Annual</td><td>Backflow report required</td></tr>
+                      <tr><td>Fire department connection</td><td>1</td><td>Visual</td><td>Caps, chains, signage</td></tr>
+                      <tr><td>Inspector test</td><td>1</td><td>Annual</td><td>Flow test</td></tr>
+                      <tr><td>Sprinkler heads</td><td>Auto-detect</td><td>Visual</td><td>Paint, damage, loading</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="mini-panel">
+                  <div class="mini-title">SERVICE ESTIMATE SUMMARY</div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Line Item</th>
+                        <th>Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Estimated service hours</td><td>8.5 hrs</td></tr>
+                      <tr><td>Estimated repair hours</td><td>4.5 hrs</td></tr>
+                      <tr><td>Material allowance</td><td>$650</td></tr>
+                      <tr><td>Labour rate</td><td>$115/hr</td></tr>
+                      <tr><td><strong>Estimated total</strong></td><td><strong>$2,145</strong></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="summary-strip">
+                <div class="strip-item">Monthly Tests <strong>Ready</strong></div>
+                <div class="strip-item">Annual Tests <strong>Ready</strong></div>
+                <div class="strip-item">Deficiency Quotes <strong>Editable</strong></div>
+                <div class="strip-item">Reports <strong>Draft</strong></div>
+                <button class="btn" onclick="showDashboard()">Back to Dashboard</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:14px;">
+            <div class="panel-header">
+              <h3>AI SERVICE REPORT PREVIEW</h3>
+              <small>Editable before sending to customer</small>
+            </div>
+
+            <div class="panel-body">
+              <div class="mini-panel">
+                <div class="mini-title">REPORT NOTES</div>
+                <div style="padding:14px; color:#e2e8f0; line-height:1.6; font-size:13px;">
+                  FireFlow will generate a customer-ready inspection/service report based on the system type,
+                  device counts, inspection frequency, deficiencies found, photos, and technician notes.
+                  The contractor can edit all line items before sending the quote or final report.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="right-col">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>SERVICE MODULE</h3>
+            </div>
+            <div class="panel-body">
+              <div class="estimate-row"><span>Monthly inspections</span><span>Enabled</span></div>
+              <div class="estimate-row"><span>Annual testing</span><span>Enabled</span></div>
+              <div class="estimate-row"><span>Deficiency quotes</span><span>Enabled</span></div>
+              <div class="estimate-row"><span>Customer reports</span><span>Draft mode</span></div>
+              <div class="estimate-row estimate-total"><span>Status</span><span>Mockup</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>COMMON DEFICIENCIES</h3>
+            </div>
+            <div class="panel-body">
+              <div class="revision"><span class="dot red"></span><div><strong>Painted sprinkler head</strong><span>Auto quote: head replacement</span></div></div>
+              <div class="revision"><span class="dot orange"></span><div><strong>Missing escutcheon</strong><span>Auto quote: escutcheon replacement</span></div></div>
+              <div class="revision"><span class="dot blue"></span><div><strong>Low pressure gauge</strong><span>Auto quote: gauge replacement / investigation</span></div></div>
+              <div class="revision"><span class="dot green"></span><div><strong>Missing signage</strong><span>Auto quote: signage install</span></div></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>SERVICE REPORT WORKFLOW</h3>
+            </div>
+            <div class="panel-body">
+              <div class="revision"><span class="dot green"></span><div><strong>1. Add customer / site</strong><span>Building information and system type</span></div></div>
+              <div class="revision"><span class="dot blue"></span><div><strong>2. Enter device counts</strong><span>Risers, valves, FDC, pumps, heads</span></div></div>
+              <div class="revision"><span class="dot orange"></span><div><strong>3. Add deficiencies</strong><span>Photos, notes, material and labour</span></div></div>
+              <div class="revision"><span class="dot purple"></span><div><strong>4. Generate quote/report</strong><span>Editable customer-ready output</span></div></div>
+            </div>
+          </div>
+        </aside>
+      </section>
     </main>
   </div>
 
@@ -1646,6 +1800,7 @@ Important rules:
         aiStatus.textContent = "Completed";
         workerStatus.textContent = "Worker connected";
         closeModal();
+        showDashboard();
       } catch (error) {
         aiStatus.textContent = "Error";
         workerStatus.textContent = "Worker error";
@@ -1690,6 +1845,104 @@ Important rules:
       document.body.removeChild(link);
 
       URL.revokeObjectURL(url);
+    }
+
+    function showServiceTesting() {
+      const dashboardPage = document.getElementById("dashboardPage");
+      const serviceTestingPage = document.getElementById("serviceTestingPage");
+      const pageTitle = document.getElementById("pageTitle");
+      const pageSubtitle = document.getElementById("pageSubtitle");
+      const projectHeaderTitle = document.getElementById("projectHeaderTitle");
+      const projectHeaderMeta = document.getElementById("projectHeaderMeta");
+      const mainTabs = document.getElementById("mainTabs");
+
+      if (dashboardPage) dashboardPage.style.display = "none";
+      if (serviceTestingPage) serviceTestingPage.style.display = "grid";
+
+      if (pageTitle) pageTitle.textContent = "Service, Testing & Deficiency Quoting";
+      if (pageSubtitle) pageSubtitle.textContent = "Generate inspection quotes, service reports, and editable deficiency pricing.";
+
+      if (projectHeaderTitle) {
+        projectHeaderTitle.innerHTML = 'SERVICE & TESTING MODULE <span class="active-pill">MOCKUP</span>';
+      }
+
+      if (projectHeaderMeta) {
+        projectHeaderMeta.innerHTML = `
+          <span>Module: Inspections</span>
+          <span>|</span>
+          <span>Monthly / Quarterly / Annual</span>
+          <span>|</span>
+          <span>Deficiency Quotes</span>
+          <span>|</span>
+          <span>Reports</span>
+        `;
+      }
+
+      if (mainTabs) {
+        mainTabs.innerHTML = `
+          <div class="tab active">SERVICE DASHBOARD</div>
+          <div class="tab">INSPECTIONS</div>
+          <div class="tab">DEFICIENCIES</div>
+          <div class="tab">REPORTS</div>
+          <div class="tab">QUOTES</div>
+        `;
+      }
+
+      setActiveNav("Service & Testing");
+    }
+
+    function showDashboard() {
+      const dashboardPage = document.getElementById("dashboardPage");
+      const serviceTestingPage = document.getElementById("serviceTestingPage");
+      const pageTitle = document.getElementById("pageTitle");
+      const pageSubtitle = document.getElementById("pageSubtitle");
+      const projectHeaderTitle = document.getElementById("projectHeaderTitle");
+      const projectHeaderMeta = document.getElementById("projectHeaderMeta");
+      const mainTabs = document.getElementById("mainTabs");
+
+      if (dashboardPage) dashboardPage.style.display = "grid";
+      if (serviceTestingPage) serviceTestingPage.style.display = "none";
+
+      if (pageTitle) pageTitle.textContent = "AI-Powered Fire Sprinkler Estimating";
+      if (pageSubtitle) pageSubtitle.textContent = "Upload. Analyze. Estimate. Win More Jobs.";
+
+      if (projectHeaderTitle) {
+        projectHeaderTitle.innerHTML = 'INDUSTRIAL WAREHOUSE <span class="active-pill">ACTIVE</span>';
+      }
+
+      if (projectHeaderMeta) {
+        projectHeaderMeta.innerHTML = `
+          <span>Project ID: FF-2024-1001</span>
+          <span>|</span>
+          <span>Created: May 20, 2024</span>
+          <span>|</span>
+          <span>Location: Ontario, Canada</span>
+          <span>|</span>
+          <span>Type: New Construction</span>
+        `;
+      }
+
+      if (mainTabs) {
+        mainTabs.innerHTML = `
+          <div class="tab">DRAWINGS</div>
+          <div class="tab active">AI ANALYSIS</div>
+          <div class="tab">MATERIALS</div>
+          <div class="tab">LABOR</div>
+          <div class="tab">SUMMARY</div>
+          <div class="tab">REVISION HISTORY</div>
+        `;
+      }
+
+      setActiveNav("Dashboard");
+    }
+
+    function setActiveNav(label) {
+      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+
+      const link = Array.from(document.querySelectorAll(".nav-item"))
+        .find(item => item.textContent.includes(label));
+
+      if (link) link.classList.add("active");
     }
 
     function escapeHtml(value) {
