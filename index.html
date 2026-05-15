@@ -621,6 +621,10 @@
                 <div class="field">
                   <label>Upload Drawings / Files</label>
                   <input id="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.xlsx,.xls,.docx">
+                  <div class="warning" style="margin-top:8px;">
+                    You can add files one at a time. Choose a file, then click the upload box again to add another file.
+                    The list below will keep everything until you click Clear or remove a file.
+                  </div>
                 </div>
               </div>
 
@@ -891,9 +895,23 @@
 
     function bindAnalyzer() {
       fileInput.addEventListener("change", () => {
-        state.selectedFiles = Array.from(fileInput.files || []);
+        const newlySelected = Array.from(fileInput.files || []);
+
+        newlySelected.forEach((file) => {
+          const duplicate = state.selectedFiles.some((existing) =>
+            existing.name === file.name &&
+            existing.size === file.size &&
+            existing.lastModified === file.lastModified
+          );
+
+          if (!duplicate) {
+            state.selectedFiles.push(file);
+          }
+        });
+
+        fileInput.value = "";
         renderFileList();
-        updateDashboardStatus("Files selected");
+        updateDashboardStatus(state.selectedFiles.length ? "Files selected" : "Idle");
       });
 
       document.getElementById("testWorkerBtn").addEventListener("click", testWorker);
@@ -930,12 +948,21 @@
         return;
       }
 
-      fileList.innerHTML = state.selectedFiles.map(file => `
+      fileList.innerHTML = state.selectedFiles.map((file, index) => `
         <div class="file-item">
-          <div><strong>${escapeHtml(file.name)}</strong></div>
-          <div>${formatBytes(file.size)}</div>
+          <div>
+            <strong>${escapeHtml(file.name)}</strong>
+            <div style="color:#94a3b8;font-size:12px;margin-top:4px;">${escapeHtml(file.type || "file")} • ${formatBytes(file.size)}</div>
+          </div>
+          <button type="button" class="btn danger" style="padding:7px 10px;font-size:12px;" onclick="removeSelectedFile(${index})">Remove</button>
         </div>
       `).join("");
+    }
+
+    function removeSelectedFile(index) {
+      state.selectedFiles.splice(index, 1);
+      renderFileList();
+      updateDashboardStatus(state.selectedFiles.length ? "Files selected" : "Idle");
     }
 
     async function testWorker() {
@@ -1029,6 +1056,7 @@ FireFlow AI website instructions:
 - Use the strict takeoff Worker result format.
 - Return confirmed, estimated, and estimator-review quantities.
 - Keep results clean enough for a contractor estimate.
+- If a spreadsheet/material list is uploaded with the drawings, treat it as estimator-provided reference data and compare the AI takeoff against it.
       `.trim();
     }
 
