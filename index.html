@@ -648,7 +648,7 @@
                     <button class="filter-btn" data-result-tab="prefabResult">Prefab</button>
                     <button class="filter-btn" data-result-tab="rawResult">Raw</button>
                   </div>
-                  <div id="fullResult" class="result-panel">Results will appear here after analysis.</div>
+                  <div id="fullResult" class="result-panel active">Results will appear here after analysis.</div>
                   <div id="materialResult" class="result-panel" style="display:none;">Material breakdown will appear here.</div>
                   <div id="laborResult" class="result-panel" style="display:none;">Labor breakdown will appear here.</div>
                   <div id="onsiteResult" class="result-panel" style="display:none;">On-site fabrication will appear here.</div>
@@ -1083,12 +1083,12 @@ FireFlow AI website instructions:
         .replace(/^### (.*)$/gm, "<h3>$1</h3>")
         .replace(/\\*\\*(.*?)\\*\\*/g, "<strong>$1</strong>")
         .replace(/^- (.*)$/gm, "<li>$1</li>")
-        .replace(/(<li>.*<\\/li>)/gs, "<ul>$1</ul>")
+        .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
         .replace(/\\n{2,}/g, "<br><br>")
         .replace(/\\n/g, "<br>");
 
-      html = html.replace(/<\\/ul><br><br><ul>/g, "");
-      html = html.replace(/<\\/li><br><li>/g, "</li><li>");
+      html = html.replace(/<\/ul><br><br><ul>/g, "");
+      html = html.replace(/<\/li><br><li>/g, "</li><li>");
 
       return html;
     }
@@ -1280,11 +1280,14 @@ Exclusions / reminders:
     }
 
     function updateDashboardStatus(status) {
-      document.getElementById("dashFilesValue")?.remove();
-      document.getElementById("aiStatusText").textContent = status === "Done" ? "Completed" : status;
+      const dashFiles = document.getElementById("dashFiles");
+      if (dashFiles) dashFiles.textContent = state.selectedFiles.length;
+
+      const aiStatus = document.getElementById("aiStatusText");
+      if (aiStatus) aiStatus.textContent = status === "Done" ? "Completed" : status;
     }
 
-    function normalizeUrl(url) { return String(url || "").trim().replace(/\\/+$/, ""); }
+    function normalizeUrl(url) { return String(url || "").trim().replace(/\/+$/, ""); }
 
     function formatBytes(bytes) {
       if (!bytes) return "0 B";
