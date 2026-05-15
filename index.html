@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FireFlow AI - Fire Sprinkler Estimator</title>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <title>FireFlow AI Estimator</title>
 
   <style>
     :root {
       --bg: #07111f;
       --panel: #0f1b2d;
-      --panel2: #13233a;
       --card: #101d31;
       --border: rgba(148, 163, 184, 0.22);
       --text: #f8fafc;
@@ -31,16 +28,16 @@
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 34%),
-        radial-gradient(circle at top right, rgba(34, 197, 94, 0.10), transparent 28%),
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 35%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 30%),
         var(--bg);
       color: var(--text);
     }
 
     header {
-      padding: 42px 20px 24px;
-      text-align: center;
+      padding: 34px 20px 24px;
       border-bottom: 1px solid var(--border);
+      text-align: center;
     }
 
     .brand {
@@ -48,32 +45,31 @@
       align-items: center;
       gap: 10px;
       padding: 8px 14px;
-      border: 1px solid var(--border);
       border-radius: 999px;
+      border: 1px solid var(--border);
       color: var(--blue);
       background: rgba(15, 27, 45, 0.75);
-      font-weight: 700;
+      font-weight: 800;
       margin-bottom: 18px;
     }
 
-    .logo-dot {
+    .dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--blue), var(--green));
-      box-shadow: 0 0 22px rgba(56, 189, 248, 0.7);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
     }
 
     h1 {
-      font-size: clamp(34px, 5vw, 62px);
-      line-height: 1.02;
       margin: 0;
+      font-size: clamp(34px, 5vw, 60px);
       letter-spacing: -1.5px;
     }
 
     .subtitle {
-      max-width: 850px;
-      margin: 18px auto 0;
+      max-width: 900px;
+      margin: 16px auto 0;
       color: var(--muted);
       font-size: 18px;
       line-height: 1.5;
@@ -83,7 +79,7 @@
       display: grid;
       grid-template-columns: 280px minmax(0, 1fr);
       gap: 18px;
-      max-width: 1440px;
+      max-width: 1450px;
       margin: 0 auto;
       padding: 22px;
     }
@@ -92,7 +88,7 @@
       position: sticky;
       top: 16px;
       align-self: start;
-      background: rgba(15, 27, 45, 0.82);
+      background: rgba(15, 27, 45, 0.86);
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 14px;
@@ -104,24 +100,19 @@
       text-align: left;
       padding: 13px 14px;
       margin: 5px 0;
-      border: 1px solid transparent;
       border-radius: 14px;
+      border: 1px solid transparent;
       background: transparent;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      transition: 0.18s ease;
     }
 
-    .nav-btn:hover,
-    .nav-btn.active {
-      background: rgba(56, 189, 248, 0.12);
-      border-color: rgba(56, 189, 248, 0.28);
+    .nav-btn.active,
+    .nav-btn:hover {
       color: var(--text);
-    }
-
-    main {
-      min-width: 0;
+      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.12);
     }
 
     .section {
@@ -139,7 +130,7 @@
     }
 
     .card {
-      background: rgba(15, 27, 45, 0.86);
+      background: rgba(15, 27, 45, 0.88);
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 20px;
@@ -170,10 +161,10 @@
 
     label {
       display: block;
-      color: #cbd5e1;
-      font-weight: 700;
-      font-size: 14px;
       margin: 14px 0 7px;
+      color: #cbd5e1;
+      font-weight: 800;
+      font-size: 14px;
     }
 
     input,
@@ -189,13 +180,6 @@
       outline: none;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: rgba(56, 189, 248, 0.65);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
-    }
-
     textarea {
       min-height: 105px;
       resize: vertical;
@@ -206,21 +190,9 @@
       border-radius: 15px;
       padding: 13px 18px;
       color: #03111f;
-      font-weight: 800;
+      font-weight: 900;
       background: linear-gradient(135deg, var(--blue), var(--green));
       cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
     }
 
     .btn.secondary {
@@ -242,16 +214,23 @@
       margin-top: 16px;
     }
 
-    .status-box {
-      background: #081423;
+    .metric {
+      background: rgba(19, 35, 58, 0.95);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .metric .value {
+      color: var(--blue);
+      font-size: 30px;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .metric .label {
       color: var(--muted);
-      white-space: pre-wrap;
       font-size: 14px;
-      line-height: 1.5;
-      overflow-wrap: break-word;
     }
 
     .pill-row {
@@ -263,34 +242,36 @@
 
     .pill {
       display: inline-flex;
-      align-items: center;
-      gap: 7px;
       padding: 8px 10px;
       border-radius: 999px;
-      background: rgba(148, 163, 184, 0.11);
       border: 1px solid var(--border);
+      background: rgba(148, 163, 184, 0.11);
       color: #cbd5e1;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    .metric {
-      background: rgba(19, 35, 58, 0.9);
+    .status-box {
+      background: #081423;
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px;
-    }
-
-    .metric .value {
-      font-size: 30px;
-      font-weight: 900;
-      margin-bottom: 5px;
-      color: var(--blue);
-    }
-
-    .metric .label {
+      border-radius: 16px;
+      padding: 14px;
       color: var(--muted);
+      white-space: pre-wrap;
+      line-height: 1.5;
       font-size: 14px;
+      overflow-wrap: break-word;
+    }
+
+    .warning {
+      color: #fed7aa;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.32);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.45;
     }
 
     .tabs {
@@ -322,32 +303,12 @@
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 18px;
-      max-height: 760px;
+      max-height: 700px;
       overflow: auto;
     }
 
     .result-panel.active {
       display: block;
-    }
-
-    .result-panel table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 12px 0 18px;
-      font-size: 14px;
-    }
-
-    .result-panel th,
-    .result-panel td {
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      padding: 9px;
-      vertical-align: top;
-      text-align: left;
-    }
-
-    .result-panel th {
-      background: rgba(56, 189, 248, 0.11);
-      color: #e0f2fe;
     }
 
     .file-list {
@@ -366,60 +327,6 @@
       border-radius: 14px;
       color: #cbd5e1;
       font-size: 14px;
-    }
-
-    .small {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .warning {
-      color: #fed7aa;
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.32);
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 12px;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .success {
-      color: #bbf7d0;
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.32);
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 12px;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .loader {
-      display: none;
-      margin-top: 14px;
-      color: var(--blue);
-      font-weight: 800;
-    }
-
-    .loader.active {
-      display: block;
-    }
-
-    .progress-bar {
-      height: 10px;
-      background: rgba(148, 163, 184, 0.13);
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 10px;
-      border: 1px solid var(--border);
-    }
-
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--blue), var(--green));
-      transition: width 0.25s ease;
     }
 
     footer {
@@ -450,16 +357,11 @@
 
 <body>
   <header>
-    <div class="brand">
-      <span class="logo-dot"></span>
-      FireFlow AI
-    </div>
-
+    <div class="brand"><span class="dot"></span> FireFlow AI</div>
     <h1>Fire Sprinkler Estimator</h1>
-
     <p class="subtitle">
-      Contractor dashboard for sprinkler estimating, AI drawing analysis, material breakdowns,
-      labour hours, supplier pricing, and service/testing quotes.
+      Dashboard for AI drawing analysis, material takeoffs, labour estimating,
+      onsite fabrication, prefab comparison, supplier pricing, and service/testing quotes.
     </p>
   </header>
 
@@ -480,53 +382,51 @@
           <div class="card span-12">
             <h2>FireFlow AI Dashboard</h2>
             <p>
-              Manage fire sprinkler estimates from one place. Start with the AI Drawing Analyzer,
+              This is the restored dashboard layout. Use the analyzer for drawing uploads,
               then review material, labour, fabrication, pricing, and service/testing sections.
             </p>
-
             <div class="pill-row">
               <span class="pill">AI drawing takeoff</span>
               <span class="pill">Onsite fabrication</span>
               <span class="pill">Prefab comparison</span>
               <span class="pill">Material breakdowns</span>
               <span class="pill">Labour estimating</span>
-              <span class="pill">Service & testing</span>
+              <span class="pill">Service & Testing</span>
             </div>
           </div>
 
           <div class="metric span-3">
             <div class="value" id="dashFiles">0</div>
-            <div class="label">Uploaded files this session</div>
+            <div class="label">Uploaded files</div>
           </div>
 
           <div class="metric span-3">
-            <div class="value" id="dashImages">0</div>
-            <div class="label">Rendered PDF page images</div>
+            <div class="value">20</div>
+            <div class="label">Max PDF pages</div>
           </div>
 
           <div class="metric span-3">
             <div class="value" id="dashStatus">Idle</div>
-            <div class="label">AI analyzer status</div>
+            <div class="label">AI analyzer</div>
           </div>
 
           <div class="metric span-3">
             <div class="value">Ready</div>
-            <div class="label">Service/testing module</div>
-          </div>
-
-          <div class="card span-6">
-            <h3>Next best step</h3>
-            <p>
-              Reconnect your Cloudflare Worker URL, upload the same drawing package, and test the analyzer.
-              Keep the PDF page limit at 20 for now so it sees more sheets without changing the whole website.
-            </p>
+            <div class="label">Service module</div>
           </div>
 
           <div class="card span-6">
             <h3>Current focus</h3>
             <p>
-              Improve analyzer accuracy for material takeoff, head counts, pipe sizes, fittings,
-              riser material, onsite fabrication, prefab, and labour logic.
+              Improve drawing analyzer accuracy for head counts, pipe, fittings, riser material,
+              hangers, labour, onsite fabrication, and prefab.
+            </p>
+          </div>
+
+          <div class="card span-6">
+            <h3>Website status</h3>
+            <p>
+              Dashboard restored. Service & Testing tab is included. Worker URL can be saved in Settings or entered in the analyzer.
             </p>
           </div>
         </div>
@@ -536,25 +436,19 @@
         <div class="grid">
           <div class="card span-8">
             <h2>AI Drawing Analyzer</h2>
-            <p>
-              Upload sprinkler drawings, hydraulic calculations, PDFs, images, spreadsheets, or rough material lists.
-            </p>
+            <p>Upload sprinkler drawings, hydraulic calculations, PDFs, images, spreadsheets, or rough material lists.</p>
 
             <label for="workerUrl">Cloudflare Worker URL</label>
-            <input
-              id="workerUrl"
-              type="url"
-              placeholder="https://fire-estimator-ai.yourname.workers.dev"
-            />
+            <input id="workerUrl" type="url" placeholder="https://your-worker.workers.dev" />
 
             <label for="projectType">Project Type</label>
             <select id="projectType">
-              <option value="Unknown">Unknown / Let AI decide</option>
-              <option value="New install">New install</option>
-              <option value="Tenant improvement">Tenant improvement</option>
-              <option value="Retrofit">Retrofit</option>
-              <option value="Service work">Service work</option>
-              <option value="Monthly/annual testing">Monthly/annual testing</option>
+              <option>Unknown</option>
+              <option>New install</option>
+              <option>Tenant improvement</option>
+              <option>Retrofit</option>
+              <option>Service / repair</option>
+              <option>Monthly/annual testing</option>
             </select>
 
             <label for="fabricationMode">Fabrication Mode</label>
@@ -564,35 +458,15 @@
               <option value="prefab">Prefab only</option>
             </select>
 
-            <label for="pdfRenderScale">PDF Render Quality</label>
-            <select id="pdfRenderScale">
-              <option value="2">Standard high-resolution</option>
-              <option value="2.6" selected>Sharper drawing review</option>
-              <option value="3.2">Very sharp, slower upload</option>
-            </select>
-
-            <label for="maxPdfPages">Maximum PDF Pages to Render</label>
-            <select id="maxPdfPages">
-              <option value="4">First 4 pages</option>
-              <option value="8">First 8 pages</option>
-              <option value="12">First 12 pages</option>
-              <option value="20" selected>First 20 pages</option>
-            </select>
-
             <label for="instructions">Project Notes / Instructions</label>
-            <textarea id="instructions" placeholder="Example: 2 inch and 1-1/2 inch are grooved. 1 inch drops are threaded. Compare onsite fab and prefab. Rough material spreadsheet is included as reference."></textarea>
+            <textarea id="instructions" placeholder='Example: 2" and 1-1/2" are grooved. 1" drops are threaded. Compare onsite fab and prefab.'></textarea>
 
             <label for="fileInput">Upload Files</label>
-            <input
-              id="fileInput"
-              type="file"
-              multiple
-              accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.json,.xlsx,.xls,.docx"
-            />
+            <input id="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.xlsx,.xls,.docx" />
 
             <div class="warning">
-              Tip: You can select multiple files at once. On Windows, use Ctrl-click or Shift-click if needed.
-              PDF drawings are rendered into page images before being sent to the Worker.
+              This restored version keeps the dashboard stable. It sends uploaded files to the Worker.
+              We can add PDF page rendering back carefully after the site is fixed.
             </div>
 
             <div class="file-list" id="fileList"></div>
@@ -603,38 +477,16 @@
               <button class="btn danger" id="clearBtn">Clear</button>
             </div>
 
-            <div class="loader" id="loader">
-              Preparing files and analyzing drawings...
-              <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-              </div>
-            </div>
-
-            <div class="status-box" id="statusBox" style="margin-top: 14px;">
-              AI status is idle.
-            </div>
+            <div class="status-box" id="statusBox" style="margin-top:14px;">AI status is idle.</div>
           </div>
 
           <div class="card span-4">
             <h3>Analyzer Checks</h3>
-
-            <div class="status-box" id="debugBox">
-              No files selected yet.
-            </div>
-
-            <div class="success">
-              This version sends:
-              <br />• Original uploaded files
-              <br />• Rendered PDF page images
-              <br />• Project type
-              <br />• Fabrication mode
-              <br />• Contractor notes
-            </div>
+            <div class="status-box" id="debugBox">No files selected yet.</div>
           </div>
 
           <div class="card span-12">
             <h2>AI Drawing Results</h2>
-
             <div class="tabs">
               <button class="tab-btn active" data-result-tab="fullResult">Full Estimate</button>
               <button class="tab-btn" data-result-tab="onsiteResult">Onsite Fab</button>
@@ -644,29 +496,12 @@
               <button class="tab-btn" data-result-tab="rawResult">Raw</button>
             </div>
 
-            <div id="fullResult" class="result-panel active">
-              Results will appear here after analysis.
-            </div>
-
-            <div id="onsiteResult" class="result-panel">
-              On-site fabrication summary will appear here.
-            </div>
-
-            <div id="prefabResult" class="result-panel">
-              Prefab summary will appear here.
-            </div>
-
-            <div id="materialResult" class="result-panel">
-              Material breakdown will appear here.
-            </div>
-
-            <div id="labourResult" class="result-panel">
-              Labour breakdown will appear here.
-            </div>
-
-            <div id="rawResult" class="result-panel">
-              Raw response will appear here.
-            </div>
+            <div id="fullResult" class="result-panel active">Results will appear here after analysis.</div>
+            <div id="onsiteResult" class="result-panel">On-site fabrication results will appear here.</div>
+            <div id="prefabResult" class="result-panel">Prefab results will appear here.</div>
+            <div id="materialResult" class="result-panel">Material breakdown will appear here.</div>
+            <div id="labourResult" class="result-panel">Labour breakdown will appear here.</div>
+            <div id="rawResult" class="result-panel">Raw response will appear here.</div>
           </div>
         </div>
       </section>
@@ -675,24 +510,14 @@
         <div class="grid">
           <div class="card span-12">
             <h2>Material Calculator</h2>
-            <p>
-              Quick calculator for drops, relocates, small jobs, and add-on work.
-            </p>
+            <p>Quick calculator for drops, relocates, and small service jobs.</p>
           </div>
 
           <div class="card span-6">
             <h3>Drop / Relocate Calculator</h3>
 
             <label for="headQty">Number of Heads</label>
-            <input id="headQty" type="number" min="0" value="10" />
-
-            <label for="dropPipeSize">Drop Pipe Size</label>
-            <select id="dropPipeSize">
-              <option value="1">1 inch threaded</option>
-              <option value="1.25">1-1/4 inch</option>
-              <option value="1.5">1-1/2 inch</option>
-              <option value="2">2 inch</option>
-            </select>
+            <input id="headQty" type="number" value="10" min="0" />
 
             <label for="workType">Work Type</label>
             <select id="workType">
@@ -700,14 +525,12 @@
               <option value="relocate">Relocate heads, no mechanical tee</option>
             </select>
 
-            <button class="btn" style="margin-top: 16px;" id="calcMaterialBtn">Calculate Material</button>
+            <button class="btn" style="margin-top:16px;" id="calcMaterialBtn">Calculate Material</button>
           </div>
 
           <div class="card span-6">
             <h3>Material Result</h3>
-            <div class="status-box" id="materialCalcResult">
-              Enter head quantity and calculate.
-            </div>
+            <div class="status-box" id="materialCalcResult">Enter quantity and calculate.</div>
           </div>
         </div>
       </section>
@@ -716,19 +539,17 @@
         <div class="grid">
           <div class="card span-12">
             <h2>Labour Estimator</h2>
-            <p>
-              Basic labour logic for heads, drops, onsite fabrication, and prefab comparison.
-            </p>
+            <p>Basic labour estimating for heads, drops, onsite fabrication, and prefab.</p>
           </div>
 
           <div class="card span-6">
             <h3>Labour Inputs</h3>
 
             <label for="labourHeads">Heads / Drops</label>
-            <input id="labourHeads" type="number" min="0" value="20" />
+            <input id="labourHeads" type="number" value="20" min="0" />
 
             <label for="hoursPerHead">Hours Per Head</label>
-            <input id="hoursPerHead" type="number" min="0" step="0.1" value="1" />
+            <input id="hoursPerHead" type="number" value="1" min="0" step="0.1" />
 
             <label for="fabTypeLabour">Fabrication Type</label>
             <select id="fabTypeLabour">
@@ -736,14 +557,12 @@
               <option value="prefab">Prefab</option>
             </select>
 
-            <button class="btn" style="margin-top: 16px;" id="calcLabourBtn">Calculate Labour</button>
+            <button class="btn" style="margin-top:16px;" id="calcLabourBtn">Calculate Labour</button>
           </div>
 
           <div class="card span-6">
             <h3>Labour Result</h3>
-            <div class="status-box" id="labourCalcResult">
-              Enter labour inputs and calculate.
-            </div>
+            <div class="status-box" id="labourCalcResult">Enter labour inputs and calculate.</div>
           </div>
         </div>
       </section>
@@ -752,28 +571,20 @@
         <div class="grid">
           <div class="card span-12">
             <h2>Supplier Pricing</h2>
-            <p>
-              Future feature: local supplier pricing by location, material type, manufacturer, and project region.
-            </p>
+            <p>Future feature for local supplier pricing by location, supplier, material, and project region.</p>
           </div>
 
           <div class="card span-6">
-            <h3>Pricing Source</h3>
-
-            <label for="supplierLocation">Pricing Area</label>
-            <input id="supplierLocation" placeholder="Example: Barrie, Ontario" />
-
-            <label for="supplierName">Supplier</label>
-            <input id="supplierName" placeholder="Example: Local sprinkler supplier" />
-
-            <button class="btn" style="margin-top: 16px;">Save Pricing Source</button>
+            <h3>Supplier Info</h3>
+            <label>Pricing Area</label>
+            <input placeholder="Example: Barrie, Ontario" />
+            <label>Supplier</label>
+            <input placeholder="Example: Wolseley, Victaulic, local supplier" />
           </div>
 
           <div class="card span-6">
             <h3>Pricing Notes</h3>
-            <div class="status-box">
-              Supplier pricing is not live yet. Later this can connect to saved price tables, supplier uploads, or supplier API data.
-            </div>
+            <div class="status-box">Live supplier pricing is not connected yet.</div>
           </div>
         </div>
       </section>
@@ -833,24 +644,14 @@
             <input id="serviceMaterial" type="number" min="0" step="1" value="0" />
 
             <label for="serviceNotes">Service Notes</label>
-            <textarea id="serviceNotes" placeholder="Example: Includes inspection of wet sprinkler system, control valves, flow switch, tamper switches, gauges, and report."></textarea>
+            <textarea id="serviceNotes" placeholder="Example: Includes wet system inspection, valves, flow switch, tamper switches, gauges, and report."></textarea>
 
-            <button class="btn" style="margin-top: 16px;" id="calcServiceBtn">Generate Service Quote</button>
+            <button class="btn" style="margin-top:16px;" id="calcServiceBtn">Generate Service Quote</button>
           </div>
 
           <div class="card span-6">
             <h3>Service Quote Result</h3>
-            <div class="status-box" id="serviceResult">
-              Enter service details and generate a quote.
-            </div>
-          </div>
-
-          <div class="card span-12">
-            <h3>Future AI Service Report</h3>
-            <p>
-              Later this section can generate inspection reports, deficiency summaries, customer-facing quotes,
-              repair recommendations, and recurring testing schedules.
-            </p>
+            <div class="status-box" id="serviceResult">Enter service details and generate a quote.</div>
           </div>
         </div>
       </section>
@@ -859,56 +660,43 @@
         <div class="grid">
           <div class="card span-12">
             <h2>Settings</h2>
-            <p>
-              Save your Worker URL and analyzer defaults in this browser.
-            </p>
+            <p>Save your Worker URL in this browser.</p>
           </div>
 
           <div class="card span-6">
             <h3>Saved Settings</h3>
-
             <div class="button-row">
-              <button class="btn" id="saveSettingsBtn">Save Current Settings</button>
-              <button class="btn secondary" id="loadSettingsBtn">Load Saved Settings</button>
-              <button class="btn danger" id="clearSettingsBtn">Clear Saved Settings</button>
+              <button class="btn" id="saveSettingsBtn">Save Settings</button>
+              <button class="btn secondary" id="loadSettingsBtn">Load Settings</button>
+              <button class="btn danger" id="clearSettingsBtn">Clear Settings</button>
             </div>
           </div>
 
           <div class="card span-6">
             <h3>Status</h3>
-            <div class="status-box" id="settingsStatus">
-              Settings are stored only in this browser.
-            </div>
+            <div class="status-box" id="settingsStatus">Settings are stored only in this browser.</div>
           </div>
         </div>
       </section>
     </main>
   </div>
 
-  <footer>
-    FireFlow AI prototype — fire sprinkler contractor estimating assistant.
-  </footer>
+  <footer>FireFlow AI prototype — fire sprinkler contractor estimating assistant.</footer>
 
   <script>
-    if (window.pdfjsLib) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    }
-
     const state = {
       selectedFiles: [],
-      renderedImages: [],
       lastResult: ""
     };
 
     const els = {
       navButtons: document.querySelectorAll(".nav-btn"),
       sections: document.querySelectorAll(".section"),
+      resultTabs: document.querySelectorAll(".tab-btn"),
+      resultPanels: document.querySelectorAll(".result-panel"),
       workerUrl: document.getElementById("workerUrl"),
       projectType: document.getElementById("projectType"),
       fabricationMode: document.getElementById("fabricationMode"),
-      pdfRenderScale: document.getElementById("pdfRenderScale"),
-      maxPdfPages: document.getElementById("maxPdfPages"),
       instructions: document.getElementById("instructions"),
       fileInput: document.getElementById("fileInput"),
       fileList: document.getElementById("fileList"),
@@ -917,30 +705,24 @@
       clearBtn: document.getElementById("clearBtn"),
       statusBox: document.getElementById("statusBox"),
       debugBox: document.getElementById("debugBox"),
-      loader: document.getElementById("loader"),
-      progressFill: document.getElementById("progressFill"),
-      dashFiles: document.getElementById("dashFiles"),
-      dashImages: document.getElementById("dashImages"),
-      dashStatus: document.getElementById("dashStatus"),
-      resultTabs: document.querySelectorAll(".tab-btn"),
-      resultPanels: document.querySelectorAll(".result-panel"),
       fullResult: document.getElementById("fullResult"),
       onsiteResult: document.getElementById("onsiteResult"),
       prefabResult: document.getElementById("prefabResult"),
       materialResult: document.getElementById("materialResult"),
       labourResult: document.getElementById("labourResult"),
-      rawResult: document.getElementById("rawResult")
+      rawResult: document.getElementById("rawResult"),
+      dashFiles: document.getElementById("dashFiles"),
+      dashStatus: document.getElementById("dashStatus")
     };
 
     initialize();
 
     function initialize() {
-      loadSettings();
       bindNavigation();
       bindResultTabs();
       bindAnalyzer();
       bindCalculators();
-      updateDashboard();
+      loadSettings();
     }
 
     function bindNavigation() {
@@ -976,10 +758,8 @@
     function bindAnalyzer() {
       els.fileInput.addEventListener("change", () => {
         state.selectedFiles = Array.from(els.fileInput.files || []);
-        state.renderedImages = [];
         renderFileList();
-        updateDashboard();
-        setStatus("Files selected. Click Analyze Drawings to render PDFs and send to Worker.");
+        updateDashboard("Files selected");
       });
 
       els.analyzeBtn.addEventListener("click", analyzeDrawings);
@@ -1004,64 +784,63 @@
         return;
       }
 
-      els.fileList.innerHTML = state.selectedFiles
-        .map((file) => {
-          return `
-            <div class="file-item">
-              <div>
-                <strong>${escapeHtml(file.name)}</strong>
-                <div class="small">${escapeHtml(file.type || "unknown type")}</div>
-              </div>
-              <div class="small">${formatBytes(file.size)}</div>
-            </div>
-          `;
-        })
-        .join("");
+      els.fileList.innerHTML = state.selectedFiles.map((file) => {
+        return `
+          <div class="file-item">
+            <div><strong>${escapeHtml(file.name)}</strong></div>
+            <div>${formatBytes(file.size)}</div>
+          </div>
+        `;
+      }).join("");
 
-      els.debugBox.textContent =
-        "Selected files:\n" +
-        state.selectedFiles
-          .map((file, index) => {
-            return `${index + 1}. ${file.name} (${formatBytes(file.size)})`;
-          })
-          .join("\n");
+      els.debugBox.textContent = "Selected files:\n" + state.selectedFiles.map((file, i) => {
+        return `${i + 1}. ${file.name} (${formatBytes(file.size)})`;
+      }).join("\n");
+    }
+
+    async function testWorker() {
+      const url = normalizeUrl(els.workerUrl.value);
+
+      if (!url) {
+        setStatus("Enter your Cloudflare Worker URL first.", true);
+        return;
+      }
+
+      try {
+        saveSettings();
+        setStatus("Testing Worker connection...");
+        const response = await fetch(url);
+        const text = await response.text();
+
+        if (!response.ok) throw new Error(text);
+
+        setStatus("Worker test result:\n" + text);
+        updateDashboard("Ready");
+      } catch (error) {
+        setStatus("Worker test failed:\n" + (error.message || String(error)), true);
+        updateDashboard("Error");
+      }
     }
 
     async function analyzeDrawings() {
-      const workerUrl = normalizeUrl(els.workerUrl.value);
+      const url = normalizeUrl(els.workerUrl.value);
 
-      if (!workerUrl) {
-        setStatus("Please enter your Cloudflare Worker URL first.", "error");
+      if (!url) {
+        setStatus("Enter your Cloudflare Worker URL first.", true);
         return;
       }
 
       if (!state.selectedFiles.length) {
-        setStatus("Please choose at least one file first.", "error");
+        setStatus("Choose at least one file first.", true);
         return;
       }
 
-      saveSettings();
-
       try {
-        setLoading(true);
-        setProgress(5);
-        setStatus("Preparing upload...");
-
-        state.renderedImages = [];
-
-        const pdfFiles = state.selectedFiles.filter((file) =>
-          file.name.toLowerCase().endsWith(".pdf")
-        );
-
-        if (pdfFiles.length) {
-          setStatus("Rendering PDF pages into high-resolution images...");
-          state.renderedImages = await renderPdfFilesToImages(pdfFiles);
-        }
-
-        setProgress(62);
+        saveSettings();
+        setStatus("Sending files to Worker...");
+        updateDashboard("Analyzing");
 
         const formData = new FormData();
-
         formData.append("aiMode", "drawing-analyzer");
         formData.append("projectType", els.projectType.value);
         formData.append("fabricationMode", els.fabricationMode.value);
@@ -1071,17 +850,7 @@
           formData.append("files", file, file.name);
         });
 
-        state.renderedImages.forEach((imageFile) => {
-          formData.append("renderedImages", imageFile, imageFile.name);
-        });
-
-        setStatus(
-          `Sending upload to Worker...\nOriginal files: ${state.selectedFiles.length}\nRendered PDF page images: ${state.renderedImages.length}`
-        );
-
-        setProgress(75);
-
-        const response = await fetch(workerUrl, {
+        const response = await fetch(url, {
           method: "POST",
           body: formData
         });
@@ -1089,7 +858,6 @@
         const text = await response.text();
 
         let data;
-
         try {
           data = JSON.parse(text);
         } catch (error) {
@@ -1100,313 +868,87 @@
           throw new Error(data.error || data.details || "Worker request failed.");
         }
 
-        const resultText = data.result || data.output || data.message || JSON.stringify(data, null, 2);
+        const result = data.result || data.output || data.message || JSON.stringify(data, null, 2);
 
-        state.lastResult = resultText;
+        state.lastResult = result;
 
-        setProgress(100);
+        els.fullResult.textContent = result;
+        els.rawResult.textContent = JSON.stringify(data, null, 2);
 
-        setStatus(
-          `Analysis complete.\n\nOriginal files: ${data.filesReceived ?? state.selectedFiles.length}\nRendered images: ${data.renderedImagesReceived ?? state.renderedImages.length}\nTotal reviewed: ${data.totalFilesReviewed ?? "unknown"}`
-        );
+        els.materialResult.textContent = extractMaterial(result);
+        els.labourResult.textContent = extractLabour(result);
+        els.onsiteResult.textContent = extractKeywordSection(result, "On-Site");
+        els.prefabResult.textContent = extractKeywordSection(result, "Prefab");
 
-        displayResults(resultText, data);
+        setStatus("Analysis complete.");
         updateDashboard("Done");
       } catch (error) {
-        console.error(error);
-        setStatus("Analyzer error:\n" + (error.message || String(error)), "error");
+        setStatus("Analyzer error:\n" + (error.message || String(error)), true);
         updateDashboard("Error");
-      } finally {
-        setLoading(false);
       }
     }
 
     function buildInstructions() {
-      const userNotes = els.instructions.value || "";
-
       return `
 User notes:
-${userNotes || "No additional user notes provided."}
+${els.instructions.value || "No additional user notes provided."}
 
-Important FireFlow AI estimating instructions:
-- Use rendered PDF page images as the main drawing review source.
-- Do not say you cannot zoom in.
-- If something is unclear, say "unclear from provided image" instead of guessing.
-- Do not only count hydraulic calculation design-area heads.
-- Build head count from sprinkler layout sheets where visible.
-- Separate pipe, fittings, riser material, valves, hangers, heads, and accessories.
-- 2" and 1-1/2" steel should be treated as grooved unless drawings say otherwise.
-- 1" drops should be treated as threaded unless drawings say otherwise.
+FireFlow AI estimating instructions:
+- Use contractor-style estimating language.
+- Separate head count, pipe, fittings, riser material, hangers, valves, accessories, onsite fabrication, prefab, and labour.
+- 2" and 1-1/2" steel are usually grooved unless drawings say otherwise.
+- 1" drops are usually threaded unless drawings say otherwise.
 - Surge restraints are for CPVC/plastic only, not steel.
-- Onsite fabrication has more field labour and no prefab fabrication cost.
-- Prefab has lower field install labour but includes shop fabrication/fabrication cost.
-- Keep the output short, structured, and practical for a sprinkler contractor.
+- Do not treat hydraulic calculation design-area heads as the full project head count.
+- Onsite fabrication has higher field labour and no prefab cost.
+- Prefab has lower field labour and should include shop fabrication cost.
+- Keep the result short, clean, and easy to read.
       `.trim();
     }
 
-    async function renderPdfFilesToImages(pdfFiles) {
-      const rendered = [];
-      const scale = Number(els.pdfRenderScale.value || 2.6);
-      const maxPages = Number(els.maxPdfPages.value || 20);
-
-      if (!window.pdfjsLib) {
-        setStatus("PDF.js did not load. PDFs will be uploaded, but pages cannot be rendered.", "error");
-        return rendered;
-      }
-
-      let completedPages = 0;
-
-      for (const pdfFile of pdfFiles) {
-        const arrayBuffer = await pdfFile.arrayBuffer();
-        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-        const pdf = await loadingTask.promise;
-
-        const pagesToRender = Math.min(pdf.numPages, maxPages);
-
-        for (let pageNumber = 1; pageNumber <= pagesToRender; pageNumber++) {
-          const page = await pdf.getPage(pageNumber);
-          const viewport = page.getViewport({ scale });
-
-          const canvas = document.createElement("canvas");
-          const context = canvas.getContext("2d", { willReadFrequently: false });
-
-          canvas.width = Math.floor(viewport.width);
-          canvas.height = Math.floor(viewport.height);
-
-          await page.render({
-            canvasContext: context,
-            viewport
-          }).promise;
-
-          const blob = await canvasToBlob(canvas, "image/jpeg", 0.88);
-          const safeName = pdfFile.name.replace(/\.pdf$/i, "").replace(/[^\w.-]+/g, "_");
-          const imageName = `${safeName}_page_${pageNumber}.jpg`;
-
-          const imageFile = new File([blob], imageName, {
-            type: "image/jpeg"
-          });
-
-          rendered.push(imageFile);
-          completedPages++;
-
-          const roughProgress = Math.min(58, 10 + completedPages * 3);
-          setProgress(roughProgress);
-
-          setStatus(
-            `Rendering PDF pages...\n${pdfFile.name}\nPage ${pageNumber} of ${pagesToRender}\nRendered images so far: ${rendered.length}`
-          );
-        }
-      }
-
-      updateDashboard();
-      return rendered;
+    function extractMaterial(text) {
+      const keywords = ["material", "pipe", "fitting", "riser", "hanger", "valve", "head"];
+      return filterLines(text, keywords) || "Material section not found. See Full Estimate.";
     }
 
-    function canvasToBlob(canvas, type, quality) {
-      return new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error("Could not convert PDF page to image."));
-        }, type, quality);
+    function extractLabour(text) {
+      const keywords = ["labour", "labor", "hours", "field", "shop", "fabrication"];
+      return filterLines(text, keywords) || "Labour section not found. See Full Estimate.";
+    }
+
+    function extractKeywordSection(text, keyword) {
+      const lines = String(text || "").split("\n");
+      const found = lines.filter((line) => line.toLowerCase().includes(keyword.toLowerCase()));
+      return found.join("\n") || `${keyword} section not found. See Full Estimate.`;
+    }
+
+    function filterLines(text, keywords) {
+      const lines = String(text || "").split("\n");
+      const found = lines.filter((line) => {
+        const lower = line.toLowerCase();
+        return keywords.some((keyword) => lower.includes(keyword));
       });
-    }
-
-    async function testWorker() {
-      const workerUrl = normalizeUrl(els.workerUrl.value);
-
-      if (!workerUrl) {
-        setStatus("Enter your Cloudflare Worker URL first.", "error");
-        return;
-      }
-
-      saveSettings();
-
-      try {
-        setLoading(true);
-        setStatus("Testing Worker connection...");
-        setProgress(35);
-
-        const response = await fetch(workerUrl, {
-          method: "GET"
-        });
-
-        const text = await response.text();
-
-        setProgress(100);
-
-        if (!response.ok) {
-          throw new Error(text);
-        }
-
-        setStatus("Worker test result:\n" + text);
-        updateDashboard("Ready");
-      } catch (error) {
-        setStatus("Worker test failed:\n" + (error.message || String(error)), "error");
-        updateDashboard("Error");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    function displayResults(resultText, rawData) {
-      const html = markdownToHtml(resultText);
-
-      els.fullResult.innerHTML = html;
-      els.rawResult.textContent = JSON.stringify(rawData, null, 2);
-
-      els.onsiteResult.innerHTML =
-        markdownToHtml(extractSection(resultText, "## 8. On-Site Fabrication Estimate", "## 9. Prefab Estimate")) ||
-        "<p>On-site fabrication section was not found in the AI response.</p>";
-
-      els.prefabResult.innerHTML =
-        markdownToHtml(extractSection(resultText, "## 9. Prefab Estimate", "## 10. Missing or Unclear Items")) ||
-        "<p>Prefab section was not found in the AI response.</p>";
-
-      const materialSections = [
-        extractSection(resultText, "## 3. Sprinkler Head Count", "## 4. Pipe Breakdown"),
-        extractSection(resultText, "## 4. Pipe Breakdown", "## 5. Fittings Breakdown"),
-        extractSection(resultText, "## 5. Fittings Breakdown", "## 6. Riser / Valve / Test Material"),
-        extractSection(resultText, "## 6. Riser / Valve / Test Material", "## 7. Hangers, Supports, and Accessories"),
-        extractSection(resultText, "## 7. Hangers, Supports, and Accessories", "## 8. On-Site Fabrication Estimate")
-      ].filter(Boolean).join("\n\n");
-
-      els.materialResult.innerHTML =
-        markdownToHtml(materialSections) ||
-        "<p>Material sections were not found in the AI response.</p>";
-
-      const labourSections = [
-        extractSection(resultText, "## 8. On-Site Fabrication Estimate", "## 9. Prefab Estimate"),
-        extractSection(resultText, "## 9. Prefab Estimate", "## 10. Missing or Unclear Items")
-      ].filter(Boolean).join("\n\n");
-
-      els.labourResult.innerHTML =
-        markdownToHtml(labourSections) ||
-        "<p>Labour sections were not found in the AI response.</p>";
-    }
-
-    function extractSection(text, startHeading, endHeading) {
-      const startIndex = text.indexOf(startHeading);
-      if (startIndex === -1) return "";
-
-      const endIndex = text.indexOf(endHeading, startIndex + startHeading.length);
-      if (endIndex === -1) return text.slice(startIndex).trim();
-
-      return text.slice(startIndex, endIndex).trim();
-    }
-
-    function markdownToHtml(markdown) {
-      if (!markdown) return "";
-
-      let html = escapeHtml(markdown);
-      html = convertMarkdownTables(html);
-
-      html = html
-        .replace(/^# (.*)$/gm, "<h1>$1</h1>")
-        .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-        .replace(/^### (.*)$/gm, "<h3>$1</h3>")
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/^- (.*)$/gm, "<li>$1</li>")
-        .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
-        .replace(/\n{2,}/g, "<br><br>")
-        .replace(/\n/g, "<br>");
-
-      html = html.replace(/<\/ul><br><br><ul>/g, "");
-      html = html.replace(/<\/li><br><li>/g, "</li><li>");
-
-      return html;
-    }
-
-    function convertMarkdownTables(text) {
-      const lines = text.split("\n");
-      const output = [];
-      let i = 0;
-
-      while (i < lines.length) {
-        const line = lines[i];
-
-        if (isTableRow(line) && i + 1 < lines.length && isSeparatorRow(lines[i + 1])) {
-          const headers = splitTableRow(line);
-          i += 2;
-
-          const rows = [];
-          while (i < lines.length && isTableRow(lines[i])) {
-            rows.push(splitTableRow(lines[i]));
-            i++;
-          }
-
-          let table = "<table><thead><tr>";
-          headers.forEach((header) => {
-            table += `<th>${header}</th>`;
-          });
-          table += "</tr></thead><tbody>";
-
-          rows.forEach((row) => {
-            table += "<tr>";
-            headers.forEach((_, index) => {
-              table += `<td>${row[index] || ""}</td>`;
-            });
-            table += "</tr>";
-          });
-
-          table += "</tbody></table>";
-          output.push(table);
-        } else {
-          output.push(line);
-          i++;
-        }
-      }
-
-      return output.join("\n");
-    }
-
-    function isTableRow(line) {
-      return /^\s*\|.*\|\s*$/.test(line);
-    }
-
-    function isSeparatorRow(line) {
-      return /^\s*\|?[\s:-]+\|[\s|:-]*\|?\s*$/.test(line);
-    }
-
-    function splitTableRow(line) {
-      return line
-        .trim()
-        .replace(/^\|/, "")
-        .replace(/\|$/, "")
-        .split("|")
-        .map((cell) => cell.trim());
+      return found.join("\n");
     }
 
     function calculateMaterial() {
       const heads = Number(document.getElementById("headQty").value || 0);
-      const size = document.getElementById("dropPipeSize").value;
       const workType = document.getElementById("workType").value;
-
-      const elbows = heads * 3;
-      const nipples = heads;
-      const hangers = heads;
-      const rods = heads;
       const mechanicalTees = workType === "new" ? heads : 0;
 
-      const result = `
+      document.getElementById("materialCalcResult").textContent = `
 Material estimate for ${heads} head(s):
 
-Pipe/drop size:
-- ${size}" threaded drop material
-
-Drop assemblies:
-- ${elbows} x ${size}" threaded 90 elbows
-- ${nipples} x ${size}" x 2" nipples
-- ${hangers} x hangers
-- ${rods} x rod assemblies
+- ${heads * 3} x 1" threaded 90 elbows
+- ${heads} x 1" x 2" nipples
+- ${heads} x hangers
+- ${heads} x rod assemblies
 - ${mechanicalTees} x mechanical tees
 
 Notes:
+- New heads include mechanical tees.
 - Relocates do not include mechanical tees by default.
-- New heads include mechanical tees by default.
-- 1" drop pipe is treated as threaded.
       `.trim();
-
-      document.getElementById("materialCalcResult").textContent = result;
     }
 
     function calculateLabour() {
@@ -1414,14 +956,8 @@ Notes:
       const hoursPerHead = Number(document.getElementById("hoursPerHead").value || 0);
       const fabType = document.getElementById("fabTypeLabour").value;
 
-      let baseHours = heads * hoursPerHead;
-      let adjustedHours = baseHours;
-      let notes = "Onsite fabrication uses standard field labour.";
-
-      if (fabType === "prefab") {
-        adjustedHours = baseHours * 0.72;
-        notes = "Prefab reduces field install hours but should include shop fabrication cost separately.";
-      }
+      const base = heads * hoursPerHead;
+      const adjusted = fabType === "prefab" ? base * 0.72 : base;
 
       document.getElementById("labourCalcResult").textContent = `
 Labour estimate:
@@ -1429,17 +965,18 @@ Labour estimate:
 Heads/drops:
 - ${heads}
 
-Base labour:
-- ${baseHours.toFixed(1)} hours
+Base hours:
+- ${base.toFixed(1)}
 
 Fabrication type:
 - ${fabType}
 
-Adjusted field labour:
-- ${adjustedHours.toFixed(1)} hours
+Adjusted field hours:
+- ${adjusted.toFixed(1)}
 
 Notes:
-- ${notes}
+- Prefab reduces field labour but needs shop fabrication cost.
+- Onsite fabrication keeps more labour in the field.
       `.trim();
     }
 
@@ -1480,18 +1017,11 @@ Exclusions / reminders:
     }
 
     function saveSettings() {
-      const settings = {
-        workerUrl: els.workerUrl.value,
-        projectType: els.projectType.value,
-        fabricationMode: els.fabricationMode.value,
-        pdfRenderScale: els.pdfRenderScale.value,
-        maxPdfPages: els.maxPdfPages.value
-      };
+      localStorage.setItem("fireflow_settings", JSON.stringify({
+        workerUrl: els.workerUrl.value
+      }));
 
-      localStorage.setItem("fireflow_settings", JSON.stringify(settings));
-
-      const settingsStatus = document.getElementById("settingsStatus");
-      if (settingsStatus) settingsStatus.textContent = "Settings saved.";
+      document.getElementById("settingsStatus").textContent = "Settings saved.";
     }
 
     function loadSettings() {
@@ -1500,17 +1030,12 @@ Exclusions / reminders:
         if (!raw) return;
 
         const settings = JSON.parse(raw);
-
         if (settings.workerUrl) els.workerUrl.value = settings.workerUrl;
-        if (settings.projectType) els.projectType.value = settings.projectType;
-        if (settings.fabricationMode) els.fabricationMode.value = settings.fabricationMode;
-        if (settings.pdfRenderScale) els.pdfRenderScale.value = settings.pdfRenderScale;
-        if (settings.maxPdfPages) els.maxPdfPages.value = settings.maxPdfPages;
 
-        const settingsStatus = document.getElementById("settingsStatus");
-        if (settingsStatus) settingsStatus.textContent = "Saved settings loaded.";
+        const status = document.getElementById("settingsStatus");
+        if (status) status.textContent = "Saved settings loaded.";
       } catch (error) {
-        console.warn("Could not load settings", error);
+        console.warn(error);
       }
     }
 
@@ -1521,74 +1046,47 @@ Exclusions / reminders:
 
     function clearAnalyzer() {
       state.selectedFiles = [];
-      state.renderedImages = [];
       state.lastResult = "";
-
       els.fileInput.value = "";
       els.fileList.innerHTML = "";
+      els.debugBox.textContent = "No files selected yet.";
       els.fullResult.textContent = "Results will appear here after analysis.";
-      els.onsiteResult.textContent = "On-site fabrication summary will appear here.";
-      els.prefabResult.textContent = "Prefab summary will appear here.";
+      els.onsiteResult.textContent = "On-site fabrication results will appear here.";
+      els.prefabResult.textContent = "Prefab results will appear here.";
       els.materialResult.textContent = "Material breakdown will appear here.";
       els.labourResult.textContent = "Labour breakdown will appear here.";
       els.rawResult.textContent = "Raw response will appear here.";
-      els.debugBox.textContent = "No files selected yet.";
-
       setStatus("AI status is idle.");
-      setProgress(0);
       updateDashboard("Idle");
     }
 
-    function setLoading(isLoading) {
-      els.loader.classList.toggle("active", isLoading);
-      els.analyzeBtn.disabled = isLoading;
-      els.testWorkerBtn.disabled = isLoading;
-    }
-
-    function setProgress(percent) {
-      els.progressFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
-    }
-
-    function setStatus(message, type) {
+    function setStatus(message, isError) {
       els.statusBox.textContent = message;
-
-      if (type === "error") {
-        els.statusBox.style.borderColor = "rgba(239, 68, 68, 0.55)";
-        els.statusBox.style.color = "#fecaca";
-      } else {
-        els.statusBox.style.borderColor = "rgba(148, 163, 184, 0.22)";
-        els.statusBox.style.color = "#94a3b8";
-      }
+      els.statusBox.style.color = isError ? "#fecaca" : "#94a3b8";
+      els.statusBox.style.borderColor = isError ? "rgba(239, 68, 68, 0.55)" : "rgba(148, 163, 184, 0.22)";
     }
 
     function updateDashboard(status) {
       els.dashFiles.textContent = state.selectedFiles.length;
-      els.dashImages.textContent = state.renderedImages.length;
-
-      if (status) {
-        els.dashStatus.textContent = status;
-      }
+      if (status) els.dashStatus.textContent = status;
     }
 
     function normalizeUrl(url) {
-      const trimmed = String(url || "").trim();
-      if (!trimmed) return "";
-      return trimmed.replace(/\/+$/, "");
+      return String(url || "").trim().replace(/\/+$/, "");
     }
 
     function formatBytes(bytes) {
       if (!bytes) return "0 B";
-
       const units = ["B", "KB", "MB", "GB"];
       let size = bytes;
-      let unitIndex = 0;
+      let unit = 0;
 
-      while (size >= 1024 && unitIndex < units.length - 1) {
+      while (size >= 1024 && unit < units.length - 1) {
         size /= 1024;
-        unitIndex++;
+        unit++;
       }
 
-      return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+      return `${size.toFixed(size >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
     }
 
     function escapeHtml(value) {
