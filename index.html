@@ -9,6 +9,7 @@
     :root {
       --bg: #080d11;
       --panel: #11181f;
+      --panel2: #151f27;
       --border: #26323d;
       --border2: #33414e;
       --red: #dc2626;
@@ -213,17 +214,18 @@
     }
 
     .topbar {
-      height: 86px;
+      min-height: 86px;
       background: rgba(8, 13, 17, 0.88);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 28px;
+      padding: 18px 28px;
       backdrop-filter: blur(20px);
       position: sticky;
       top: 0;
       z-index: 10;
+      gap: 18px;
     }
 
     .topbar-title h1 {
@@ -244,6 +246,7 @@
       gap: 18px;
       color: white;
       font-size: 14px;
+      flex-wrap: wrap;
     }
 
     .badge {
@@ -295,6 +298,7 @@
       border: 1px solid var(--border2);
       position: relative;
       overflow: hidden;
+      flex: 0 0 auto;
     }
 
     .drawing-thumb::before,
@@ -339,6 +343,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -375,6 +380,7 @@
       font-size: 13px;
       border-bottom: 2px solid transparent;
       white-space: nowrap;
+      cursor: pointer;
     }
 
     .tab.active {
@@ -411,6 +417,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .panel-header h3 {
@@ -540,6 +547,11 @@
       font-weight: 700;
     }
 
+    .small-btn.active {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
     .filter-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -579,6 +591,8 @@
       border-bottom: 1px solid var(--border);
       font-size: 12px;
       font-weight: 800;
+      color: white;
+      background: rgba(255,255,255,0.025);
     }
 
     table {
@@ -593,6 +607,7 @@
       font-size: 12px;
       text-align: left;
       white-space: nowrap;
+      vertical-align: top;
     }
 
     th {
@@ -819,6 +834,87 @@
       color: var(--muted);
     }
 
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    .formatted-takeoff {
+      color: #e2e8f0;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .formatted-takeoff h1,
+    .formatted-takeoff h2,
+    .formatted-takeoff h3 {
+      color: white;
+      margin: 18px 0 10px;
+      line-height: 1.2;
+    }
+
+    .formatted-takeoff h1 {
+      font-size: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .formatted-takeoff h2 {
+      font-size: 17px;
+      background: rgba(220,38,38,0.16);
+      border: 1px solid rgba(220,38,38,0.3);
+      padding: 10px 12px;
+      border-radius: 6px;
+    }
+
+    .formatted-takeoff h3 {
+      font-size: 15px;
+      color: #fecaca;
+    }
+
+    .formatted-takeoff p {
+      margin: 8px 0;
+    }
+
+    .formatted-takeoff ul {
+      margin: 8px 0 12px 20px;
+      padding: 0;
+    }
+
+    .formatted-takeoff li {
+      margin: 4px 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 10px 0 16px;
+      background: rgba(8, 13, 17, 0.55);
+    }
+
+    .table-wrap table {
+      min-width: 620px;
+    }
+
+    .raw-output {
+      display: none;
+      white-space: pre-wrap;
+      background: #080d11;
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 7px;
+      color: #cbd5e1;
+      max-height: 420px;
+      overflow: auto;
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -970,21 +1066,6 @@
       to { transform: rotate(360deg); }
     }
 
-    .raw-output {
-      display: none;
-      white-space: pre-wrap;
-      background: #080d11;
-      border: 1px solid var(--border);
-      padding: 14px;
-      border-radius: 7px;
-      color: #cbd5e1;
-      max-height: 420px;
-      overflow: auto;
-      margin-top: 12px;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
     @media (max-width: 1450px) {
       .content {
         grid-template-columns: 1fr;
@@ -1067,18 +1148,18 @@
       </div>
 
       <nav class="nav">
-        <a href="#" class="nav-item active" onclick="showDashboard(); return false;">🏠 Dashboard</a>
-        <a href="#" class="nav-item">📁 Projects</a>
+        <a href="#" class="nav-item active" data-page="dashboard">🏠 Dashboard</a>
+        <a href="#" class="nav-item" data-page="projects">📁 Projects</a>
         <a href="#" class="nav-item" onclick="openModal(); return false;">⬆️ Upload Drawings</a>
-        <a href="#" class="nav-item">🧠 AI Analyzer</a>
-        <a href="#" class="nav-item">📋 Material Estimate</a>
-        <a href="#" class="nav-item">👷 Labor Estimate</a>
-        <a href="#" class="nav-item">🔩 Assemblies</a>
-        <a href="#" class="nav-item">🕘 Revisions</a>
-        <a href="#" class="nav-item">📄 Reports</a>
-        <a href="#" class="nav-item" onclick="showServiceTesting(); return false;">🧯 Service & Testing</a>
-        <a href="#" class="nav-item">🔗 Suppliers & Pricing</a>
-        <a href="#" class="nav-item">⚙️ Settings</a>
+        <a href="#" class="nav-item" data-page="analyzer">🧠 AI Analyzer</a>
+        <a href="#" class="nav-item" data-page="materials">📋 Material Estimate</a>
+        <a href="#" class="nav-item" data-page="labor">👷 Labor Estimate</a>
+        <a href="#" class="nav-item" data-page="assemblies">🔩 Assemblies</a>
+        <a href="#" class="nav-item" data-page="revisions">🕘 Revisions</a>
+        <a href="#" class="nav-item" data-page="reports">📄 Reports</a>
+        <a href="#" class="nav-item" data-page="service">🧯 Service & Testing</a>
+        <a href="#" class="nav-item" data-page="suppliers">🔗 Suppliers & Pricing</a>
+        <a href="#" class="nav-item" data-page="settings">⚙️ Settings</a>
       </nav>
 
       <div class="status-card">
@@ -1130,202 +1211,381 @@
         </div>
 
         <div class="project-buttons">
-          <button class="btn">Edit Project</button>
+          <button class="btn" onclick="showPage('projects')">Edit Project</button>
           <button class="btn" onclick="openModal()">Upload Revision</button>
           <button class="btn red" onclick="openModal()">New Estimate</button>
         </div>
       </section>
 
       <nav class="tabs" id="mainTabs">
-        <div class="tab">DRAWINGS</div>
-        <div class="tab active">AI ANALYSIS</div>
-        <div class="tab">MATERIALS</div>
-        <div class="tab">LABOR</div>
-        <div class="tab">SUMMARY</div>
-        <div class="tab">REVISION HISTORY</div>
+        <div class="tab active" data-page="dashboard">DASHBOARD</div>
+        <div class="tab" data-page="analyzer">AI ANALYSIS</div>
+        <div class="tab" data-page="materials">MATERIALS</div>
+        <div class="tab" data-page="labor">LABOR</div>
+        <div class="tab" data-page="suppliers">SUPPLIERS</div>
+        <div class="tab" data-page="revisions">REVISION HISTORY</div>
       </nav>
 
-      <section class="content" id="dashboardPage">
+      <section class="content" id="mainContent">
         <div>
-          <div class="left-grid">
-            <div>
-              <div class="panel">
-                <div class="panel-body">
-                  <select class="drawing-select">
-                    <option>FP1 - MAIN FLOOR PLAN</option>
-                    <option>FP2 - SECOND FLOOR PLAN</option>
-                    <option>Riser Detail</option>
-                    <option>Hydraulic Calculations</option>
-                  </select>
+          <div id="page_dashboard" class="page-section active">
+            <div class="left-grid">
+              <div>
+                <div class="panel">
+                  <div class="panel-body">
+                    <select class="drawing-select">
+                      <option>FP1 - MAIN FLOOR PLAN</option>
+                      <option>FP2 - SECOND FLOOR PLAN</option>
+                      <option>Riser Detail</option>
+                      <option>Hydraulic Calculations</option>
+                    </select>
 
-                  <div class="drawing-view">
-                    <div class="plan-lines"></div>
+                    <div class="drawing-view">
+                      <div class="plan-lines"></div>
+                      <div class="pipe-red" style="left:42px;top:75px;width:190px;"></div>
+                      <div class="pipe-red" style="left:95px;top:75px;width:3px;height:125px;"></div>
+                      <div class="pipe-green" style="left:35px;top:135px;width:245px;"></div>
+                      <div class="pipe-green" style="left:180px;top:50px;width:3px;height:160px;"></div>
+                      <div class="pipe-blue" style="left:62px;top:190px;width:200px;"></div>
 
-                    <div class="pipe-red" style="left:42px;top:75px;width:190px;"></div>
-                    <div class="pipe-red" style="left:95px;top:75px;width:3px;height:125px;"></div>
-                    <div class="pipe-green" style="left:35px;top:135px;width:245px;"></div>
-                    <div class="pipe-green" style="left:180px;top:50px;width:3px;height:160px;"></div>
-                    <div class="pipe-blue" style="left:62px;top:190px;width:200px;"></div>
+                      <span class="sprinkler" style="left:53px;top:70px;"></span>
+                      <span class="sprinkler" style="left:92px;top:70px;"></span>
+                      <span class="sprinkler" style="left:142px;top:70px;"></span>
+                      <span class="sprinkler" style="left:206px;top:70px;"></span>
+                      <span class="sprinkler" style="left:61px;top:132px;"></span>
+                      <span class="sprinkler" style="left:126px;top:132px;"></span>
+                      <span class="sprinkler" style="left:180px;top:132px;"></span>
+                      <span class="sprinkler" style="left:245px;top:132px;"></span>
+                      <span class="sprinkler" style="left:91px;top:194px;"></span>
+                      <span class="sprinkler" style="left:176px;top:194px;"></span>
+                      <span class="sprinkler" style="left:240px;top:194px;"></span>
+                    </div>
 
-                    <span class="sprinkler" style="left:53px;top:70px;"></span>
-                    <span class="sprinkler" style="left:92px;top:70px;"></span>
-                    <span class="sprinkler" style="left:142px;top:70px;"></span>
-                    <span class="sprinkler" style="left:206px;top:70px;"></span>
-                    <span class="sprinkler" style="left:61px;top:132px;"></span>
-                    <span class="sprinkler" style="left:126px;top:132px;"></span>
-                    <span class="sprinkler" style="left:180px;top:132px;"></span>
-                    <span class="sprinkler" style="left:245px;top:132px;"></span>
-                    <span class="sprinkler" style="left:91px;top:194px;"></span>
-                    <span class="sprinkler" style="left:176px;top:194px;"></span>
-                    <span class="sprinkler" style="left:240px;top:194px;"></span>
+                    <div class="tool-row">
+                      <button class="tool-btn">⌕</button>
+                      <button class="tool-btn">＋</button>
+                      <button class="tool-btn">－</button>
+                      <button class="tool-btn">⛓</button>
+                      <button class="tool-btn">⤢</button>
+                      <button class="tool-btn">◫</button>
+                    </div>
                   </div>
+                </div>
 
-                  <div class="tool-row">
-                    <button class="tool-btn">⌕</button>
-                    <button class="tool-btn">＋</button>
-                    <button class="tool-btn">－</button>
-                    <button class="tool-btn">⛓</button>
-                    <button class="tool-btn">⤢</button>
-                    <button class="tool-btn">◫</button>
+                <div class="panel" style="margin-top:14px;">
+                  <div class="panel-header">
+                    <h3>LAYERS</h3>
+                    <small>Working mockup</small>
+                  </div>
+                  <div class="panel-body">
+                    <div class="layer-list">
+                      <div class="layer"><label><span class="check">✓</span> Sprinkler Heads</label><span class="dot red"></span></div>
+                      <div class="layer"><label><span class="check">✓</span> Pipe Wet</label><span class="dot green"></span></div>
+                      <div class="layer"><label><span class="check">✓</span> Pipe Dry</label><span class="dot blue"></span></div>
+                      <div class="layer"><label><span class="check">✓</span> Fittings</label><span class="dot orange"></span></div>
+                      <div class="layer"><label><span class="check">✓</span> Valves</label><span class="dot purple"></span></div>
+                      <div class="layer"><label><span class="check">✓</span> Hangers</label><span class="dot" style="background:#fbbf24;"></span></div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="panel" style="margin-top:14px;">
+              <div class="panel">
                 <div class="panel-header">
-                  <h3>LAYERS</h3>
-                  <small>⌄</small>
+                  <h3>AI ANALYSIS RESULTS - DETAILED MATERIAL BREAKDOWN</h3>
+                  <div class="analysis-controls">
+                    <button class="small-btn" onclick="showPage('materials')">Edit Quantities</button>
+                    <button class="small-btn" onclick="downloadResults()">Export</button>
+                    <button class="small-btn" onclick="copyResults()">Copy</button>
+                  </div>
                 </div>
+
                 <div class="panel-body">
-                  <div class="layer-list">
-                    <div class="layer"><label><span class="check">✓</span> Sprinkler Heads</label><span class="dot red"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Pipe Wet</label><span class="dot green"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Pipe Dry</label><span class="dot blue"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Fittings</label><span class="dot orange"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Valves</label><span class="dot purple"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Hangers</label><span class="dot" style="background:#fbbf24;"></span></div>
-                    <div class="layer"><label><span class="check">✓</span> Zones</label><span class="dot blue"></span></div>
+                  <div class="filter-tabs" id="materialFilters">
+                    <button class="active" data-filter="all">All Materials</button>
+                    <button data-filter="pipe">Pipe</button>
+                    <button data-filter="fittings">Fittings</button>
+                    <button data-filter="hangers">Hangers</button>
+                    <button data-filter="heads">Heads</button>
+                    <button data-filter="valves">Valves</button>
+                    <button data-filter="assemblies">Assemblies</button>
+                  </div>
+
+                  <div id="analysisContent">
+                    <div class="materials-grid">
+                      <div class="mini-panel material-card" data-type="pipe">
+                        <div class="mini-title">PIPE</div>
+                        <table>
+                          <thead>
+                            <tr><th>Size</th><th>Type</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                          </thead>
+                          <tbody>
+                            <tr><td>2"</td><td>Sch 10 Grooved</td><td>180</td><td>FT</td><td class="confidence">92%</td></tr>
+                            <tr><td>1½"</td><td>Sch 10 Grooved</td><td>620</td><td>FT</td><td class="confidence">94%</td></tr>
+                            <tr><td>1"</td><td>Sch 40 Threaded</td><td>240</td><td>FT</td><td class="confidence">89%</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class="mini-panel material-card" data-type="heads assemblies">
+                        <div class="mini-title">SPRINKLER ASSEMBLIES</div>
+                        <table>
+                          <thead>
+                            <tr><th>Assembly</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                          </thead>
+                          <tbody>
+                            <tr><td>Concealed Pendant Assembly</td><td>80</td><td>EA</td><td class="confidence">98%</td></tr>
+                            <tr><td>Upright Assembly</td><td>24</td><td>EA</td><td class="confidence">97%</td></tr>
+                            <tr><td>Sidewall Assembly</td><td>6</td><td>EA</td><td class="confidence">96%</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class="mini-panel material-card" data-type="fittings">
+                        <div class="mini-title">GROOVED FITTINGS</div>
+                        <table>
+                          <thead>
+                            <tr><th>Item</th><th>Size</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                          </thead>
+                          <tbody>
+                            <tr><td>Coupling</td><td>2"</td><td>26</td><td>EA</td><td class="confidence">93%</td></tr>
+                            <tr><td>90° Elbow</td><td>2"</td><td>12</td><td>EA</td><td class="confidence">92%</td></tr>
+                            <tr><td>Tee</td><td>2"</td><td>6</td><td>EA</td><td class="confidence">91%</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class="mini-panel material-card" data-type="valves">
+                        <div class="mini-title">VALVES & SPECIALTIES</div>
+                        <table>
+                          <thead>
+                            <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
+                          </thead>
+                          <tbody>
+                            <tr><td>DCVA</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
+                            <tr><td>FDC</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
+                            <tr><td>Waterflow Switch</td><td>2</td><td>EA</td><td class="confidence">97%</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="summary-strip">
+                    <div class="strip-item">Total Items <strong id="totalItems">247</strong></div>
+                    <div class="strip-item">Total Pipe <strong id="totalPipe">1,245 FT</strong></div>
+                    <div class="strip-item">Sprinkler Heads <strong id="totalHeads">364</strong></div>
+                    <div class="strip-item">AI Confidence <strong id="totalConfidence">89%</strong></div>
+                    <button class="btn" onclick="openModal()">Re-analyze Drawings</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" style="margin-top:14px;">
               <div class="panel-header">
-                <h3>AI ANALYSIS RESULTS - DETAILED MATERIAL BREAKDOWN</h3>
-                <div class="analysis-controls">
-                  <button class="small-btn">✎ Edit Quantities</button>
-                  <button class="small-btn" onclick="downloadResults()">Export</button>
-                </div>
+                <h3>TOP ASSEMBLIES DETECTED</h3>
+                <small style="color:var(--red2); cursor:pointer;" onclick="showPage('assemblies')">View All Assemblies</small>
               </div>
 
               <div class="panel-body">
-                <div class="filter-tabs">
-                  <button class="active">All Materials</button>
-                  <button>Pipe</button>
-                  <button>Fittings</button>
-                  <button>Hangers</button>
-                  <button>Heads</button>
-                  <button>Valves</button>
-                  <button>Specialties</button>
-                  <button>Assemblies</button>
+                <div class="assembly-row">
+                  <div class="assembly-card"><div class="icon"></div><strong>Concealed Pendant</strong><small>K-5.6</small><span class="qty">QTY: 80</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>Upright Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 24</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>Sidewall Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 6</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>Dry Pendant</strong><small>K-5.6</small><span class="qty">QTY: 2</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>FDC Assembly</strong><small>6" Storz</small><span class="qty">QTY: 1</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>DCVA Assembly</strong><small>6"</small><span class="qty">QTY: 1</span></div>
                 </div>
+              </div>
+            </div>
 
-                <div id="analysisContent">
-                  <div class="materials-grid">
-                    <div class="mini-panel">
-                      <div class="mini-title">PIPE</div>
-                      <table>
-                        <thead>
-                          <tr><th>Size</th><th>Type</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>2"</td><td>Sch 10 Grooved</td><td>180</td><td>FT</td><td class="confidence">92%</td></tr>
-                          <tr><td>1½"</td><td>Sch 10 Grooved</td><td>620</td><td>FT</td><td class="confidence">94%</td></tr>
-                          <tr><td>1"</td><td>Sch 40 Threaded</td><td>240</td><td>FT</td><td class="confidence">89%</td></tr>
-                          <tr><td>¾"</td><td>Sch 40 Threaded</td><td>120</td><td>FT</td><td class="confidence">85%</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
+            <div class="raw-output" id="rawOutput"></div>
+          </div>
 
-                    <div class="mini-panel">
-                      <div class="mini-title">SPRINKLER ASSEMBLIES</div>
-                      <table>
-                        <thead>
-                          <tr><th>Assembly</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>Concealed Pendant Assembly</td><td>80</td><td>EA</td><td class="confidence">98%</td></tr>
-                          <tr><td>Upright Assembly</td><td>24</td><td>EA</td><td class="confidence">97%</td></tr>
-                          <tr><td>Sidewall Assembly</td><td>6</td><td>EA</td><td class="confidence">96%</td></tr>
-                          <tr><td>Dry Pendant Assembly</td><td>2</td><td>EA</td><td class="confidence">95%</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="mini-panel">
-                      <div class="mini-title">GROOVED FITTINGS</div>
-                      <table>
-                        <thead>
-                          <tr><th>Item</th><th>Size</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>Coupling</td><td>2"</td><td>26</td><td>EA</td><td class="confidence">93%</td></tr>
-                          <tr><td>90° Elbow</td><td>2"</td><td>12</td><td>EA</td><td class="confidence">92%</td></tr>
-                          <tr><td>Tee</td><td>2"</td><td>6</td><td>EA</td><td class="confidence">91%</td></tr>
-                          <tr><td>Reducer</td><td>2" x 1½"</td><td>4</td><td>EA</td><td class="confidence">90%</td></tr>
-                          <tr><td>Reducer</td><td>1½" x 1"</td><td>6</td><td>EA</td><td class="confidence">88%</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="mini-panel">
-                      <div class="mini-title">VALVES & SPECIALTIES</div>
-                      <table>
-                        <thead>
-                          <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Confidence</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>DCVA</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
-                          <tr><td>FDC</td><td>1</td><td>EA</td><td class="confidence">98%</td></tr>
-                          <tr><td>Waterflow Switch</td><td>2</td><td>EA</td><td class="confidence">97%</td></tr>
-                          <tr><td>Inspector Test & Drain</td><td>1</td><td>EA</td><td class="confidence">95%</td></tr>
-                        </tbody>
-                      </table>
+          <div id="page_analyzer" class="page-section">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>AI ANALYZER TAKEOFF VIEW</h3>
+                <div class="analysis-controls">
+                  <button class="small-btn" onclick="openModal()">Upload / Analyze</button>
+                  <button class="small-btn" onclick="copyResults()">Copy Results</button>
+                  <button class="small-btn" onclick="downloadResults()">Download TXT</button>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="formattedTakeoff" class="formatted-takeoff">
+                  <div class="mini-panel">
+                    <div class="mini-title">NO AI TAKEOFF LOADED YET</div>
+                    <div style="padding:14px; color:#cbd5e1;">
+                      Upload drawings and run the analyzer. The AI result will be formatted here into readable sections and tables.
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div class="summary-strip">
-                  <div class="strip-item">Total Items <strong id="totalItems">247</strong></div>
-                  <div class="strip-item">Total Pipe <strong id="totalPipe">1,245 FT</strong></div>
-                  <div class="strip-item">Sprinkler Heads <strong id="totalHeads">364</strong></div>
-                  <div class="strip-item">AI Confidence <strong id="totalConfidence">89%</strong></div>
-                  <button class="btn" onclick="openModal()">Re-analyze Drawings</button>
+          <div id="page_materials" class="page-section">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>MATERIAL ESTIMATE</h3>
+                <button class="small-btn" onclick="openModal()">Re-analyze Drawings</button>
+              </div>
+              <div class="panel-body">
+                <div class="materials-grid">
+                  <div class="mini-panel">
+                    <div class="mini-title">PIPE BY SIZE</div>
+                    <table><thead><tr><th>Size</th><th>Material</th><th>Connection</th><th>Qty</th></tr></thead><tbody><tr><td>2"</td><td>Steel Sch 10</td><td>Grooved</td><td>180 ft</td></tr><tr><td>1½"</td><td>Steel Sch 10</td><td>Grooved</td><td>620 ft</td></tr><tr><td>1"</td><td>Steel Sch 40</td><td>Threaded</td><td>240 ft</td></tr></tbody></table>
+                  </div>
+                  <div class="mini-panel">
+                    <div class="mini-title">FITTINGS BY SIZE</div>
+                    <table><thead><tr><th>Item</th><th>Size</th><th>Connection</th><th>Qty</th></tr></thead><tbody><tr><td>Coupling</td><td>2"</td><td>Grooved</td><td>26</td></tr><tr><td>90° Elbow</td><td>2"</td><td>Grooved</td><td>12</td></tr><tr><td>90° Elbow</td><td>1"</td><td>Threaded</td><td>86</td></tr></tbody></table>
+                  </div>
+                  <div class="mini-panel">
+                    <div class="mini-title">RISER / VALVE ROOM</div>
+                    <table><thead><tr><th>Item</th><th>Size</th><th>Qty</th><th>Notes</th></tr></thead><tbody><tr><td>DCVA</td><td>4"</td><td>1</td><td>Confirm from riser detail</td></tr><tr><td>Waterflow switch</td><td>4"</td><td>1</td><td>Confirm model</td></tr><tr><td>Test and drain</td><td>1"</td><td>1</td><td>Allowance</td></tr></tbody></table>
+                  </div>
+                  <div class="mini-panel">
+                    <div class="mini-title">HANGERS / SUPPORTS</div>
+                    <table><thead><tr><th>Item</th><th>Size</th><th>Qty</th><th>Confidence</th></tr></thead><tbody><tr><td>Swivel ring hanger</td><td>1"-2"</td><td>156</td><td>Estimated</td></tr><tr><td>Beam clamp</td><td>3/8"</td><td>156</td><td>Estimated</td></tr><tr><td>Rod</td><td>3/8"</td><td>198 ft</td><td>Estimated</td></tr></tbody></table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="panel" style="margin-top:14px;">
-            <div class="panel-header">
-              <h3>TOP ASSEMBLIES DETECTED</h3>
-              <small style="color:var(--red2);">View All Assemblies</small>
-            </div>
-
-            <div class="panel-body">
-              <div class="assembly-row">
-                <div class="assembly-card"><div class="icon"></div><strong>Concealed Pendant</strong><small>K-5.6</small><span class="qty">QTY: 80</span></div>
-                <div class="assembly-card"><div class="icon"></div><strong>Upright Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 24</span></div>
-                <div class="assembly-card"><div class="icon"></div><strong>Sidewall Sprinkler</strong><small>K-5.6</small><span class="qty">QTY: 6</span></div>
-                <div class="assembly-card"><div class="icon"></div><strong>Dry Pendant</strong><small>K-5.6</small><span class="qty">QTY: 2</span></div>
-                <div class="assembly-card"><div class="icon"></div><strong>FDC Assembly</strong><small>6" Storz</small><span class="qty">QTY: 1</span></div>
-                <div class="assembly-card"><div class="icon"></div><strong>DCVA Assembly</strong><small>6"</small><span class="qty">QTY: 1</span></div>
+          <div id="page_labor" class="page-section">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>LABOR ESTIMATE</h3>
+                <button class="small-btn" onclick="openModal()">Update From Drawings</button>
+              </div>
+              <div class="panel-body">
+                <div class="mini-panel">
+                  <div class="mini-title">LABOUR BY TASK</div>
+                  <table>
+                    <thead><tr><th>Task</th><th>Fitter Hours</th><th>Helper Hours</th><th>Total</th><th>Notes</th></tr></thead>
+                    <tbody>
+                      <tr><td>Layout / coordination</td><td>16</td><td>8</td><td>24</td><td>Site verification</td></tr>
+                      <tr><td>Hangers / supports</td><td>40</td><td>20</td><td>60</td><td>Based on hanger count</td></tr>
+                      <tr><td>Main piping</td><td>60</td><td>30</td><td>90</td><td>Prefab reduces field time</td></tr>
+                      <tr><td>Branchline piping</td><td>50</td><td>25</td><td>75</td><td>Field install allowance</td></tr>
+                      <tr><td>Drops / heads</td><td>30</td><td>15</td><td>45</td><td>Head count based</td></tr>
+                      <tr><td>Testing / closeout</td><td>23</td><td>9</td><td>32</td><td>Flushing, deficiencies, closeout</td></tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="raw-output" id="rawOutput"></div>
+          <div id="page_assemblies" class="page-section">
+            <div class="panel">
+              <div class="panel-header"><h3>ASSEMBLIES</h3></div>
+              <div class="panel-body">
+                <div class="assembly-row">
+                  <div class="assembly-card"><div class="icon"></div><strong>Pendant Drop Assembly</strong><small>Head, escutcheon, nipple, 90s</small><span class="qty">Editable</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>Upright Assembly</strong><small>Head and branch connection</small><span class="qty">Editable</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>Riser Assembly</strong><small>Backflow, valves, drain, flow switch</small><span class="qty">Editable</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>FDC Assembly</strong><small>FDC, check, ball drip, signage</small><span class="qty">Editable</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>Hanger Assembly</strong><small>Clamp, rod, ring</small><span class="qty">Editable</span></div>
+                  <div class="assembly-card"><div class="icon"></div><strong>CPVC Restraint Assembly</strong><small>Only for plastic pipe</small><span class="qty">Rule</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="page_revisions" class="page-section">
+            <div class="panel">
+              <div class="panel-header"><h3>REVISION HISTORY</h3><button class="small-btn" onclick="openModal()">Upload Revision</button></div>
+              <div class="panel-body">
+                <div class="revision"><span class="dot purple"></span><div><strong>Rev 2</strong><span>Added office area, 14 heads</span></div></div>
+                <div class="revision"><span class="dot blue"></span><div><strong>Rev 1</strong><span>Riser location changed</span></div></div>
+                <div class="revision"><span class="dot green"></span><div><strong>Rev 0</strong><span>Issued for construction</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="page_reports" class="page-section">
+            <div class="panel">
+              <div class="panel-header"><h3>REPORTS</h3><button class="small-btn" onclick="downloadResults()">Download Current Takeoff</button></div>
+              <div class="panel-body">
+                <div class="materials-grid">
+                  <div class="mini-panel"><div class="mini-title">CONTRACTOR TAKEOFF REPORT</div><div style="padding:14px;color:#cbd5e1;">Generate a customer-ready material and labour estimate from the AI takeoff.</div></div>
+                  <div class="mini-panel"><div class="mini-title">SERVICE REPORT</div><div style="padding:14px;color:#cbd5e1;">Generate inspection and deficiency reports from the Service & Testing module.</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="page_projects" class="page-section">
+            <div class="panel">
+              <div class="panel-header"><h3>PROJECTS</h3><button class="small-btn" onclick="openModal()">New Project Estimate</button></div>
+              <div class="panel-body">
+                <div class="mini-panel">
+                  <div class="mini-title">PROJECT LIST</div>
+                  <table><thead><tr><th>Project</th><th>Status</th><th>Type</th><th>Last Updated</th></tr></thead><tbody><tr><td>Industrial Warehouse</td><td>Active</td><td>New Construction</td><td>Today</td></tr><tr><td>Service Call Template</td><td>Draft</td><td>Service</td><td>Today</td></tr></tbody></table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="page_service" class="page-section">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>🧯 SERVICE & TESTING DASHBOARD</h3>
+                <div class="analysis-controls">
+                  <button class="small-btn">Create Quote</button>
+                  <button class="small-btn">Generate Report</button>
+                  <button class="small-btn">Export PDF</button>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="materials-grid">
+                  <div class="mini-panel">
+                    <div class="mini-title">INSPECTION / TESTING</div>
+                    <table><thead><tr><th>Service Type</th><th>Frequency</th><th>Hours</th><th>Status</th></tr></thead><tbody><tr><td>Monthly Inspection</td><td>Monthly</td><td>1.5</td><td class="confidence">Ready</td></tr><tr><td>Quarterly Inspection</td><td>Quarterly</td><td>3.0</td><td class="confidence">Ready</td></tr><tr><td>Annual Wet System Test</td><td>Annual</td><td>5.0</td><td class="confidence">Ready</td></tr><tr><td>Backflow Test</td><td>Annual</td><td>2.0</td><td class="confidence">Ready</td></tr></tbody></table>
+                  </div>
+                  <div class="mini-panel">
+                    <div class="mini-title">DEFICIENCY QUOTE BUILDER</div>
+                    <table><thead><tr><th>Deficiency</th><th>Material</th><th>Labour</th><th>Status</th></tr></thead><tbody><tr><td>Painted sprinkler head</td><td>Head + escutcheon</td><td>1.0 hr</td><td>Editable</td></tr><tr><td>Missing escutcheon</td><td>Escutcheon</td><td>0.5 hr</td><td>Editable</td></tr><tr><td>Leaking drain valve</td><td>Valve allowance</td><td>2.0 hr</td><td>Editable</td></tr><tr><td>Replace gauge</td><td>Gauge</td><td>0.5 hr</td><td>Editable</td></tr></tbody></table>
+                  </div>
+                  <div class="mini-panel">
+                    <div class="mini-title">DEVICE COUNTS</div>
+                    <table><thead><tr><th>Device</th><th>Qty</th><th>Test</th><th>Notes</th></tr></thead><tbody><tr><td>Wet riser</td><td>1</td><td>Annual</td><td>Main drain, flow, alarm</td></tr><tr><td>Backflow</td><td>1</td><td>Annual</td><td>Report required</td></tr><tr><td>FDC</td><td>1</td><td>Visual</td><td>Caps, chains, signage</td></tr><tr><td>Sprinkler heads</td><td>Auto-detect</td><td>Visual</td><td>Paint, damage, loading</td></tr></tbody></table>
+                  </div>
+                  <div class="mini-panel">
+                    <div class="mini-title">SERVICE ESTIMATE SUMMARY</div>
+                    <table><thead><tr><th>Line Item</th><th>Value</th></tr></thead><tbody><tr><td>Service hours</td><td>8.5 hrs</td></tr><tr><td>Repair hours</td><td>4.5 hrs</td></tr><tr><td>Material allowance</td><td>$650</td></tr><tr><td><strong>Estimated total</strong></td><td><strong>$2,145</strong></td></tr></tbody></table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="page_suppliers" class="page-section">
+            <div class="panel">
+              <div class="panel-header"><h3>SUPPLIERS & PRICING</h3></div>
+              <div class="panel-body">
+                <table class="supplier-table">
+                  <thead><tr><th></th><th class="active-supplier">VICTAULIC<br><small>Preferred</small></th><th>ANVIL<br><small>Standard</small></th><th>WOLSELEY<br><small>Alternate</small></th></tr></thead>
+                  <tbody><tr><td>Material</td><td>$47,850</td><td>$51,620</td><td>$45,780</td></tr><tr><td>Shipping</td><td>$1,250</td><td>$1,450</td><td>$1,190</td></tr><tr><td>Tax</td><td>$6,370</td><td>$6,860</td><td>$6,080</td></tr><tr><td><strong>Total</strong></td><td><strong>$55,470</strong></td><td><strong>$59,930</strong></td><td><strong>$53,050</strong></td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="page_settings" class="page-section">
+            <div class="panel">
+              <div class="panel-header"><h3>SETTINGS</h3></div>
+              <div class="panel-body">
+                <div class="field"><label>Saved Worker URL</label><input id="settingsWorkerUrl" placeholder="Paste Worker URL here"></div>
+                <div class="field"><label>Default labour rate</label><input value="115"></div>
+                <button class="btn red" onclick="saveSettings()">Save Settings</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <aside class="right-col">
@@ -1354,228 +1614,32 @@
               <div class="estimate-row"><span>Labor Cost</span><span id="laborCost">$28,650.00</span></div>
               <div class="estimate-row"><span>Equipment Cost</span><span>$2,450.00</span></div>
               <div class="estimate-row estimate-total"><span>Total Cost</span><span id="totalCost">$78,950.00</span></div>
-              <button class="btn red full-width" style="margin-top:12px;">View Full Estimate</button>
+              <button class="btn red full-width" style="margin-top:12px;" onclick="showPage('materials')">View Full Estimate</button>
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-header">
-              <h3>SUPPLIER PRICING</h3>
-              <small>Edit Suppliers⌄</small>
+              <h3>AI CONFIDENCE</h3>
             </div>
             <div class="panel-body">
-              <table class="supplier-table">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th class="active-supplier">VICTAULIC<br><small>Preferred</small></th>
-                    <th>ANVIL<br><small>Standard</small></th>
-                    <th>WOLSELEY<br><small>Alternate</small></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>Material</td><td>$47,850</td><td>$51,620</td><td>$45,780</td></tr>
-                  <tr><td>Shipping</td><td>$1,250</td><td>$1,450</td><td>$1,190</td></tr>
-                  <tr><td>Tax</td><td>$6,370</td><td>$6,860</td><td>$6,080</td></tr>
-                  <tr><td><strong>Total</strong></td><td><strong>$55,470</strong></td><td><strong>$59,930</strong></td><td><strong>$53,050</strong></td></tr>
-                </tbody>
-              </table>
-
-              <button class="btn full-width" style="margin-top:12px;">Compare Full Pricing</button>
-              <div style="color:var(--muted); font-size:11px; margin-top:10px; text-align:right;">Prices updated: May 20, 2024</div>
-            </div>
-          </div>
-
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            <div class="panel">
-              <div class="panel-header">
-                <h3>AI CONFIDENCE</h3>
-              </div>
-              <div class="panel-body">
-                <div class="confidence-row"><span>Pipe Length</span><div class="bar"><span style="width:92%;"></span></div><span>92%</span></div>
-                <div class="confidence-row"><span>Sprinkler Heads</span><div class="bar"><span style="width:98%;"></span></div><span>98%</span></div>
-                <div class="confidence-row"><span>Fittings</span><div class="bar"><span style="width:91%;"></span></div><span>91%</span></div>
-                <div class="confidence-row"><span>Hangers</span><div class="bar yellow"><span style="width:72%;"></span></div><span>72%</span></div>
-                <div class="confidence-row"><span>Valves</span><div class="bar"><span style="width:95%;"></span></div><span>95%</span></div>
-              </div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-header">
-                <h3>RECENT REVISIONS</h3>
-                <small style="color:var(--red2);">View All</small>
-              </div>
-              <div class="panel-body">
-                <div class="revision"><span class="dot purple"></span><div><strong>Rev 2</strong><span>May 20, 2024<br>Added office area, 14 heads</span></div></div>
-                <div class="revision"><span class="dot blue"></span><div><strong>Rev 1</strong><span>May 15, 2024<br>Riser location changed</span></div></div>
-                <div class="revision"><span class="dot green"></span><div><strong>Rev 0</strong><span>May 10, 2024<br>Issued for construction</span></div></div>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <section class="content" id="serviceTestingPage" style="display:none;">
-        <div>
-          <div class="panel">
-            <div class="panel-header">
-              <h3>🧯 SERVICE & TESTING DASHBOARD</h3>
-              <div class="analysis-controls">
-                <button class="small-btn">Create Quote</button>
-                <button class="small-btn">Generate Report</button>
-                <button class="small-btn">Export PDF</button>
-              </div>
-            </div>
-
-            <div class="panel-body">
-              <div class="materials-grid">
-                <div class="mini-panel">
-                  <div class="mini-title">INSPECTION / TESTING</div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Service Type</th>
-                        <th>Frequency</th>
-                        <th>Estimated Hours</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>Monthly Inspection</td><td>Monthly</td><td>1.5</td><td class="confidence">Ready</td></tr>
-                      <tr><td>Quarterly Inspection</td><td>Quarterly</td><td>3.0</td><td class="confidence">Ready</td></tr>
-                      <tr><td>Annual Wet System Test</td><td>Annual</td><td>5.0</td><td class="confidence">Ready</td></tr>
-                      <tr><td>Backflow Test</td><td>Annual</td><td>2.0</td><td class="confidence">Ready</td></tr>
-                      <tr><td>Fire Pump Run Test</td><td>Monthly / Annual</td><td>2.5</td><td class="confidence">Ready</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="mini-panel">
-                  <div class="mini-title">DEFICIENCY QUOTE BUILDER</div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Deficiency</th>
-                        <th>Material</th>
-                        <th>Labour</th>
-                        <th>Quote Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>Replace painted sprinkler head</td><td>1 head + escutcheon</td><td>1.0 hr</td><td>Editable</td></tr>
-                      <tr><td>Replace missing escutcheon</td><td>1 escutcheon</td><td>0.5 hr</td><td>Editable</td></tr>
-                      <tr><td>Repair leaking drain valve</td><td>Valve / trim allowance</td><td>2.0 hr</td><td>Editable</td></tr>
-                      <tr><td>Replace pressure gauge</td><td>1 gauge</td><td>0.5 hr</td><td>Editable</td></tr>
-                      <tr><td>Add missing signage</td><td>Signage allowance</td><td>0.5 hr</td><td>Editable</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="mini-panel">
-                  <div class="mini-title">DEVICE COUNTS</div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Device / Item</th>
-                        <th>Qty</th>
-                        <th>Test Type</th>
-                        <th>Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>Wet sprinkler riser</td><td>1</td><td>Annual</td><td>Main drain, flow, alarm</td></tr>
-                      <tr><td>Backflow preventer</td><td>1</td><td>Annual</td><td>Backflow report required</td></tr>
-                      <tr><td>Fire department connection</td><td>1</td><td>Visual</td><td>Caps, chains, signage</td></tr>
-                      <tr><td>Inspector test</td><td>1</td><td>Annual</td><td>Flow test</td></tr>
-                      <tr><td>Sprinkler heads</td><td>Auto-detect</td><td>Visual</td><td>Paint, damage, loading</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="mini-panel">
-                  <div class="mini-title">SERVICE ESTIMATE SUMMARY</div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Line Item</th>
-                        <th>Value</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>Estimated service hours</td><td>8.5 hrs</td></tr>
-                      <tr><td>Estimated repair hours</td><td>4.5 hrs</td></tr>
-                      <tr><td>Material allowance</td><td>$650</td></tr>
-                      <tr><td>Labour rate</td><td>$115/hr</td></tr>
-                      <tr><td><strong>Estimated total</strong></td><td><strong>$2,145</strong></td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div class="summary-strip">
-                <div class="strip-item">Monthly Tests <strong>Ready</strong></div>
-                <div class="strip-item">Annual Tests <strong>Ready</strong></div>
-                <div class="strip-item">Deficiency Quotes <strong>Editable</strong></div>
-                <div class="strip-item">Reports <strong>Draft</strong></div>
-                <button class="btn" onclick="showDashboard()">Back to Dashboard</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel" style="margin-top:14px;">
-            <div class="panel-header">
-              <h3>AI SERVICE REPORT PREVIEW</h3>
-              <small>Editable before sending to customer</small>
-            </div>
-
-            <div class="panel-body">
-              <div class="mini-panel">
-                <div class="mini-title">REPORT NOTES</div>
-                <div style="padding:14px; color:#e2e8f0; line-height:1.6; font-size:13px;">
-                  FireFlow will generate a customer-ready inspection/service report based on the system type,
-                  device counts, inspection frequency, deficiencies found, photos, and technician notes.
-                  The contractor can edit all line items before sending the quote or final report.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <aside class="right-col">
-          <div class="panel">
-            <div class="panel-header">
-              <h3>SERVICE MODULE</h3>
-            </div>
-            <div class="panel-body">
-              <div class="estimate-row"><span>Monthly inspections</span><span>Enabled</span></div>
-              <div class="estimate-row"><span>Annual testing</span><span>Enabled</span></div>
-              <div class="estimate-row"><span>Deficiency quotes</span><span>Enabled</span></div>
-              <div class="estimate-row"><span>Customer reports</span><span>Draft mode</span></div>
-              <div class="estimate-row estimate-total"><span>Status</span><span>Mockup</span></div>
+              <div class="confidence-row"><span>Pipe Length</span><div class="bar"><span style="width:92%;"></span></div><span>92%</span></div>
+              <div class="confidence-row"><span>Sprinkler Heads</span><div class="bar"><span style="width:98%;"></span></div><span>98%</span></div>
+              <div class="confidence-row"><span>Fittings</span><div class="bar"><span style="width:91%;"></span></div><span>91%</span></div>
+              <div class="confidence-row"><span>Hangers</span><div class="bar yellow"><span style="width:72%;"></span></div><span>72%</span></div>
+              <div class="confidence-row"><span>Valves</span><div class="bar"><span style="width:95%;"></span></div><span>95%</span></div>
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-header">
-              <h3>COMMON DEFICIENCIES</h3>
+              <h3>RECENT REVISIONS</h3>
+              <small style="color:var(--red2); cursor:pointer;" onclick="showPage('revisions')">View All</small>
             </div>
             <div class="panel-body">
-              <div class="revision"><span class="dot red"></span><div><strong>Painted sprinkler head</strong><span>Auto quote: head replacement</span></div></div>
-              <div class="revision"><span class="dot orange"></span><div><strong>Missing escutcheon</strong><span>Auto quote: escutcheon replacement</span></div></div>
-              <div class="revision"><span class="dot blue"></span><div><strong>Low pressure gauge</strong><span>Auto quote: gauge replacement / investigation</span></div></div>
-              <div class="revision"><span class="dot green"></span><div><strong>Missing signage</strong><span>Auto quote: signage install</span></div></div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>SERVICE REPORT WORKFLOW</h3>
-            </div>
-            <div class="panel-body">
-              <div class="revision"><span class="dot green"></span><div><strong>1. Add customer / site</strong><span>Building information and system type</span></div></div>
-              <div class="revision"><span class="dot blue"></span><div><strong>2. Enter device counts</strong><span>Risers, valves, FDC, pumps, heads</span></div></div>
-              <div class="revision"><span class="dot orange"></span><div><strong>3. Add deficiencies</strong><span>Photos, notes, material and labour</span></div></div>
-              <div class="revision"><span class="dot purple"></span><div><strong>4. Generate quote/report</strong><span>Editable customer-ready output</span></div></div>
+              <div class="revision"><span class="dot purple"></span><div><strong>Rev 2</strong><span>May 20, 2024<br>Added office area, 14 heads</span></div></div>
+              <div class="revision"><span class="dot blue"></span><div><strong>Rev 1</strong><span>May 15, 2024<br>Riser location changed</span></div></div>
+              <div class="revision"><span class="dot green"></span><div><strong>Rev 0</strong><span>May 10, 2024<br>Issued for construction</span></div></div>
             </div>
           </div>
         </aside>
@@ -1655,12 +1719,17 @@
     const workerStatus = document.getElementById("workerStatus");
     const rawOutput = document.getElementById("rawOutput");
     const analysisContent = document.getElementById("analysisContent");
+    const formattedTakeoff = document.getElementById("formattedTakeoff");
 
     let selectedFiles = [];
     let latestResultText = "";
 
     const savedWorkerUrl = localStorage.getItem("fireflowWorkerUrl");
-    if (savedWorkerUrl) workerUrl.value = savedWorkerUrl;
+    if (savedWorkerUrl) {
+      workerUrl.value = savedWorkerUrl;
+      const settingsWorkerUrl = document.getElementById("settingsWorkerUrl");
+      if (settingsWorkerUrl) settingsWorkerUrl.value = savedWorkerUrl;
+    }
 
     instructions.value = `Act as a professional fire sprinkler estimator.
 
@@ -1686,6 +1755,92 @@ Important rules:
 - Break down fittings by exact size whenever possible.
 - If a fitting cannot be confirmed, estimate based on visible pipe routing, branch turns, drops, riser details, and standard sprinkler installation practice.`;
 
+    document.querySelectorAll(".nav-item[data-page]").forEach(item => {
+      item.addEventListener("click", function(event) {
+        event.preventDefault();
+        showPage(this.dataset.page);
+      });
+    });
+
+    document.querySelectorAll(".tab[data-page]").forEach(item => {
+      item.addEventListener("click", function() {
+        showPage(this.dataset.page);
+      });
+    });
+
+    document.querySelectorAll("#materialFilters button").forEach(button => {
+      button.addEventListener("click", function() {
+        document.querySelectorAll("#materialFilters button").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
+        filterMaterials(this.dataset.filter);
+      });
+    });
+
+    function showPage(page) {
+      document.querySelectorAll(".page-section").forEach(section => section.classList.remove("active"));
+
+      const target = document.getElementById(`page_${page}`);
+      if (target) target.classList.add("active");
+
+      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+      const nav = document.querySelector(`.nav-item[data-page="${page}"]`);
+      if (nav) nav.classList.add("active");
+
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      const tab = document.querySelector(`.tab[data-page="${page}"]`);
+      if (tab) tab.classList.add("active");
+
+      updateHeaderForPage(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateHeaderForPage(page) {
+      const pageTitle = document.getElementById("pageTitle");
+      const pageSubtitle = document.getElementById("pageSubtitle");
+      const projectHeaderTitle = document.getElementById("projectHeaderTitle");
+      const projectHeaderMeta = document.getElementById("projectHeaderMeta");
+
+      const titles = {
+        dashboard: ["AI-Powered Fire Sprinkler Estimating", "Upload. Analyze. Estimate. Win More Jobs.", "INDUSTRIAL WAREHOUSE"],
+        projects: ["Projects", "Manage estimates, revisions, and active jobs.", "PROJECT DASHBOARD"],
+        analyzer: ["AI Drawing Analyzer", "Review formatted AI takeoffs and drawing analysis.", "AI ANALYZER"],
+        materials: ["Material Estimate", "Pipe, fittings, heads, risers, FDC, and support material.", "MATERIAL ESTIMATE"],
+        labor: ["Labor Estimate", "Fitter/helper hours, prefab assumptions, and task breakdowns.", "LABOR ESTIMATE"],
+        assemblies: ["Assemblies", "Reusable sprinkler assemblies and estimating rules.", "ASSEMBLIES"],
+        revisions: ["Revision History", "Track drawing revisions and estimate changes.", "REVISION HISTORY"],
+        reports: ["Reports", "Generate contractor takeoffs and customer reports.", "REPORTS"],
+        service: ["Service, Testing & Deficiency Quoting", "Generate inspection quotes, service reports, and deficiency pricing.", "SERVICE & TESTING MODULE"],
+        suppliers: ["Suppliers & Pricing", "Compare material pricing and supplier options.", "SUPPLIER PRICING"],
+        settings: ["Settings", "Configure worker URL, pricing, and estimating defaults.", "SETTINGS"]
+      };
+
+      const current = titles[page] || titles.dashboard;
+
+      pageTitle.textContent = current[0];
+      pageSubtitle.textContent = current[1];
+      projectHeaderTitle.innerHTML = `${current[2]} <span class="active-pill">${page === "service" ? "MOCKUP" : "ACTIVE"}</span>`;
+
+      projectHeaderMeta.innerHTML = `
+        <span>Project ID: FF-2024-1001</span>
+        <span>|</span>
+        <span>Location: Ontario, Canada</span>
+        <span>|</span>
+        <span>Type: ${page === "service" ? "Service / Testing" : "New Construction"}</span>
+      `;
+    }
+
+    function filterMaterials(filter) {
+      document.querySelectorAll(".material-card").forEach(card => {
+        if (filter === "all") {
+          card.style.display = "";
+          return;
+        }
+
+        const types = card.dataset.type || "";
+        card.style.display = types.includes(filter) ? "" : "none";
+      });
+    }
+
     function openModal() {
       modal.style.display = "flex";
       document.body.classList.add("modal-open");
@@ -1710,9 +1865,7 @@ Important rules:
           existingFile.lastModified === newFile.lastModified
         );
 
-        if (!alreadyAdded) {
-          selectedFiles.push(newFile);
-        }
+        if (!alreadyAdded) selectedFiles.push(newFile);
       });
 
       fileInput.value = "";
@@ -1835,12 +1988,14 @@ Important rules:
         rawOutput.style.display = "block";
         rawOutput.textContent = resultText;
 
-        analysisContent.innerHTML = aiResultToDashboard(resultText);
+        const formattedHtml = markdownToHtml(resultText);
+        analysisContent.innerHTML = aiResultToDashboard(formattedHtml);
+        formattedTakeoff.innerHTML = formattedHtml;
 
         aiStatus.textContent = "Completed";
         workerStatus.textContent = "Worker connected";
         closeModal();
-        showDashboard();
+        showPage("analyzer");
       } catch (error) {
         aiStatus.textContent = "Error";
         workerStatus.textContent = "Worker error";
@@ -1850,22 +2005,156 @@ Important rules:
       }
     }
 
-    function aiResultToDashboard(text) {
-      const safe = escapeHtml(text || "No AI result returned.");
-
+    function aiResultToDashboard(formattedHtml) {
       return `
         <div class="mini-panel" style="margin-bottom:12px;">
           <div class="mini-title">AI RESULT RECEIVED</div>
           <div style="padding:12px; color:#cbd5e1; line-height:1.55; font-size:13px;">
-            The AI result has been loaded below. The next Worker update will return structured JSON so this dashboard can automatically fill every table.
+            The AI takeoff is now formatted below into readable sections and tables.
           </div>
         </div>
 
-        <div class="mini-panel">
-          <div class="mini-title">RAW CONTRACTOR TAKEOFF</div>
-          <div style="padding:14px; white-space:pre-wrap; color:#e2e8f0; line-height:1.55; font-size:13px; max-height:620px; overflow:auto;">${safe}</div>
-        </div>
+        <div class="formatted-takeoff">${formattedHtml}</div>
       `;
+    }
+
+    function markdownToHtml(markdown) {
+      if (!markdown) return "<p>No AI result returned.</p>";
+
+      const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+      let html = "";
+      let paragraph = [];
+      let listOpen = false;
+
+      function flushParagraph() {
+        if (paragraph.length) {
+          html += `<p>${inlineFormat(escapeHtml(paragraph.join(" ")))}</p>`;
+          paragraph = [];
+        }
+      }
+
+      function closeList() {
+        if (listOpen) {
+          html += "</ul>";
+          listOpen = false;
+        }
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+          flushParagraph();
+          closeList();
+          continue;
+        }
+
+        if (isTableStart(lines, i)) {
+          flushParagraph();
+          closeList();
+
+          const tableLines = [];
+          while (i < lines.length && lines[i].trim().startsWith("|")) {
+            tableLines.push(lines[i].trim());
+            i++;
+          }
+          i--;
+
+          html += renderTable(tableLines);
+          continue;
+        }
+
+        if (trimmed.startsWith("### ")) {
+          flushParagraph();
+          closeList();
+          html += `<h3>${inlineFormat(escapeHtml(trimmed.slice(4)))}</h3>`;
+          continue;
+        }
+
+        if (trimmed.startsWith("## ")) {
+          flushParagraph();
+          closeList();
+          html += `<h2>${inlineFormat(escapeHtml(trimmed.slice(3)))}</h2>`;
+          continue;
+        }
+
+        if (trimmed.startsWith("# ")) {
+          flushParagraph();
+          closeList();
+          html += `<h1>${inlineFormat(escapeHtml(trimmed.slice(2)))}</h1>`;
+          continue;
+        }
+
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          flushParagraph();
+
+          if (!listOpen) {
+            html += "<ul>";
+            listOpen = true;
+          }
+
+          html += `<li>${inlineFormat(escapeHtml(trimmed.slice(2)))}</li>`;
+          continue;
+        }
+
+        paragraph.push(trimmed);
+      }
+
+      flushParagraph();
+      closeList();
+
+      return html;
+    }
+
+    function isTableStart(lines, index) {
+      const current = lines[index]?.trim() || "";
+      const next = lines[index + 1]?.trim() || "";
+      return current.startsWith("|") && current.endsWith("|") && next.startsWith("|") && next.includes("---");
+    }
+
+    function renderTable(tableLines) {
+      if (tableLines.length < 2) return "";
+
+      const headers = splitTableRow(tableLines[0]);
+      const bodyRows = tableLines.slice(2);
+
+      let html = `<div class="table-wrap"><table><thead><tr>`;
+      headers.forEach(header => {
+        html += `<th>${inlineFormat(escapeHtml(header))}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
+
+      bodyRows.forEach(row => {
+        const cells = splitTableRow(row);
+        html += "<tr>";
+        cells.forEach(cell => {
+          html += `<td>${inlineFormat(escapeHtml(cell))}</td>`;
+        });
+        html += "</tr>";
+      });
+
+      html += `</tbody></table></div>`;
+      return html;
+    }
+
+    function splitTableRow(row) {
+      return row
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map(cell => cell.trim());
+    }
+
+    function copyResults() {
+      if (!latestResultText) {
+        alert("No AI result to copy yet.");
+        return;
+      }
+
+      navigator.clipboard.writeText(latestResultText)
+        .then(() => alert("Results copied."))
+        .catch(() => alert("Could not copy results."));
     }
 
     function downloadResults() {
@@ -1887,102 +2176,13 @@ Important rules:
       URL.revokeObjectURL(url);
     }
 
-    function showServiceTesting() {
-      const dashboardPage = document.getElementById("dashboardPage");
-      const serviceTestingPage = document.getElementById("serviceTestingPage");
-      const pageTitle = document.getElementById("pageTitle");
-      const pageSubtitle = document.getElementById("pageSubtitle");
-      const projectHeaderTitle = document.getElementById("projectHeaderTitle");
-      const projectHeaderMeta = document.getElementById("projectHeaderMeta");
-      const mainTabs = document.getElementById("mainTabs");
-
-      if (dashboardPage) dashboardPage.style.display = "none";
-      if (serviceTestingPage) serviceTestingPage.style.display = "grid";
-
-      if (pageTitle) pageTitle.textContent = "Service, Testing & Deficiency Quoting";
-      if (pageSubtitle) pageSubtitle.textContent = "Generate inspection quotes, service reports, and editable deficiency pricing.";
-
-      if (projectHeaderTitle) {
-        projectHeaderTitle.innerHTML = 'SERVICE & TESTING MODULE <span class="active-pill">MOCKUP</span>';
+    function saveSettings() {
+      const settingsWorkerUrl = document.getElementById("settingsWorkerUrl");
+      if (settingsWorkerUrl && settingsWorkerUrl.value.trim()) {
+        localStorage.setItem("fireflowWorkerUrl", settingsWorkerUrl.value.trim());
+        workerUrl.value = settingsWorkerUrl.value.trim();
       }
-
-      if (projectHeaderMeta) {
-        projectHeaderMeta.innerHTML = `
-          <span>Module: Inspections</span>
-          <span>|</span>
-          <span>Monthly / Quarterly / Annual</span>
-          <span>|</span>
-          <span>Deficiency Quotes</span>
-          <span>|</span>
-          <span>Reports</span>
-        `;
-      }
-
-      if (mainTabs) {
-        mainTabs.innerHTML = `
-          <div class="tab active">SERVICE DASHBOARD</div>
-          <div class="tab">INSPECTIONS</div>
-          <div class="tab">DEFICIENCIES</div>
-          <div class="tab">REPORTS</div>
-          <div class="tab">QUOTES</div>
-        `;
-      }
-
-      setActiveNav("Service & Testing");
-    }
-
-    function showDashboard() {
-      const dashboardPage = document.getElementById("dashboardPage");
-      const serviceTestingPage = document.getElementById("serviceTestingPage");
-      const pageTitle = document.getElementById("pageTitle");
-      const pageSubtitle = document.getElementById("pageSubtitle");
-      const projectHeaderTitle = document.getElementById("projectHeaderTitle");
-      const projectHeaderMeta = document.getElementById("projectHeaderMeta");
-      const mainTabs = document.getElementById("mainTabs");
-
-      if (dashboardPage) dashboardPage.style.display = "grid";
-      if (serviceTestingPage) serviceTestingPage.style.display = "none";
-
-      if (pageTitle) pageTitle.textContent = "AI-Powered Fire Sprinkler Estimating";
-      if (pageSubtitle) pageSubtitle.textContent = "Upload. Analyze. Estimate. Win More Jobs.";
-
-      if (projectHeaderTitle) {
-        projectHeaderTitle.innerHTML = 'INDUSTRIAL WAREHOUSE <span class="active-pill">ACTIVE</span>';
-      }
-
-      if (projectHeaderMeta) {
-        projectHeaderMeta.innerHTML = `
-          <span>Project ID: FF-2024-1001</span>
-          <span>|</span>
-          <span>Created: May 20, 2024</span>
-          <span>|</span>
-          <span>Location: Ontario, Canada</span>
-          <span>|</span>
-          <span>Type: New Construction</span>
-        `;
-      }
-
-      if (mainTabs) {
-        mainTabs.innerHTML = `
-          <div class="tab">DRAWINGS</div>
-          <div class="tab active">AI ANALYSIS</div>
-          <div class="tab">MATERIALS</div>
-          <div class="tab">LABOR</div>
-          <div class="tab">SUMMARY</div>
-          <div class="tab">REVISION HISTORY</div>
-        `;
-      }
-
-      setActiveNav("Dashboard");
-    }
-
-    function setActiveNav(label) {
-      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-
-      const link = Array.from(document.querySelectorAll(".nav-item"))
-        .find(item => item.textContent.includes(label));
-
-      if (link) link.classList.add("active");
+      alert("Settings saved.");
     }
 
     function escapeHtml(value) {
@@ -1992,6 +2192,12 @@ Important rules:
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    }
+
+    function inlineFormat(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/`(.*?)`/g, "<code>$1</code>");
     }
   </script>
 </body>
