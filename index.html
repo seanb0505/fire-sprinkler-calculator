@@ -2459,6 +2459,415 @@ Exclusions / reminders:
       .replaceAll("'", "&#039;");
   }
 })();
+
+/* ============================================================
+   FireFlow AI v7.3 Dashboard Page Sync Add-On
+   This pushes AI Analyzer results into the main Dashboard page
+   while keeping the same FireFlow layout and style.
+============================================================ */
+
+(function installFireFlowMainDashboardSync() {
+  const previousDisplayResults = window.displayResults;
+
+  window.displayResults = function displayResultsWithDashboardSync(result, rawData) {
+    if (typeof previousDisplayResults === "function") {
+      previousDisplayResults(result, rawData);
+    }
+
+    try {
+      const estimate = normalizeMainDashboardEstimate(rawData || {}, result || "");
+      syncMainDashboardPage(estimate);
+    } catch (error) {
+      console.error("FireFlow dashboard sync failed:", error);
+    }
+  };
+
+  function normalizeMainDashboardEstimate(rawData, resultText) {
+    const dashboardData =
+      rawData.dashboardData ||
+      rawData.rawStructuredEstimate ||
+      {};
+
+    const summary = dashboardData.summary || {};
+
+    return {
+      summary: {
+        projectType: summary.projectType || rawData.projectType || "Unknown project",
+        nfpaStandard: summary.nfpaStandard || "Not confirmed",
+        systemType: summary.systemType || "Unknown system",
+        materialType: summary.materialType || "Unknown material",
+        fabricationMethod: summary.fabricationMethod || rawData.fabricationMethod || "Unknown",
+        totalHeads: toNumber(summary.totalHeads),
+        totalFieldHours: toNumber(summary.totalFieldHours),
+        materialConfidence: summary.materialConfidence || "Review required",
+        labourConfidence: summary.labourConfidence || "Review required",
+        overallConfidence: summary.overallConfidence || "Review required"
+      },
+      materialRows: Array.isArray(dashboardData.materialRows) ? dashboardData.materialRows : [],
+      labourRows: Array.isArray(dashboardData.labourRows) ? dashboardData.labourRows : [],
+      riserRows: Array.isArray(dashboardData.riserRows) ? dashboardData.riserRows : [],
+      warningRows: Array.isArray(dashboardData.warningRows) ? dashboardData.warningRows : [],
+      quoteSummary: dashboardData.quoteSummary || {},
+      reportMarkdown:
+        dashboardData.reportMarkdown ||
+        rawData.analysis ||
+        resultText ||
+        "No AI report returned.",
+      rawData
+    };
+  }
+
+  function syncMainDashboardPage(estimate) {
+    const dashboard = document.getElementById("dashboard");
+    if (!dashboard) return;
+
+    const grid = dashboard.querySelector(".dashboard-grid");
+    if (!grid || grid.children.length < 3) return;
+
+    const middleColumn = grid.children[1];
+    const rightColumn = grid.children[2];
+
+    middleColumn.innerHTML = renderSyncedDashboardMainPanel(estimate);
+    rightColumn.innerHTML = renderSyncedDashboardRightPanel(estimate);
+
+    updateProjectHeaderFromEstimate(estimate);
+    updateDashboardMiniStatus(estimate);
+  }
+
+  function renderSyncedDashboardMainPanel(estimate) {
+    const groupedMaterials = groupRowsByCategory(estimate.materialRows);
+    const materialCategoryNames = Object.keys(groupedMaterials);
+
+    return `
+      <div class="panel">
+        <div class="panel-head">
+          <h3>AI Analysis Results - Live Dashboard Material Breakdown</h3>
+          <div>
+            <button class="btn" type="button">Edit Quantities</button>
+            <button class="btn" type="button">Export</button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          ${renderDashboardWarningStrip(estimate.warningRows)}
+
+          <div class="bottom-strip" style="margin-top:0;margin-bottom:14px;">
+            <div class="strip-item">Total Heads<strong>${estimate.summary.totalHeads || "Review"}</strong></div>
+            <div class="strip-item">Field Hours<strong>${estimate.summary.totalFieldHours || "Review"}</strong></div>
+            <div class="strip-item">System<strong>${escapeHtml(shortText(estimate.summary.systemType, 18))}</strong></div>
+            <div class="strip-item">Confidence<strong>${escapeHtml(estimate.summary.overallConfidence || "Review")}</strong></div>
+            <button class="btn" data-section-jump="analyzer" type="button">Re-analyze Drawings</button>
+          </div>
+
+          <div class="analysis-toolbar">
+            <button class="filter-btn active" type="button">All Materials</button>
+            <button class="filter-btn" type="button">Pipe</button>
+            <button class="filter-btn" type="button">Fittings</button>
+            <button class="filter-btn" type="button">Heads</button>
+            <button class="filter-btn" type="button">Riser</button>
+            <button class="filter-btn" type="button">Warnings</button>
+          </div>
+
+          ${
+            materialCategoryNames.length
+              ? `<div class="table-grid">
+                  ${materialCategoryNames.map(category => renderDashboardMaterialMiniCard(category, groupedMaterials[category])).join("")}
+                </div>`
+              : `<div class="status-box">No structured material rows were returned. Check the AI Analyzer Raw tab.</div>`
+          }
+
+          <div class="assemblies-row">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>TOP MATERIAL GROUPS DETECTED</strong>
+              <span style="color:#ef4444;font-size:12px;">Live AI Estimate</span>
+            </div>
+            <div class="assembly-cards">
+              ${renderTopAssemblyCards(estimate)}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDashboardMaterialMiniCard(category, rows) {
+    return `
+      <div class="mini-card">
+        <div class="mini-title">${escapeHtml(category)}</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Size</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Conf.</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.slice(0, 8).map(row => `
+              <tr>
+                <td>${escapeHtml(row.item || "Item")}</td>
+                <td>${escapeHtml(row.size || "")}</td>
+                <td contenteditable="true">${escapeHtml(String(row.quantity ?? ""))}</td>
+                <td>${escapeHtml(row.unit || "each")}</td>
+                <td class="${confidenceClass(row.confidence)}">${escapeHtml(row.confidence || "Review")}</td>
+              </tr>
+            `).join("")}
+            ${
+              rows.length > 8
+                ? `<tr><td colspan="5" style="color:#94a3b8;">+ ${rows.length - 8} more line(s) in Material tab</td></tr>`
+                : ""
+            }
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function renderSyncedDashboardRightPanel(estimate) {
+    const s = estimate.summary;
+    const pipeTotal = calculatePipeTotal(estimate.materialRows);
+    const materialLineCount = estimate.materialRows.length;
+    const totalLabourHours =
+      estimate.labourRows.reduce((sum, row) => sum + toNumber(row.hours), 0) ||
+      s.totalFieldHours ||
+      0;
+
+    return `
+      <div class="panel">
+        <div class="panel-head"><h3>Project Summary</h3></div>
+        <div class="panel-body">
+          <div class="summary-grid">
+            <div class="summary-tile"><strong>${escapeHtml(s.nfpaStandard || "Review")}</strong><span>Standard</span></div>
+            <div class="summary-tile"><strong>${s.totalHeads || "Review"}</strong><span>Sprinkler Heads</span></div>
+            <div class="summary-tile"><strong>${totalLabourHours || "Review"}</strong><span>Field Hours</span></div>
+            <div class="summary-tile"><strong>${materialLineCount}</strong><span>Material Lines</span></div>
+            <div class="summary-tile"><strong>${escapeHtml(pipeTotal)}</strong><span>Pipe Qty</span></div>
+            <div class="summary-tile"><strong>${escapeHtml(s.overallConfidence || "Review")}</strong><span>Confidence</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Estimate Summary</h3></div>
+        <div class="panel-body">
+          <div class="estimate-lines">
+            <div class="line-item"><span>Material Pricing</span><span>Not priced yet</span></div>
+            <div class="line-item"><span>Labour Hours</span><span>${totalLabourHours || "Review"}</span></div>
+            <div class="line-item"><span>Suggested Contingency</span><span>${escapeHtml(estimate.quoteSummary.suggestedContingencyPercent || "10-15%")}</span></div>
+            <div class="line-item line-total"><span>Status</span><span>Review</span></div>
+          </div>
+          <button class="full-width-btn" type="button" data-section-jump="materials">View Material Estimate</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>AI Confidence</h3></div>
+        <div class="panel-body">
+          ${renderConfidenceRow("Materials", s.materialConfidence)}
+          ${renderConfidenceRow("Labour", s.labourConfidence)}
+          ${renderConfidenceRow("Overall", s.overallConfidence)}
+          ${renderConfidenceRow("Manual Review", estimate.warningRows.length ? "Required" : "Low")}
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Manual Review Items</h3></div>
+        <div class="panel-body">
+          ${
+            estimate.warningRows.length
+              ? estimate.warningRows.map(row => `
+                  <div class="revision">
+                    <strong><span class="rev-dot" style="background:${warningColor(row.severity)};"></span>${escapeHtml(row.area || "Review")}</strong>
+                    <small>${escapeHtml(row.warning || "")}</small>
+                  </div>
+                `).join("")
+              : `<div class="revision"><strong>No warnings returned</strong><small>Still review before ordering.</small></div>`
+          }
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDashboardWarningStrip(warnings) {
+    if (!warnings || !warnings.length) return "";
+
+    return `
+      <div class="status-box" style="min-height:auto;margin-bottom:14px;border-color:rgba(251,146,60,.4);background:rgba(251,146,60,.08);">
+        <strong style="color:white;">Estimator Review Required</strong>
+        <div style="margin-top:8px;">
+          ${warnings.slice(0, 3).map(w => `
+            <div style="margin-bottom:6px;">
+              <span style="color:#fb923c;font-weight:900;">${escapeHtml(w.area || "Review")}:</span>
+              ${escapeHtml(w.warning || "")}
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTopAssemblyCards(estimate) {
+    const heads = estimate.summary.totalHeads || findQuantityByCategory(estimate.materialRows, "Sprinkler Heads");
+    const cpvcRows = estimate.materialRows.filter(row => includesAny(row.category, ["CPVC"]));
+    const steelRows = estimate.materialRows.filter(row => includesAny(row.category, ["Steel"]));
+    const riserRows = estimate.riserRows.length || estimate.materialRows.filter(row => includesAny(row.category, ["Riser", "Backflow", "FDC", "Valves"])).length;
+    const labour = estimate.summary.totalFieldHours || 0;
+    const warnings = estimate.warningRows.length;
+
+    const cards = [
+      { icon: "🚿", title: "Sprinkler Heads", value: heads || "Review" },
+      { icon: "🟠", title: "CPVC Lines", value: cpvcRows.length },
+      { icon: "⚙", title: "Steel / Riser", value: steelRows.length + riserRows },
+      { icon: "🧯", title: "Riser / BFP / FDC", value: riserRows || "Review" },
+      { icon: "👷", title: "Field Labour", value: `${labour || "Review"} hrs` },
+      { icon: "⚠", title: "Review Items", value: warnings }
+    ];
+
+    return cards.map(card => `
+      <div class="assembly-card">
+        <div class="assembly-icon">${card.icon}</div>
+        <strong>${escapeHtml(card.title)}</strong>
+        <span class="qty-pill">QTY: ${escapeHtml(String(card.value))}</span>
+      </div>
+    `).join("");
+  }
+
+  function renderConfidenceRow(label, confidence) {
+    const percent = confidenceToPercent(confidence);
+
+    return `
+      <div class="confidence-row">
+        <span>${escapeHtml(label)}</span>
+        <div>
+          <div class="mini-bar">
+            <span style="width:${percent}%;${percent < 70 ? "background:#facc15;" : ""}"></span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function updateProjectHeaderFromEstimate(estimate) {
+    const title = document.querySelector(".project-title h2");
+    if (title) {
+      title.innerHTML = `AI SPRINKLER ESTIMATE <span class="active-pill">LIVE</span>`;
+    }
+
+    const meta = document.querySelector(".project-title .meta");
+    if (meta) {
+      meta.innerHTML = `
+        <span>Project Type: ${escapeHtml(estimate.summary.projectType)}</span>
+        <span>Standard: ${escapeHtml(estimate.summary.nfpaStandard)}</span>
+        <span>System: ${escapeHtml(estimate.summary.systemType)}</span>
+        <span>Material: ${escapeHtml(estimate.summary.materialType)}</span>
+      `;
+    }
+  }
+
+  function updateDashboardMiniStatus(estimate) {
+    const aiStatusText = document.getElementById("aiStatusText");
+    if (aiStatusText) aiStatusText.textContent = "Estimate loaded";
+
+    document.querySelectorAll("[data-section-jump]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (typeof setSection === "function") {
+          setSection(btn.dataset.sectionJump);
+        }
+      });
+    });
+  }
+
+  function groupRowsByCategory(rows) {
+    return rows.reduce((groups, row) => {
+      const category = row.category || "Miscellaneous";
+      if (!groups[category]) groups[category] = [];
+      groups[category].push(row);
+      return groups;
+    }, {});
+  }
+
+  function calculatePipeTotal(rows) {
+    const pipeRows = rows.filter(row =>
+      String(row.category || "").toLowerCase().includes("pipe") ||
+      String(row.item || "").toLowerCase().includes("pipe")
+    );
+
+    if (!pipeRows.length) return "Review";
+
+    const unitGroups = {};
+
+    pipeRows.forEach(row => {
+      const unit = row.unit || "unit";
+      const qty = toNumber(row.quantity);
+      if (!unitGroups[unit]) unitGroups[unit] = 0;
+      unitGroups[unit] += qty;
+    });
+
+    return Object.keys(unitGroups)
+      .map(unit => `${Math.round(unitGroups[unit])} ${unit}`)
+      .join(" / ");
+  }
+
+  function findQuantityByCategory(rows, categoryName) {
+    const row = rows.find(r => String(r.category || "").toLowerCase().includes(categoryName.toLowerCase()));
+    return row ? row.quantity : 0;
+  }
+
+  function includesAny(value, terms) {
+    const text = String(value || "").toLowerCase();
+    return terms.some(term => text.includes(term.toLowerCase()));
+  }
+
+  function confidenceClass(confidence) {
+    const value = String(confidence || "").toLowerCase();
+
+    if (value.includes("high")) return "conf";
+    if (value.includes("medium")) return "conf warn";
+    return "conf low";
+  }
+
+  function confidenceToPercent(confidence) {
+    const value = String(confidence || "").toLowerCase();
+
+    if (value.includes("high")) return 90;
+    if (value.includes("medium-high")) return 82;
+    if (value.includes("medium")) return 72;
+    if (value.includes("low")) return 48;
+    if (value.includes("required")) return 55;
+
+    return 65;
+  }
+
+  function warningColor(severity) {
+    const value = String(severity || "").toLowerCase();
+
+    if (value.includes("high")) return "#ef4444";
+    if (value.includes("medium")) return "#facc15";
+    return "#fb923c";
+  }
+
+  function shortText(value, maxLength) {
+    const text = String(value || "");
+    return text.length > maxLength ? text.slice(0, maxLength - 1) + "…" : text;
+  }
+
+  function toNumber(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+})();
+
   </script>
 </body>
 </html>
