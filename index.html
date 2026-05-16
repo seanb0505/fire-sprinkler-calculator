@@ -1592,6 +1592,873 @@ Exclusions / reminders:
         .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
         .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
     }
+/* ============================================================
+   FireFlow AI v7.2 Dashboard Results Display Add-On
+   Paste this block directly above the closing </script> tag.
+   This keeps the existing website look/layout and only improves
+   how v7.1/v7.2 Worker results are displayed.
+============================================================ */
+
+(function installFireFlowDashboardRenderer() {
+  injectDashboardStyles();
+
+  // This overrides the older displayResults function without changing layout.
+  window.displayResults = function displayResults(result, rawData) {
+    const data = rawData || {};
+    const dashboardData = data.dashboardData || data.rawStructuredEstimate || null;
+    const analysisText =
+      data.analysis ||
+      data.result ||
+      data.output ||
+      data.message ||
+      result ||
+      "";
+
+    const normalized = normalizeFireFlowDashboardData(dashboardData, analysisText, data);
+
+    const fullEl = document.getElementById("fullResult");
+    const materialEl = document.getElementById("materialResult");
+    const labourEl = document.getElementById("labourResult") || document.getElementById("laborResult");
+    const onsiteEl = document.getElementById("onsiteResult");
+    const prefabEl = document.getElementById("prefabResult");
+    const rawEl = document.getElementById("rawResult");
+
+    if (fullEl) {
+      fullEl.innerHTML = renderFullEstimateDashboard(normalized);
+    }
+
+    if (materialEl) {
+      materialEl.innerHTML = renderMaterialDashboard(normalized);
+    }
+
+    if (labourEl) {
+      labourEl.innerHTML = renderLabourDashboard(normalized);
+    }
+
+    if (onsiteEl) {
+      onsiteEl.innerHTML = renderOnsiteDashboard(normalized);
+    }
+
+    if (prefabEl) {
+      prefabEl.innerHTML = renderPrefabDashboard(normalized);
+    }
+
+    if (rawEl) {
+      rawEl.textContent = JSON.stringify(data, null, 2);
+    }
+
+    updateFireFlowPageMetrics(normalized, data);
+  };
+
+  function normalizeFireFlowDashboardData(dashboardData, analysisText, rawData) {
+    const safe = dashboardData || {};
+
+    const summary = {
+      projectType: safe.summary?.projectType || rawData?.projectType || "Unknown",
+      nfpaStandard: safe.summary?.nfpaStandard || "Not confirmed",
+      systemType: safe.summary?.systemType || "Unknown",
+      materialType: safe.summary?.materialType || "Unknown",
+      fabricationMethod:
+        safe.summary?.fabricationMethod ||
+        rawData?.fabricationMethod ||
+        "Unknown / not selected",
+      totalHeads: toNumber(safe.summary?.totalHeads),
+      totalFieldHours: toNumber(safe.summary?.totalFieldHours),
+      materialConfidence: safe.summary?.materialConfidence || "Review required",
+      labourConfidence: safe.summary?.labourConfidence || "Review required",
+      overallConfidence: safe.summary?.overallConfidence || "Review required"
+    };
+
+    const materialRows = Array.isArray(safe.materialRows) ? safe.materialRows.map(cleanMaterialRow) : [];
+    const labourRows = Array.isArray(safe.labourRows) ? safe.labourRows.map(cleanLabourRow) : [];
+    const riserRows = Array.isArray(safe.riserRows) ? safe.riserRows.map(cleanRiserRow) : [];
+    const warningRows = Array.isArray(safe.warningRows) ? safe.warningRows.map(cleanWarningRow) : [];
+
+    const quoteSummary = {
+      suggestedContingencyPercent:
+        safe.quoteSummary?.suggestedContingencyPercent || "10-15%",
+      majorMissingItems: Array.isArray(safe.quoteSummary?.majorMissingItems)
+        ? safe.quoteSummary.majorMissingItems
+        : [],
+      manualReviewItems: Array.isArray(safe.quoteSummary?.manualReviewItems)
+        ? safe.quoteSummary.manualReviewItems
+        : []
+    };
+
+    const reportMarkdown =
+      safe.reportMarkdown ||
+      rawData?.analysis ||
+      analysisText ||
+      "No written estimate returned.";
+
+    return {
+      summary,
+      materialRows: improveMaterialRows(materialRows, summary),
+      labourRows,
+      riserRows,
+      warningRows,
+      quoteSummary,
+      reportMarkdown
+    };
+  }
+
+  function cleanMaterialRow(row) {
+    return {
+      category: text(row.category || "Miscellaneous"),
+      item: text(row.item || "Item"),
+      size: text(row.size || ""),
+      material: text(row.material || ""),
+      connection: text(row.connection || ""),
+      quantity: row.quantity ?? "",
+      unit: text(row.unit || "each"),
+      confidence: text(row.confidence || "Review"),
+      source: text(row.source || ""),
+      notes: text(row.notes || "")
+    };
+  }
+
+  function cleanLabourRow(row) {
+    return {
+      category: text(row.category || "Labour"),
+      hours: toNumber(row.hours),
+      confidence: text(row.confidence || "Review"),
+      reasoning: text(row.reasoning || "")
+    };
+  }
+
+  function cleanRiserRow(row) {
+    return {
+      item: text(row.item || "Riser item"),
+      size: text(row.size || ""),
+      quantity: row.quantity ?? "",
+      unit: text(row.unit || "each"),
+      confirmedOrAllowance: text(row.confirmedOrAllowance || "Review"),
+      confidence: text(row.confidence || "Review"),
+      notes: text(row.notes || "")
+    };
+  }
+
+  function cleanWarningRow(row) {
+    return {
+      area: text(row.area || "Review"),
+      severity: text(row.severity || "Medium"),
+      warning: text(row.warning || ""),
+      recommendedAction: text(row.recommendedAction || "")
+    };
+  }
+
+  function improveMaterialRows(rows, summary) {
+    const improved = [...rows];
+
+    // If AI gave one broad CPVC pipe row, flag it visually instead of trusting it.
+    const cpvcPipeRows = improved.filter(
+      r => lower(r.category).includes("cpvc pipe") || (lower(r.item).includes("cpvc pipe") && lower(r.category).includes("pipe"))
+    );
+
+    if (cpvcPipeRows.length === 1) {
+      cpvcPipeRows[0].notes =
+        (cpvcPipeRows[0].notes ? cpvcPipeRows[0].notes + " " : "") +
+        "Estimator review: AI returned broad CPVC pipe quantity. Split by 2 inch, 1-1/2 inch, 1-1/4 inch, and 1 inch before ordering.";
+      cpvcPipeRows[0].confidence = downgradeConfidence(cpvcPipeRows[0].confidence);
+    }
+
+    const headCount = toNumber(summary.totalHeads);
+    const hasSurge = improved.some(r => lower(r.category).includes("surge") || lower(r.item).includes("surge"));
+    const usesCpvc = improved.some(r => lower(r.category).includes("cpvc") || lower(r.material).includes("cpvc"));
+
+    if (usesCpvc && headCount > 0 && !hasSurge) {
+      improved.push({
+        category: "Surge Restraints",
+        item: "CPVC surge restraint allowance",
+        size: "CPVC",
+        material: "Listed CPVC restraint",
+        connection: "Clamp",
+        quantity: Math.round(headCount * 2.2),
+        unit: "each",
+        confidence: "Medium",
+        source: "Website estimator rule based on CPVC head count",
+        notes: "Surge restraints apply to CPVC/plastic pipe only, not steel."
+      });
+    }
+
+    return improved;
+  }
+
+  function renderFullEstimateDashboard(data) {
+    return `
+      ${renderSummaryCards(data)}
+      ${renderWarningCards(data.warningRows)}
+      <div class="ff-section-title">Estimator Dashboard View</div>
+      <div class="ff-two-col">
+        <div class="ff-card-lite">
+          <h3>Material Snapshot</h3>
+          ${renderCategorySummary(data.materialRows)}
+        </div>
+        <div class="ff-card-lite">
+          <h3>Labour Snapshot</h3>
+          ${renderLabourSummary(data.labourRows, data.summary.totalFieldHours)}
+        </div>
+      </div>
+      <div class="ff-section-title">Full AI Report</div>
+      <div class="ff-report">
+        ${markdownToSafeHtml(data.reportMarkdown)}
+      </div>
+    `;
+  }
+
+  function renderMaterialDashboard(data) {
+    const rows = data.materialRows;
+
+    if (!rows.length) {
+      return `
+        ${renderSummaryCards(data)}
+        <div class="ff-empty">
+          No structured material rows were returned yet. Check the Full Estimate or Raw tab.
+        </div>
+      `;
+    }
+
+    const grouped = groupBy(rows, row => row.category || "Miscellaneous");
+
+    return `
+      ${renderSummaryCards(data)}
+      <div class="ff-section-title">Material Breakdown</div>
+      <div class="ff-note">
+        Quantities marked Medium or Low should be reviewed before ordering. This view is built from the Worker's structured dashboard data.
+      </div>
+      ${Object.keys(grouped).map(category => renderMaterialGroup(category, grouped[category])).join("")}
+      ${renderRiserDashboard(data)}
+      ${renderQuoteSummary(data)}
+    `;
+  }
+
+  function renderMaterialGroup(category, rows) {
+    return `
+      <div class="ff-table-card">
+        <div class="ff-table-head">
+          <h3>${escapeHtml(category)}</h3>
+          <span>${rows.length} line${rows.length === 1 ? "" : "s"}</span>
+        </div>
+        <div class="ff-table-wrap">
+          <table class="ff-clean-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Size</th>
+                <th>Material</th>
+                <th>Connection</th>
+                <th>Qty</th>
+                <th>Unit</th>
+                <th>Confidence</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(row => `
+                <tr>
+                  <td>${escapeHtml(row.item)}</td>
+                  <td>${escapeHtml(row.size)}</td>
+                  <td>${escapeHtml(row.material)}</td>
+                  <td>${escapeHtml(row.connection)}</td>
+                  <td class="ff-qty" contenteditable="true">${escapeHtml(String(row.quantity))}</td>
+                  <td>${escapeHtml(row.unit)}</td>
+                  <td>${confidenceBadge(row.confidence)}</td>
+                  <td>${escapeHtml(row.notes || row.source || "")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderLabourDashboard(data) {
+    const rows = data.labourRows;
+    const total = rows.reduce((sum, row) => sum + toNumber(row.hours), 0) || data.summary.totalFieldHours || 0;
+
+    return `
+      ${renderSummaryCards(data)}
+      <div class="ff-section-title">Labour Breakdown</div>
+      <div class="ff-table-card">
+        <div class="ff-table-head">
+          <h3>Field Labour</h3>
+          <span>${total} total hours</span>
+        </div>
+        <div class="ff-table-wrap">
+          <table class="ff-clean-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Hours</th>
+                <th>Confidence</th>
+                <th>Reasoning</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(row => `
+                <tr>
+                  <td>${escapeHtml(row.category)}</td>
+                  <td class="ff-qty" contenteditable="true">${escapeHtml(String(row.hours))}</td>
+                  <td>${confidenceBadge(row.confidence)}</td>
+                  <td>${escapeHtml(row.reasoning)}</td>
+                </tr>
+              `).join("")}
+              <tr class="ff-total-row">
+                <td>Total Field Hours</td>
+                <td>${total}</td>
+                <td colspan="2">${escapeHtml(data.summary.labourConfidence)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      ${renderWarningCards(data.warningRows)}
+    `;
+  }
+
+  function renderRiserDashboard(data) {
+    const rows = data.riserRows || [];
+
+    if (!rows.length) return "";
+
+    return `
+      <div class="ff-section-title">Riser / Backflow / FDC</div>
+      <div class="ff-table-card">
+        <div class="ff-table-head">
+          <h3>Riser Material</h3>
+          <span>${rows.length} line${rows.length === 1 ? "" : "s"}</span>
+        </div>
+        <div class="ff-table-wrap">
+          <table class="ff-clean-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Size</th>
+                <th>Qty</th>
+                <th>Unit</th>
+                <th>Confirmed / Allowance</th>
+                <th>Confidence</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(row => `
+                <tr>
+                  <td>${escapeHtml(row.item)}</td>
+                  <td>${escapeHtml(row.size)}</td>
+                  <td class="ff-qty" contenteditable="true">${escapeHtml(String(row.quantity))}</td>
+                  <td>${escapeHtml(row.unit)}</td>
+                  <td>${escapeHtml(row.confirmedOrAllowance)}</td>
+                  <td>${confidenceBadge(row.confidence)}</td>
+                  <td>${escapeHtml(row.notes)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderOnsiteDashboard(data) {
+    const total = data.labourRows.reduce((sum, row) => sum + toNumber(row.hours), 0) || data.summary.totalFieldHours || 0;
+
+    return `
+      ${renderSummaryCards(data)}
+      <div class="ff-section-title">Onsite Fabrication View</div>
+      <div class="ff-note">
+        Onsite fabrication generally means more field labour for measuring, cutting, threading/grooving, assembling, and installing. No separate shop fabrication cost is included.
+      </div>
+      <div class="ff-two-col">
+        <div class="ff-card-lite">
+          <h3>Estimated Field Hours</h3>
+          <div class="ff-big-number">${total}</div>
+          <p>Total practical field hours from the AI estimate.</p>
+        </div>
+        <div class="ff-card-lite">
+          <h3>Estimator Notes</h3>
+          <p>Use this view when material will be cut and assembled mostly in the field.</p>
+          <p>For CPVC residential work, review fittings, hangers, and surge restraints before ordering.</p>
+        </div>
+      </div>
+      ${renderLabourDashboard(data)}
+    `;
+  }
+
+  function renderPrefabDashboard(data) {
+    const fieldTotal = data.labourRows.reduce((sum, row) => sum + toNumber(row.hours), 0) || data.summary.totalFieldHours || 0;
+    const prefabFieldHours = Math.round(fieldTotal * 0.9);
+    const shopHours = Math.round(fieldTotal * 0.12);
+
+    return `
+      ${renderSummaryCards(data)}
+      <div class="ff-section-title">Prefab Comparison View</div>
+      <div class="ff-two-col">
+        <div class="ff-card-lite">
+          <h3>Estimated Prefab Field Hours</h3>
+          <div class="ff-big-number">${prefabFieldHours}</div>
+          <p>Approx. 10% field labour reduction allowance.</p>
+        </div>
+        <div class="ff-card-lite">
+          <h3>Shop Fabrication Allowance</h3>
+          <div class="ff-big-number">${shopHours}</div>
+          <p>Approx. shop hours to add if branch lines/mains are prefabbed.</p>
+        </div>
+      </div>
+      <div class="ff-note">
+        Prefab should reduce field install time but add fabrication cost. Onsite fabrication has higher field labour and no shop fabrication allowance.
+      </div>
+    `;
+  }
+
+  function renderSummaryCards(data) {
+    const s = data.summary;
+
+    return `
+      <div class="ff-summary-grid">
+        <div class="ff-summary-card">
+          <span>Total Heads</span>
+          <strong>${s.totalHeads || "Review"}</strong>
+        </div>
+        <div class="ff-summary-card">
+          <span>Field Hours</span>
+          <strong>${s.totalFieldHours || "Review"}</strong>
+        </div>
+        <div class="ff-summary-card">
+          <span>System</span>
+          <strong>${escapeHtml(shorten(s.systemType, 24))}</strong>
+        </div>
+        <div class="ff-summary-card">
+          <span>Material</span>
+          <strong>${escapeHtml(shorten(s.materialType, 24))}</strong>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCategorySummary(rows) {
+    if (!rows.length) return "<p>No structured material rows returned.</p>";
+
+    const counts = {};
+    rows.forEach(row => {
+      const key = row.category || "Miscellaneous";
+      counts[key] = (counts[key] || 0) + 1;
+    });
+
+    return `
+      <div class="ff-chip-list">
+        ${Object.keys(counts).map(key => `
+          <span class="ff-chip">${escapeHtml(key)}: ${counts[key]}</span>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderLabourSummary(rows, fallbackTotal) {
+    const total = rows.reduce((sum, row) => sum + toNumber(row.hours), 0) || fallbackTotal || 0;
+
+    return `
+      <div class="ff-big-number">${total}</div>
+      <p>Total estimated field hours.</p>
+      <div class="ff-chip-list">
+        ${rows.slice(0, 6).map(row => `
+          <span class="ff-chip">${escapeHtml(row.category)}: ${row.hours} hrs</span>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderWarningCards(rows) {
+    if (!rows || !rows.length) return "";
+
+    return `
+      <div class="ff-section-title">Estimator Review Warnings</div>
+      <div class="ff-warning-grid">
+        ${rows.map(row => `
+          <div class="ff-warning-card ${lower(row.severity)}">
+            <strong>${escapeHtml(row.area)} — ${escapeHtml(row.severity)}</strong>
+            <p>${escapeHtml(row.warning)}</p>
+            <small>${escapeHtml(row.recommendedAction)}</small>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderQuoteSummary(data) {
+    const q = data.quoteSummary || {};
+    const missing = q.majorMissingItems || [];
+    const review = q.manualReviewItems || [];
+
+    return `
+      <div class="ff-section-title">Quote Summary / Manual Review</div>
+      <div class="ff-two-col">
+        <div class="ff-card-lite">
+          <h3>Suggested Contingency</h3>
+          <div class="ff-big-number">${escapeHtml(q.suggestedContingencyPercent || "10-15%")}</div>
+        </div>
+        <div class="ff-card-lite">
+          <h3>Manual Review Items</h3>
+          <ul>
+            ${missing.concat(review).map(item => `<li>${escapeHtml(item)}</li>`).join("") || "<li>No manual review items returned.</li>"}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  function markdownToSafeHtml(markdown) {
+    if (typeof window.markdownToHtml === "function") {
+      return window.markdownToHtml(markdown);
+    }
+
+    return escapeHtml(markdown)
+      .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+      .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+      .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\n/g, "<br>");
+  }
+
+  function confidenceBadge(value) {
+    const label = value || "Review";
+    const l = lower(label);
+    let cls = "ff-badge";
+
+    if (l.includes("high")) cls += " high";
+    else if (l.includes("medium")) cls += " medium";
+    else if (l.includes("low")) cls += " low";
+    else cls += " review";
+
+    return `<span class="${cls}">${escapeHtml(label)}</span>`;
+  }
+
+  function updateFireFlowPageMetrics(data, rawData) {
+    const aiStatusText = document.getElementById("aiStatusText");
+    if (aiStatusText) aiStatusText.textContent = "Completed";
+
+    const dashStatus = document.getElementById("dashStatus");
+    if (dashStatus) dashStatus.textContent = "Done";
+
+    const dashFiles = document.getElementById("dashFiles");
+    if (dashFiles && rawData?.filesReceived !== undefined) {
+      dashFiles.textContent = rawData.filesReceived;
+    }
+  }
+
+  function injectDashboardStyles() {
+    if (document.getElementById("fireflow-v72-dashboard-styles")) return;
+
+    const style = document.createElement("style");
+    style.id = "fireflow-v72-dashboard-styles";
+    style.textContent = `
+      .ff-summary-grid {
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:10px;
+        margin-bottom:16px;
+      }
+
+      .ff-summary-card {
+        background:rgba(17,24,39,.9);
+        border:1px solid rgba(148,163,184,.18);
+        border-radius:7px;
+        padding:13px;
+      }
+
+      .ff-summary-card span {
+        display:block;
+        color:#94a3b8;
+        font-size:10px;
+        text-transform:uppercase;
+        font-weight:900;
+        letter-spacing:.04em;
+        margin-bottom:6px;
+      }
+
+      .ff-summary-card strong {
+        display:block;
+        color:#fff;
+        font-size:20px;
+        line-height:1.1;
+      }
+
+      .ff-section-title {
+        margin:18px 0 10px;
+        color:#fff;
+        font-size:14px;
+        text-transform:uppercase;
+        letter-spacing:.05em;
+        font-weight:900;
+      }
+
+      .ff-note {
+        border:1px solid rgba(56,189,248,.25);
+        background:rgba(56,189,248,.06);
+        color:#cbd5e1;
+        border-radius:7px;
+        padding:12px;
+        margin-bottom:14px;
+        font-size:13px;
+        line-height:1.45;
+      }
+
+      .ff-table-card {
+        border:1px solid rgba(148,163,184,.18);
+        background:rgba(17,24,39,.74);
+        border-radius:7px;
+        overflow:hidden;
+        margin-bottom:14px;
+      }
+
+      .ff-table-head {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        padding:12px 14px;
+        border-bottom:1px solid rgba(148,163,184,.18);
+        background:rgba(255,255,255,.02);
+      }
+
+      .ff-table-head h3 {
+        margin:0;
+        color:#fff;
+        font-size:13px;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+      }
+
+      .ff-table-head span {
+        color:#94a3b8;
+        font-size:12px;
+        font-weight:800;
+      }
+
+      .ff-table-wrap {
+        overflow:auto;
+      }
+
+      .ff-clean-table {
+        width:100%;
+        border-collapse:collapse;
+        font-size:12px;
+        min-width:760px;
+      }
+
+      .ff-clean-table th,
+      .ff-clean-table td {
+        padding:9px;
+        border-bottom:1px solid rgba(148,163,184,.14);
+        border-right:1px solid rgba(148,163,184,.08);
+        vertical-align:top;
+      }
+
+      .ff-clean-table th {
+        color:#e5e7eb;
+        background:rgba(255,255,255,.025);
+        text-transform:uppercase;
+        font-size:10px;
+        letter-spacing:.04em;
+      }
+
+      .ff-clean-table td {
+        color:#cbd5e1;
+      }
+
+      .ff-qty {
+        color:#fff !important;
+        font-weight:900;
+        background:rgba(220,38,38,.08);
+        min-width:60px;
+      }
+
+      .ff-qty:focus {
+        outline:2px solid rgba(239,68,68,.45);
+        background:rgba(220,38,38,.16);
+      }
+
+      .ff-badge {
+        display:inline-flex;
+        align-items:center;
+        border-radius:999px;
+        padding:4px 8px;
+        font-size:11px;
+        font-weight:900;
+        border:1px solid rgba(148,163,184,.2);
+      }
+
+      .ff-badge.high {
+        color:#86efac;
+        background:rgba(34,197,94,.09);
+      }
+
+      .ff-badge.medium {
+        color:#fde68a;
+        background:rgba(250,204,21,.09);
+      }
+
+      .ff-badge.low,
+      .ff-badge.review {
+        color:#fdba74;
+        background:rgba(251,146,60,.09);
+      }
+
+      .ff-warning-grid {
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:10px;
+        margin-bottom:16px;
+      }
+
+      .ff-warning-card {
+        border:1px solid rgba(251,146,60,.35);
+        background:rgba(251,146,60,.08);
+        border-radius:7px;
+        padding:12px;
+        color:#cbd5e1;
+      }
+
+      .ff-warning-card strong {
+        display:block;
+        color:#fff;
+        margin-bottom:6px;
+      }
+
+      .ff-warning-card p {
+        margin:0 0 8px;
+        font-size:13px;
+        line-height:1.45;
+      }
+
+      .ff-warning-card small {
+        color:#94a3b8;
+        line-height:1.35;
+      }
+
+      .ff-two-col {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+        margin-bottom:14px;
+      }
+
+      .ff-card-lite {
+        border:1px solid rgba(148,163,184,.18);
+        background:rgba(17,24,39,.78);
+        border-radius:7px;
+        padding:14px;
+      }
+
+      .ff-card-lite h3 {
+        margin:0 0 10px;
+        font-size:13px;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+      }
+
+      .ff-big-number {
+        color:#ef4444;
+        font-size:32px;
+        font-weight:900;
+        line-height:1;
+        margin-bottom:8px;
+      }
+
+      .ff-chip-list {
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+      }
+
+      .ff-chip {
+        display:inline-flex;
+        border:1px solid rgba(148,163,184,.2);
+        background:rgba(15,23,42,.75);
+        color:#cbd5e1;
+        border-radius:999px;
+        padding:6px 9px;
+        font-size:12px;
+        font-weight:800;
+      }
+
+      .ff-report {
+        border:1px solid rgba(148,163,184,.18);
+        background:rgba(11,17,24,.7);
+        border-radius:7px;
+        padding:14px;
+      }
+
+      .ff-total-row td {
+        color:#fff;
+        font-weight:900;
+        background:rgba(220,38,38,.08);
+      }
+
+      .ff-empty {
+        border:1px solid rgba(148,163,184,.18);
+        background:rgba(17,24,39,.78);
+        border-radius:7px;
+        padding:16px;
+        color:#cbd5e1;
+      }
+
+      @media (max-width:900px) {
+        .ff-summary-grid,
+        .ff-warning-grid,
+        .ff-two-col {
+          grid-template-columns:1fr;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function groupBy(array, keyFn) {
+    return array.reduce((groups, item) => {
+      const key = keyFn(item);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(item);
+      return groups;
+    }, {});
+  }
+
+  function lower(value) {
+    return String(value || "").toLowerCase();
+  }
+
+  function text(value) {
+    return String(value ?? "").trim();
+  }
+
+  function toNumber(value) {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : 0;
+  }
+
+  function shorten(value, max) {
+    const str = String(value || "");
+    return str.length > max ? str.slice(0, max - 1) + "…" : str;
+  }
+
+  function downgradeConfidence(value) {
+    const l = lower(value);
+    if (l.includes("high")) return "Medium";
+    if (l.includes("medium")) return "Medium";
+    return value || "Review";
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+})();
   </script>
 </body>
 </html>
