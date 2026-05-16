@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FireFlow AI Estimator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     :root {
       --bg:#070b10; --panel:#0d131a; --panel2:#111922; --panel3:#151f2a;
@@ -224,6 +225,16 @@
     .result-panel h1 { font-size:22px; }
     .result-panel h2 { font-size:18px; margin-top:22px; }
     .result-panel table { margin:12px 0; }
+
+
+    .sheet-review-grid { display:grid; gap:10px; margin-top:12px; }
+    .sheet-card { border:1px solid var(--border); background:rgba(17,24,39,.78); border-radius:7px; padding:12px; display:grid; grid-template-columns:96px minmax(0,1fr); gap:12px; align-items:start; }
+    .sheet-card canvas { width:96px; height:auto; border-radius:5px; border:1px solid rgba(148,163,184,.25); background:white; }
+    .sheet-card h4 { margin:0 0 6px; font-size:13px; }
+    .sheet-controls { display:grid; grid-template-columns:120px 1fr 120px; gap:8px; align-items:center; margin-top:8px; }
+    .sheet-controls select,.sheet-controls input { padding:8px; font-size:12px; }
+    .sheet-note { color:#94a3b8; font-size:12px; line-height:1.35; margin-top:7px; }
+    .tiny-help { color:#94a3b8; font-size:12px; line-height:1.45; margin-top:8px; }
 
     @media (max-width:1300px) {
       .dashboard-grid { grid-template-columns:1fr; }
@@ -579,7 +590,8 @@
             <div class="panel-body">
               <p>Upload sprinkler PDFs, hydraulic calculations, images, rough material lists, or spreadsheets.</p>
               <div class="field"><label>Upload Files</label><input id="uploadOnlyInput" type="file" multiple></div>
-              <div class="status-box">This area is for project drawing management. Use AI Analyzer to send files to the Worker.</div>
+              <div class="status-box">Files added here are shared with the AI Analyzer. Add drawings, hydraulic calcs, and material lists here, then open AI Analyzer to prepare PDF pages and run analysis.</div>
+              <div class="button-row"><button class="btn red" type="button" data-section-jump="analyzer">Go to AI Analyzer</button></div>
             </div>
           </div>
         </section>
@@ -639,6 +651,55 @@
               </div>
 
               <div class="file-list" id="fileList"></div>
+
+              <div class="panel" style="margin-top:16px;">
+                <div class="panel-head">
+                  <h3>Sheet Review / Page Selection</h3>
+                  <button class="btn" id="renderPagesBtn" type="button">Prepare PDF Pages</button>
+                </div>
+                <div class="panel-body">
+                  <div class="warning">
+                    This keeps the same dashboard look but gives the AI better inputs.
+                    After adding PDFs, click Prepare PDF Pages, mark layout sheets as Layout, and only send useful drawing pages to the Worker.
+                  </div>
+                  <div class="form-grid three" style="margin-top:12px;">
+                    <div class="field">
+                      <label>PDF Render Quality</label>
+                      <select id="pdfRenderScale">
+                        <option value="2">Standard</option>
+                        <option value="2.6" selected>Sharp</option>
+                        <option value="3.2">Very Sharp / Slower</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label>Max Pages Per PDF</label>
+                      <select id="maxPdfPages">
+                        <option value="3">First 3</option>
+                        <option value="6" selected>First 6</option>
+                        <option value="10">First 10</option>
+                        <option value="20">First 20</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label>Default Sheet Type</label>
+                      <select id="defaultSheetType">
+                        <option value="layout" selected>Layout</option>
+                        <option value="riser">Riser / Detail</option>
+                        <option value="notes">Notes / Specs</option>
+                        <option value="hydraulic">Hydraulic Calc</option>
+                        <option value="material">Material List</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="tiny-help">
+                    Recommended: mark FP layout sheets as Layout, riser/detail sheets as Riser / Detail, and hydraulic calculation pages as Hydraulic Calc.
+                    The AI will use selected page images plus the original PDFs.
+                  </div>
+                  <div class="sheet-review-grid" id="sheetReviewList">No PDF pages prepared yet.</div>
+                </div>
+              </div>
+
               <div class="status-box" id="statusBox" style="margin-top:12px;">AI status is idle.</div>
 
               <div class="panel" style="margin-top:16px;">
@@ -839,8 +900,14 @@
   <script>
     const DEFAULT_WORKER_URL = "https://fire-estimator-ai.seanmbarbour.workers.dev";
 
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+
     const state = {
       selectedFiles: [],
+      preparedSheets: [],
+      renderedImages: [],
       lastResult: ""
     };
 
@@ -852,7 +919,10 @@
     const workerUrl = document.getElementById("workerUrl");
     const settingsWorkerUrl = document.getElementById("settingsWorkerUrl");
     const fileInput = document.getElementById("fileInput");
+    const uploadOnlyInput = document.getElementById("uploadOnlyInput");
     const fileList = document.getElementById("fileList");
+    const sheetReviewList = document.getElementById("sheetReviewList");
+    const renderPagesBtn = document.getElementById("renderPagesBtn");
     const statusBox = document.getElementById("statusBox");
     const aiStatusText = document.getElementById("aiStatusText");
 
@@ -911,12 +981,42 @@
 
         fileInput.value = "";
         renderFileList();
+        state.preparedSheets = [];
+        state.renderedImages = [];
+        renderSheetReviewList();
         updateDashboardStatus(state.selectedFiles.length ? "Files selected" : "Idle");
       });
+
+      if (uploadOnlyInput) {
+        uploadOnlyInput.addEventListener("change", () => {
+          const newlySelected = Array.from(uploadOnlyInput.files || []);
+
+          newlySelected.forEach((file) => {
+            const duplicate = state.selectedFiles.some((existing) =>
+              existing.name === file.name &&
+              existing.size === file.size &&
+              existing.lastModified === file.lastModified
+            );
+
+            if (!duplicate) {
+              state.selectedFiles.push(file);
+            }
+          });
+
+          uploadOnlyInput.value = "";
+          renderFileList();
+          state.preparedSheets = [];
+          state.renderedImages = [];
+          renderSheetReviewList();
+          setStatus("Files added from Upload Drawings. Go to AI Analyzer, prepare PDF pages if needed, then analyze.");
+          updateDashboardStatus(state.selectedFiles.length ? "Files selected" : "Idle");
+        });
+      }
 
       document.getElementById("testWorkerBtn").addEventListener("click", testWorker);
       document.getElementById("analyzeBtn").addEventListener("click", analyzeDrawings);
       document.getElementById("clearBtn").addEventListener("click", clearAnalyzer);
+      document.getElementById("renderPagesBtn").addEventListener("click", preparePdfPages);
 
       document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
       document.getElementById("loadSettingsBtn").addEventListener("click", loadSettings);
@@ -945,6 +1045,7 @@
     function renderFileList() {
       if (!state.selectedFiles.length) {
         fileList.innerHTML = "";
+      renderSheetReviewList();
         return;
       }
 
@@ -961,8 +1062,147 @@
 
     function removeSelectedFile(index) {
       state.selectedFiles.splice(index, 1);
+      state.preparedSheets = [];
+      state.renderedImages = [];
       renderFileList();
+      renderSheetReviewList();
       updateDashboardStatus(state.selectedFiles.length ? "Files selected" : "Idle");
+    }
+
+    async function preparePdfPages() {
+      const pdfFiles = state.selectedFiles.filter(file => file.name.toLowerCase().endsWith(".pdf"));
+
+      if (!pdfFiles.length) {
+        setStatus("Add at least one PDF first, then click Prepare PDF Pages.", true);
+        return;
+      }
+
+      if (!window.pdfjsLib) {
+        setStatus("PDF.js did not load. Try refreshing the page, then prepare PDF pages again.", true);
+        return;
+      }
+
+      try {
+        setBusy(true);
+        setStatus("Preparing PDF page images for sheet review...");
+        state.preparedSheets = [];
+        state.renderedImages = [];
+        renderSheetReviewList("Preparing pages...");
+
+        const scale = Number(document.getElementById("pdfRenderScale").value || 2.6);
+        const maxPages = Number(document.getElementById("maxPdfPages").value || 6);
+        const defaultType = document.getElementById("defaultSheetType").value || "layout";
+
+        for (const pdfFile of pdfFiles) {
+          const arrayBuffer = await pdfFile.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const pagesToRender = Math.min(pdf.numPages, maxPages);
+
+          for (let pageNumber = 1; pageNumber <= pagesToRender; pageNumber++) {
+            setStatus(`Rendering ${pdfFile.name} page ${pageNumber} of ${pagesToRender}...`);
+            const page = await pdf.getPage(pageNumber);
+            const viewport = page.getViewport({ scale });
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d", { willReadFrequently: false });
+            canvas.width = Math.floor(viewport.width);
+            canvas.height = Math.floor(viewport.height);
+            await page.render({ canvasContext: context, viewport }).promise;
+
+            const blob = await canvasToBlob(canvas, "image/jpeg", 0.9);
+            const safeName = pdfFile.name.replace(/\.pdf$/i, "").replace(/[^\w.-]+/g, "_");
+            const imageName = `${safeName}_page_${pageNumber}.jpg`;
+            const imageFile = new File([blob], imageName, { type: "image/jpeg" });
+
+            const previewCanvas = document.createElement("canvas");
+            const previewScale = Math.min(1, 180 / canvas.width);
+            previewCanvas.width = Math.max(1, Math.floor(canvas.width * previewScale));
+            previewCanvas.height = Math.max(1, Math.floor(canvas.height * previewScale));
+            const previewContext = previewCanvas.getContext("2d");
+            previewContext.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+            const previewDataUrl = previewCanvas.toDataURL("image/jpeg", 0.72);
+
+            const sheet = {
+              id: `${safeName}_${pageNumber}_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+              fileName: pdfFile.name,
+              pageNumber,
+              include: true,
+              sheetType: defaultType,
+              label: pageNumber === 1 ? pdfFile.name.replace(/\.pdf$/i, "") : `${pdfFile.name.replace(/\.pdf$/i, "")} page ${pageNumber}`,
+              imageFile,
+              previewDataUrl
+            };
+
+            state.preparedSheets.push(sheet);
+            state.renderedImages.push(imageFile);
+            renderSheetReviewList();
+          }
+        }
+
+        setStatus(`Prepared ${state.preparedSheets.length} PDF page image(s). Mark sheet types, then click Analyze Drawings.`);
+      } catch (error) {
+        setStatus("Could not prepare PDF pages:\n" + (error.message || String(error)), true);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(blob => {
+          if (blob) resolve(blob);
+          else reject(new Error("Could not convert PDF page to image."));
+        }, type, quality);
+      });
+    }
+
+    function renderSheetReviewList(message) {
+      if (!sheetReviewList) return;
+
+      if (message) {
+        sheetReviewList.textContent = message;
+        return;
+      }
+
+      if (!state.preparedSheets.length) {
+        sheetReviewList.textContent = "No PDF pages prepared yet.";
+        return;
+      }
+
+      sheetReviewList.innerHTML = state.preparedSheets.map((sheet, index) => `
+        <div class="sheet-card">
+          <img src="${sheet.previewDataUrl}" alt="${escapeHtml(sheet.fileName)} page ${sheet.pageNumber}" style="width:96px;border-radius:5px;border:1px solid rgba(148,163,184,.25);background:white;" />
+          <div>
+            <h4>${escapeHtml(sheet.fileName)} — Page ${sheet.pageNumber}</h4>
+            <div class="sheet-controls">
+              <label style="margin:0;display:flex;gap:6px;align-items:center;font-size:12px;">
+                <input type="checkbox" data-sheet-include="${index}" ${sheet.include ? "checked" : ""} style="width:auto;" /> Send
+              </label>
+              <select data-sheet-type="${index}">
+                <option value="layout" ${sheet.sheetType === "layout" ? "selected" : ""}>Layout</option>
+                <option value="riser" ${sheet.sheetType === "riser" ? "selected" : ""}>Riser / Detail</option>
+                <option value="notes" ${sheet.sheetType === "notes" ? "selected" : ""}>Notes / Specs</option>
+                <option value="hydraulic" ${sheet.sheetType === "hydraulic" ? "selected" : ""}>Hydraulic Calc</option>
+                <option value="material" ${sheet.sheetType === "material" ? "selected" : ""}>Material List</option>
+                <option value="other" ${sheet.sheetType === "other" ? "selected" : ""}>Other</option>
+              </select>
+              <input data-sheet-label="${index}" value="${escapeHtml(sheet.label)}" placeholder="Sheet label" />
+            </div>
+            <div class="sheet-note">Layout pages are used for head symbol counting and center-to-center pipe dimensions. Hydraulic pages are reference only.</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function syncSheetReviewState() {
+      state.preparedSheets.forEach((sheet, index) => {
+        const include = document.querySelector(`[data-sheet-include="${index}"]`);
+        const type = document.querySelector(`[data-sheet-type="${index}"]`);
+        const label = document.querySelector(`[data-sheet-label="${index}"]`);
+
+        if (include) sheet.include = include.checked;
+        if (type) sheet.sheetType = type.value;
+        if (label) sheet.label = label.value;
+      });
     }
 
     async function testWorker() {
@@ -1011,6 +1251,11 @@
 
         state.selectedFiles.forEach(file => formData.append("files", file, file.name));
 
+        syncSheetReviewState();
+        state.preparedSheets
+          .filter(sheet => sheet.include && sheet.imageFile)
+          .forEach(sheet => formData.append("renderedImages", sheet.imageFile, sheet.imageFile.name));
+
         const response = await fetch(url, { method:"POST", body:formData });
         const text = await response.text();
 
@@ -1033,7 +1278,8 @@
           `Worker version: ${data.version || "unknown"}\\n` +
           `Model: ${data.modelUsed || "unknown"}\\n` +
           `Files received: ${data.filesReceived ?? state.selectedFiles.length}\\n` +
-          `PDF/document files sent to AI: ${data.inputFilesSentToAI ?? "unknown"}`
+          `PDF/document files sent to AI: ${data.inputFilesSentToAI ?? "unknown"}\n` +
+          `Prepared page images sent: ${data.renderedImagesReceived ?? state.preparedSheets.filter(sheet => sheet.include).length}`
         );
 
         aiStatusText.textContent = "Completed";
@@ -1048,14 +1294,27 @@
     }
 
     function buildInstructions() {
+      syncSheetReviewState();
+      const sheetSummary = state.preparedSheets.length
+        ? state.preparedSheets.map((sheet, index) => {
+            return `${index + 1}. ${sheet.fileName} page ${sheet.pageNumber} | include: ${sheet.include ? "yes" : "no"} | type: ${sheet.sheetType} | label: ${sheet.label || ""}`;
+          }).join("\n")
+        : "No prepared sheet/page images. Use original PDFs only.";
+
       return `
 User notes:
 ${document.getElementById("instructions").value || "No additional user notes provided."}
+
+Prepared sheet/page review:
+${sheetSummary}
 
 FireFlow AI website instructions:
 - Use the strict takeoff Worker result format.
 - Return confirmed, estimated, and estimator-review quantities.
 - Keep results clean enough for a contractor estimate.
+- If prepared sheet/page images are included, use Layout pages for symbol counting and dimension-based pipe takeoff.
+- Use Riser / Detail pages for riser, valves, FDC, test and drain, and hanger detail review.
+- Use Hydraulic Calc pages only as design-area reference, not total head count.
 - If a spreadsheet/material list is uploaded with the drawings, treat it as estimator-provided reference data and compare the AI takeoff against it.
       `.trim();
     }
@@ -1283,9 +1542,12 @@ Exclusions / reminders:
 
     function clearAnalyzer() {
       state.selectedFiles = [];
+      state.preparedSheets = [];
+      state.renderedImages = [];
       state.lastResult = "";
       fileInput.value = "";
       fileList.innerHTML = "";
+      renderSheetReviewList();
       document.getElementById("fullResult").innerHTML = "Results will appear here after analysis.";
       document.getElementById("materialResult").innerHTML = "Material breakdown will appear here.";
       document.getElementById("laborResult").innerHTML = "Labor breakdown will appear here.";
